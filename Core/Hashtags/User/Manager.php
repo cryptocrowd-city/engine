@@ -88,8 +88,8 @@ class Manager
         $trending = [];
 
         if ($opts['trending']) {
-            //$cached = $this->cacher->get($this->getCacheKey('trending'));
-            $cached = false;
+            $cached = $this->cacher->get($this->getCacheKey('trending'));
+
             if ($cached !== false) {
                 $trending = json_decode($cached, true);
             } else {
