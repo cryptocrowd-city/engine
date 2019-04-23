@@ -10,6 +10,7 @@ use Minds\Entities\Entity;
 use Minds\Entities\User;
 use Minds\Core\Reports;
 use Minds\Core\Steward\Reason;
+use Prophecy\Argument;
 
 class AutoReporterSpec extends ObjectBehavior
 {
@@ -18,6 +19,7 @@ class AutoReporterSpec extends ObjectBehavior
     private $reportManager;
     private $juryManager;
     private $moderationManager;
+    private $stewardUser;
 
     public function let(Config $config,
         EntitiesBuilder $entitiesBuilder,
@@ -33,6 +35,8 @@ class AutoReporterSpec extends ObjectBehavior
 
         $stewardUser = (new User())
             ->set('guid', 123);
+
+        $this->stewardUser = $stewardUser;
         $this->config->get('steward_guid')->willReturn(123);
         $this->entitiesBuilder->single(123)->willReturn($stewardUser);
         $this->beConstructedWith($this->config,
@@ -53,15 +57,95 @@ class AutoReporterSpec extends ObjectBehavior
             ->set('guid', 456)
             ->set('owner_guid', 789)
             ->set('message', 'this is only a test: nigger');
-        $reason = new Reason(Reason::REASON_NSFW, Reason::REASON_NSFW_RACE, 10);
 
         $report = (new Reports\Report())
             ->setEntityGuid($entity->guid)
             ->setEntityOwnerGuid($entity->get('owner_guid'));
+
         $autoReport = (new Reports\UserReports\UserReport())
-            ->setReport($report);
+            ->setReport($report)
+            ->setReporterGuid($this->stewardUser->guid)
+            ->setReasonCode(Reason::REASON_NSFW)
+            ->setSubReasonCode(Reason::REASON_NSFW_RACE)
+            ->setTimestamp(1);
 
         $this->reportManager->add($autoReport)->shouldBeCalled();
-        $this->validate($entity);
+        $scoredReason = $this->validate($entity, 1)->getWrappedObject();
+        expect($scoredReason->getReasonCode())->toEqual(Reason::REASON_NSFW);
+        expect($scoredReason->getSubreasonCode())->toEqual(Reason::REASON_NSFW_RACE);
+        expect($scoredReason->getWeight())->toEqual(10);
+    }
+
+    public function it_should_report_bad_words()
+    {
+        $entity = (new Entity())
+            ->set('guid', 456)
+            ->set('owner_guid', 789)
+            ->set('message', 'this is only a test: adult, amateur, #anal, #ass, #babe');
+
+        $report = (new Reports\Report())
+            ->setEntityGuid($entity->guid)
+            ->setEntityOwnerGuid($entity->get('owner_guid'));
+
+        $autoReport = (new Reports\UserReports\UserReport())
+            ->setReport($report)
+            ->setReporterGuid($this->stewardUser->guid)
+            ->setReasonCode(Reason::REASON_NSFW)
+            ->setSubReasonCode(Reason::REASON_NSFW_PORNOGRAPHY)
+            ->setTimestamp(1);
+
+        $this->reportManager->add($autoReport)->shouldBeCalled();
+        $scoredReason = $this->validate($entity, 1)->getWrappedObject();
+        expect($scoredReason->getReasonCode())->toEqual(Reason::REASON_NSFW);
+        expect($scoredReason->getSubreasonCode())->toEqual(Reason::REASON_NSFW_PORNOGRAPHY);
+        expect($scoredReason->getWeight())->toEqual(4);
+    }
+
+    public function it_should_not_report_words()
+    {
+        $entity = (new Entity())
+            ->set('guid', 456)
+            ->set('owner_guid', 789)
+            ->set('message', 'this is only a test');
+
+        $report = (new Reports\Report())
+            ->setEntityGuid($entity->guid)
+            ->setEntityOwnerGuid($entity->get('owner_guid'));
+
+        $autoReport = (new Reports\UserReports\UserReport())
+            ->setReport($report)
+            ->setReporterGuid($this->stewardUser->guid)
+            ->setReasonCode(Reason::REASON_NSFW)
+            ->setSubReasonCode(Reason::REASON_NSFW_PORNOGRAPHY)
+            ->setTimestamp(1);
+
+        $this->reportManager->add(Argument::any())->shouldNotBeCalled();
+        $scoredReason = $this->validate($entity, 1)->getWrappedObject();
+        expect($scoredReason)->toBeNull();
+    }
+
+    public function it_should_not_report_below_threshold()
+    {
+        $entity = (new Entity())
+            ->set('guid', 456)
+            ->set('owner_guid', 789)
+            ->set('message', 'this is only a test: adult asian');
+
+        $report = (new Reports\Report())
+            ->setEntityGuid($entity->guid)
+            ->setEntityOwnerGuid($entity->get('owner_guid'));
+
+        $autoReport = (new Reports\UserReports\UserReport())
+            ->setReport($report)
+            ->setReporterGuid($this->stewardUser->guid)
+            ->setReasonCode(Reason::REASON_NSFW)
+            ->setSubReasonCode(Reason::REASON_NSFW_PORNOGRAPHY)
+            ->setTimestamp(1);
+
+        $this->reportManager->add(Argument::any())->shouldNotBeCalled();
+        $scoredReason = $this->validate($entity, 1)->getWrappedObject();
+        expect($scoredReason->getReasonCode())->toEqual(Reason::REASON_NSFW);
+        expect($scoredReason->getSubreasonCode())->toEqual(Reason::REASON_NSFW_PORNOGRAPHY);
+        expect($scoredReason->getWeight())->toEqual(2);
     }
 }

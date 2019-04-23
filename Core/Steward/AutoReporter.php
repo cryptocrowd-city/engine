@@ -10,10 +10,14 @@ use Minds\Core\Config\Config;
 use Minds\Core\Reports;
 use Minds\Core\EntitiesBuilder;
 use Minds\Core\Reports\Jury\Decision;
+use Minds\Traits\MagicAttributes;
 
-const REPORT_THRESHOLD = 4;
 class AutoReporter
 {
+    use MagicAttributes;
+
+    const REPORT_THRESHOLD = 4;
+
     private $dictionary = [];
     /** @var Minds\Entites\User */
     private $stewardUser;
@@ -152,9 +156,10 @@ class AutoReporter
      * Examines the text content of an entity and reports if the post contains problematic words
      * The words are arbitrarily weighted and should be replaced by a cached lookup of statistical analysis.
      */
-    public function validate($entity)
+    public function validate($entity, $time = null)
     {
         $reasons = array();
+        $time = $time ?: round(microtime(true) * 1000);
         //Build up a list of reasons to flag unique words in the post
         if (isset($entity['message'])) {
             error_log('message');
@@ -168,14 +173,17 @@ class AutoReporter
         if (count($reasons) > 0) {
             $scorer = new ReasonScorer($reasons);
             $scoredReason = $scorer->score();
-            if ($scoredReason && $scoredReason->getWeight() > REPORT_THRESHOLD) {
-                $this->report($entity, $scoredReason);
-                $this->cast($entity);
+            error_log($scoredReason->getWeight());
+            if ($scoredReason && $scoredReason->getWeight() >= AutoReporter::REPORT_THRESHOLD) {
+                $this->report($entity, $scoredReason, $time);
+                $this->cast($entity, $time);
             }
+
+            return $scoredReason;
         }
     }
 
-    public function cast($entity)
+    protected function cast($entity, $time)
     {
         $report = $this->moderationManager->getReport($entity->guid);
         $stewardUser = $this->entitiesBuilder->single($this->config->get('steward_guid'));
@@ -185,14 +193,14 @@ class AutoReporter
             ->setAppeal(null)
             ->setAction('uphold')
             ->setReport($report)
-            ->setTimestamp(round(microtime(true) * 1000))
+            ->setTimestamp($time)
             ->setJurorGuid($stewardUser->getGuid())
             ->setJurorHash($stewardUser->getPhoneNumberHash());
 
         $this->juryManager->cast($decision);
     }
 
-    public function report($entity, $reason)
+    protected function report($entity, $reason, $time)
     {
         $stewardUser = $this->entitiesBuilder->single($this->config->get('steward_guid'));
         $report = new Reports\Report();
@@ -205,7 +213,7 @@ class AutoReporter
             ->setReporterGuid($stewardUser->guid)
             ->setReasonCode((int) $reason->getReasonCode())
             ->setSubReasonCode($reason->getSubreasonCode())
-            ->setTimestamp(round(microtime(true) * 1000));
+            ->setTimestamp($time);
         $this->reportManager->add($autoReport);
     }
 

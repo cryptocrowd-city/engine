@@ -36,7 +36,7 @@ class Reason
     const REASON_MALWARE = 13;
     const REASON_OTHER = 11;
 
-    public function __construct($reasonCode, $subreasonCode, $weight)
+    public function __construct(int $reasonCode, int $subreasonCode, int $weight)
     {
         $this->reasonCode = $reasonCode;
         $this->subreasonCode = $subreasonCode;
