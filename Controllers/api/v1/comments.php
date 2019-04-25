@@ -194,6 +194,12 @@ class comments implements Interfaces\Api
             }
 
             if ($entity->type == 'group') {
+                if ($entity->conversationDisabled == 1) {
+                    return Factory::response([
+                        'status' => 'error',
+                        'message' => 'Conversation has been disabled for this group',
+                    ]);
+                }
                 $comment->setGroupConversation(true);
             }
 
