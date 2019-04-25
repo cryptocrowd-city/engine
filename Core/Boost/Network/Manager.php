@@ -49,9 +49,16 @@ class Manager
 
         if ($opts['useElastic']) {
             $response = $this->elasticRepository->getList($opts);
-        } else {
-            $response = $this->repository->getList($opts);
+            $opts['guids'] = array_map(function($boost) {
+                return $boost->getGuid();
+            }, $response->toArray());
+
+            if (empty($opts['guids'])) {
+                return $response;
+            }
         }
+
+        $response = $this->repository->getList($opts);
 
         if (!$opts['hydrate']) {
             return $response;
