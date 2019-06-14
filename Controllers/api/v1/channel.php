@@ -211,6 +211,11 @@ class channel implements Interfaces\Api
                     }
                 }
 
+                if (isset($_POST['nsfw']) && $_POST['nsfw']) {
+                    $nsfw = array_unique(array_merge($_POST['nsfw'], $owner->getNsfwLock()));
+                    $update['nsfw'] = json_encode($nsfw);
+                    $owner->nsfw = $update['nsfw'];
+                }
 
                 if (isset($_POST['tags']) && $_POST['tags']) {
                     $update['tags'] = json_encode($_POST['tags']);
