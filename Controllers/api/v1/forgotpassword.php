@@ -94,6 +94,12 @@ class forgotpassword implements Interfaces\Api, Interfaces\ApiIgnorePam
               break;
           }
 
+          if (!preg_match('/[A-Z]/', $password) || !preg_match('/\d/', $password) || !preg_match('/[^a-zA-Z\d]/', $password) || preg_match("/\\s/", $password)) {
+              $response['status'] = "error";
+              $response['message'] = "Password must have more than 8 characters. Including uppercase, numbers, special characters (ie. !,#,@), and cannot have spaces.";
+              break;
+          }
+
           //$user->salt = Core\Security\Password::salt();
           $user->password = Core\Security\Password::generate($user, $_POST['password']);
           $user->password_reset_code = "";
