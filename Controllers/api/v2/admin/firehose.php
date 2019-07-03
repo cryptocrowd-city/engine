@@ -7,6 +7,7 @@ use Minds\Api\Factory;
 use Minds\Interfaces;
 use Minds\Core\Di\Di;
 use Minds\Core\Session;
+use Minds\Core;
 use Minds\Entities\Activity;
 
 class firehose implements Interfaces\Api, Interfaces\ApiAdminPam
@@ -20,6 +21,9 @@ class firehose implements Interfaces\Api, Interfaces\ApiAdminPam
      */
     public function get($pages)
     {
+        /** @var User $currentUser */
+        $currentUser = Core\Session::getLoggedinUser();
+        
         $algorithm = $pages[0] ?? null;
 
         if (!$algorithm) {
@@ -34,17 +38,11 @@ class firehose implements Interfaces\Api, Interfaces\ApiAdminPam
             case 'activities':
                 $type = 'activity';
                 break;
-            case 'channels':
-                $type = 'user';
-                break;
             case 'images':
                 $type = 'object:image';
                 break;
             case 'videos':
                 $type = 'object:video';
-                break;
-            case 'groups':
-                $type = 'group';
                 break;
             case 'blogs':
                 $type = 'object:blog';
@@ -113,6 +111,13 @@ class firehose implements Interfaces\Api, Interfaces\ApiAdminPam
             return Factory::response(['status' => 'error', 'message' => $e->getMessage()]);
         }
 
+        if ($type !== 'activity') {
+             /** @var Core\Feeds\Top\Entities $entities */
+            $entities = new Core\Feeds\Top\Entities();
+            $entities->setActor($currentUser);
+            $activities = $activities->map([$entities, 'cast']);
+        }
+
         return Factory::response([
             'status' => 'success',
             'entities' => Exportable::_($activities)
@@ -135,14 +140,8 @@ class firehose implements Interfaces\Api, Interfaces\ApiAdminPam
 
         $moderator = Session::getLoggedinUser();
         $manager = Di::_()->get('Feeds\Firehose\Manager');
-        if (isset($_POST['reason'])) {
-            $reasonCode = $_POST['reason'];
-        }
-        if (isset($_POST['subreason_code'])) {
-            $reasonCode = $_POST['subreason'];
-        }
         
-        $manager->save($entity, $moderator, $reasonCode, $subReasonCode);
+        $manager->save($entity, $moderator);
         return Factory::response([]);
     }
 
