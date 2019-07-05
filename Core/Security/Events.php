@@ -306,7 +306,17 @@ class Events
             'reworkedgames.eu',
             'mp3gain.sourceforge.net',
             'pages10.com',
-            ];
+            'nudegirIs.info',
+            'aidagirls.com',
+            'alsoloves.com',
+            'hotswishes.com',
+            'instaphoto.club',
+            'intimspace.com',
+            'pornopoisk.info',
+            'localmodels.online',
+            'kaikki-mallit.com',
+            'hotswishes.com',
+        ];
     }
 
     public function onCreateHook($hook, $type, $params, $return = null)

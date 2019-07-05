@@ -2,6 +2,7 @@
 
 namespace Spec\Minds\Core\Security\AbuseGuard;
 
+use Minds\Core\Channels\Ban as ChannelsBan;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -12,6 +13,21 @@ use Minds\Core\Security\AbuseGuard\Recover;
 
 class BanSpec extends ObjectBehavior
 {
+    /** @var Sessions */
+    private $sessions;
+
+    /** @var Recover */
+    private $recover;
+
+    /** @var ChannelsBan */
+    private $channelsBanManager;
+
+    function let(Sessions $sessions, Recover $recover, ChannelsBan $channelsBanManager) {
+        $this->beConstructedWith($sessions, $recover, false, $channelsBanManager);
+        $this->sessions = $sessions;
+        $this->recover = $recover;
+        $this->channelsBanManager = $channelsBanManager;
+    }
 
     function it_is_initializable()
     {
@@ -23,26 +39,29 @@ class BanSpec extends ObjectBehavior
         $this->setAccused($accused)->shouldReturn($this);
     }
 
-    function it_should_ban_a_user(AccusedEntity $accused, User $user, Sessions $sessions, Recover $recover)
+    function it_should_ban_a_user(
+        AccusedEntity $accused,
+        User $user
+    )
     {
-        $this->beConstructedWith($sessions, $recover, false);
-
         $user->get('guid')->willReturn(123);
-        $user->set('ban_reason', 'spam')->shouldBeCalled();
         $user->get('banned')->willReturn('no');
-        $user->set('banned', 'yes')->shouldBeCalled();
-        $user->set('code', '')->shouldBeCalled();
-        $user->save()->willReturn(true);
 
         $accused->getUser()->willReturn($user);
         $accused->getScore()->willReturn(1);
         $this->setAccused($accused);
 
-        $recover->setAccused($accused)->willReturn($recover);
-        $recover->recover()->willReturn(true);
+        $this->recover->setAccused($accused)->willReturn($this->recover);
+        $this->recover->recover()->willReturn(true);
+
+        $this->channelsBanManager->setUser($user)
+            ->shouldBeCalled()
+            ->willReturn($this->channelsBanManager);
+
+        $this->channelsBanManager->ban(8)
+            ->shouldBeCalled()
+            ->willReturn(true);
 
         $this->ban()->shouldBe(true);
-
-        $sessions->destroyAll(123)->shouldBeCalled();
     }
 }

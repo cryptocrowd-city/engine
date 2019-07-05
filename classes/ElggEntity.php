@@ -15,6 +15,8 @@
  * @property int    $access_id      Specifies the visibility level of this entity
  * @property int    $time_created   A UNIX timestamp of when the entity was created (read-only, set on first save)
  * @property int    $time_updated   A UNIX timestamp of when the entity was last updated (automatically updated on save)
+ * @property int    $moderator_guid The GUID of the moderator
+ * @property int    $moderated_at   A UNIX timestamp of when the entity was moderated
  * @property-read string $enabled
  */
 abstract class ElggEntity extends ElggData implements
@@ -66,8 +68,12 @@ abstract class ElggEntity extends ElggData implements
 		$this->attributes['last_action'] = NULL;
 		$this->attributes['enabled'] = "yes";
 		$this->attributes['tags'] = null;
-        $this->attributes['nsfw'] = [];
-
+		$this->attributes['nsfw'] = [];
+		$this->attributes['nsfw_lock'] = [];
+		$this->attributes['nsfw'] = [];
+		$this->attributes['nsfw_lock'] = [];
+		$this->attributes['moderator_guid'] = null;
+		$this->attributes['time_moderated'] = null;
 	}
 
 	/**
@@ -1374,7 +1380,8 @@ abstract class ElggEntity extends ElggData implements
 			'site_guid',
 			'access_id',
             'tags',
-            'nsfw',
+			'nsfw',
+			'nsfw_lock'
 		);
 	}
 
@@ -1387,7 +1394,8 @@ abstract class ElggEntity extends ElggData implements
 		}
 		$export = array_merge($export, \Minds\Core\Events\Dispatcher::trigger('export:extender', 'all', array('entity'=>$this), []) ?: []);
         $export = \Minds\Helpers\Export::sanitize($export);
-        $export['nsfw'] = $this->getNsfw();
+		$export['nsfw'] = $this->getNsfw();
+		$export['nsfw_lock'] = $this->getNsfwLock();
 		return $export;
 	}
 
@@ -1572,8 +1580,90 @@ abstract class ElggEntity extends ElggData implements
             if ($reason < 1 || $reason > 6) {
                 throw \Exception('Incorrect NSFW value provided');
             }
+    	}
+		
+		$this->nsfw = $array;
+		return $this;
+	}
+
+	 /**
+     * Get NSFW Lock options.
+     *
+     * @return array
+     */
+    public function getNsfwLock()
+    {
+        $array = [];
+        if (!$this->nsfwLock) {
+            return $array;
         }
-        $this->nsfw = $array;
+        foreach ($this->nsfwLock as $reason) {
+            $array[] = (int) $reason;
+        }
+
+        return $array;
+	}
+	
+	/**
+     * Set NSFW lock tags for administrators. Users cannot remove these themselves.
+     *
+     * @param array $array
+     *
+     * @return $this
+     */
+    public function setNsfwLock($array)
+    {
+        $array = array_unique($array);
+        foreach ($array as $reason) {
+            if ($reason < 1 || $reason > 6) {
+                throw \Exception('Incorrect NSFW value provided');
+            }
+        }
+        $this->nsfwLock = $array;
+
         return $this;
     }
+
+	/**
+	 * Return a preferred urn
+	 * @return string
+	 */
+	public function getUrn()
+	{
+		return "urn:entity:{$this->getGuid()}";
+	}
+
+	/** gets the guid of the moderator
+	 * @return int
+	 */
+	public function getModeratorGuid() {
+		return $this->moderator_guid;
+	}
+
+
+	/**
+	 * Marks the user as moderated by a user
+	 * @param int $moderatorGuid the moderator
+	 */
+	public function setModeratorGuid(int $moderatorGuid)
+    {
+        $this->moderator_guid = $moderatorGuid;
+    }
+
+	/**
+	 * Marks the time as when an entity was moderated
+	 * @param int $timeModerated unix timestamp when the entity was moderated
+	 */
+    public function setTimeModerated(int $timeModerated)
+    {
+        $this->time_moderated = $timeModerated;
+	}
+	
+	/**
+	 * Gets the time moderated
+	 * @return int
+	 */
+	public function getTimeModerated() {
+		return $this->time_moderated;
+	}
 }

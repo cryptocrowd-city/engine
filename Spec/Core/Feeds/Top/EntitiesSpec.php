@@ -5,8 +5,10 @@ namespace Spec\Minds\Core\Feeds\Top;
 use Minds\Core\Blogs\Blog;
 use Minds\Core\EntitiesBuilder;
 use Minds\Core\Feeds\Top\Entities;
+use Minds\Core\Security\ACL;
 use Minds\Entities\Activity;
 use Minds\Entities\Image;
+use Minds\Entities\User;
 use Minds\Entities\Video;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -16,15 +18,81 @@ class EntitiesSpec extends ObjectBehavior
     /** @var EntitiesBuilder */
     protected $entitiesBuilder;
 
-    function let(EntitiesBuilder $entitiesBuilder)
+    /** @var ACL */
+    protected $acl;
+
+    function let(
+        EntitiesBuilder $entitiesBuilder,
+        ACL $acl
+    )
     {
+        $this->beConstructedWith($entitiesBuilder, $acl);
         $this->entitiesBuilder = $entitiesBuilder;
-        $this->beConstructedWith($entitiesBuilder);
+        $this->acl = $acl;
     }
 
     function it_is_initializable()
     {
         $this->shouldHaveType(Entities::class);
+    }
+
+    function it_should_filter_a_readable_entity(
+        User $actor,
+        Activity $activity
+    )
+    {
+        $this->acl->read($activity, $actor)
+            ->shouldBeCalled()
+            ->willReturn(true);
+
+        $this
+            ->setActor($actor)
+            ->filter($activity)
+            ->shouldReturn(true);
+    }
+
+    function it_should_filter_out_a_unreadable_entity(
+        User $actor,
+        Activity $activity
+    )
+    {
+        $this->acl->read($activity, $actor)
+            ->shouldBeCalled()
+            ->willReturn(false);
+
+        $this
+            ->setActor($actor)
+            ->filter($activity)
+            ->shouldReturn(false);
+    }
+
+
+    function it_should_filter_a_readable_entity_being_guest(
+        Activity $activity
+    )
+    {
+        $this->acl->read($activity, null)
+            ->shouldBeCalled()
+            ->willReturn(true);
+
+        $this
+            ->setActor(null)
+            ->filter($activity)
+            ->shouldReturn(true);
+    }
+
+    function it_should_filter_out_a_unreadable_entity_being_guest(
+        Activity $activity
+    )
+    {
+        $this->acl->read($activity, null)
+            ->shouldBeCalled()
+            ->willReturn(false);
+
+        $this
+            ->setActor(null)
+            ->filter($activity)
+            ->shouldReturn(false);
     }
 
     function it_should_not_cast_an_activity(Activity $activity)

@@ -10,6 +10,7 @@ namespace Minds\Core\Feeds\Top;
 use Minds\Core\Blogs\Blog;
 use Minds\Core\Di\Di;
 use Minds\Core\EntitiesBuilder;
+use Minds\Core\Security\ACL;
 use Minds\Entities\Activity;
 use Minds\Entities\Group;
 use Minds\Entities\Image;
@@ -21,9 +22,33 @@ class Entities
     /** @var EntitiesBuilder */
     protected $entitiesBuilder;
 
-    public function __construct($entitiesBuilder = null)
+    /** @var ACL */
+    protected $acl;
+
+    /** @var User */
+    protected $actor = null;
+
+    /**
+     * Entities constructor.
+     * @param EntitiesBuilder $entitiesBuilder
+     * @param ACL $acl
+     */
+    public function __construct(
+        $entitiesBuilder = null, $acl = null
+    )
     {
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
+        $this->acl = $acl ?: ACL::_();
+    }
+
+    /**
+     * @param User $user
+     * @return $this
+     */
+    public function setActor(User $user = null)
+    {
+        $this->actor = $user;
+        return $this;
     }
 
     /**
@@ -32,7 +57,7 @@ class Entities
      */
     public function filter($entity)
     {
-        return $entity->getAccessId() != 0;
+        return $this->acl->read($entity, $this->actor ?: null);
     }
 
     /**
@@ -76,7 +101,8 @@ class Entities
         ];
 
         $activity = new Activity();
-        $activity->setEphemeral(true);
+        $activity->setEphemeral(true)
+            ->setHideImpressions(true);
 
         if ($entity instanceof Blog) {
             // New entities

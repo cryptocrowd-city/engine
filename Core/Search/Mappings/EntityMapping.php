@@ -33,6 +33,8 @@ class EntityMapping implements MappingInterface
         'nsfw' => [ 'type' => 'integer' ],
         'paywall' => [ 'type' => 'boolean', '$exportField' => 'paywall' ],
         'rating' => [ 'type' => 'integer', '$exportField' => 'rating' ],
+        'moderator_guid' => [ 'type' => 'text'],
+        '@moderated' => [ 'type' => 'date'],
     ];
 
     /** @var mixed $entity */
@@ -187,6 +189,13 @@ class EntityMapping implements MappingInterface
         $map['tags'] = array_unique(array_merge($map['tags'], array_map('strtolower', $tags)));
 
         $map['nsfw'] = array_unique($this->entity->getNsfw());
+
+        if (isset($this->entity->moderator_guid) && !empty($this->entity->moderator_guid)) {
+            $map['moderator_guid'] = $this->entity->moderator_guid;
+        }
+        if (isset($this->entity->time_moderated) && $this->entity->time_moderated) {
+            $map['@moderated'] = $this->entity->time_created * 1000;
+        }
 
         //
 

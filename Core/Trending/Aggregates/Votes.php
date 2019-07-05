@@ -33,7 +33,7 @@ class Votes extends Aggregate
             ]
         ];
         
-        if ($this->type && $this->type != 'group') {
+        if ($this->type && $this->type != 'group' && $this->type != 'user') {
             $must[]['match'] = [
                 'entity_type' => $this->type
             ];
@@ -56,8 +56,12 @@ class Votes extends Aggregate
                 'entity_access_id' => [
                   'gte' => 3, //would be group
                   'lt' => null,
-                ]
+                ],
             ];
+        }
+
+        if ($this->type === 'user') {
+            $field = 'entity_owner_guid';
         }
 
         //$must[]['match'] = [

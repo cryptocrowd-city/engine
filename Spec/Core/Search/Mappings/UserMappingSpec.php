@@ -37,12 +37,15 @@ class UserMappingSpec extends ObjectBehavior
         $user->get('username')->willReturn('phpspec');
         $user->get('briefdescription')->willReturn('PHPSpec Brief Description #invalidhashtag');
         $user->get('rating')->willReturn(1);
+        $user->get('moderator_guid')->willReturn('123');
+        $user->get('time_moderated')->willReturn($now);
         $user->isBanned()->willReturn(false);
 
         $user->isMature()->willReturn(false);
         $user->getMatureContent()->willReturn(false);
         $user->getGroupMembership()->willReturn([ 2000 ]);
         $user->getNsfw()->willReturn([ 1 ]);
+        $user->getTags()->willReturn([ 'spaceiscool' ]);
 
         $this
             ->setEntity($user)
@@ -73,8 +76,11 @@ class UserMappingSpec extends ObjectBehavior
                 '@timestamp' => $now * 1000,
                 'taxonomy' => 'user',
                 'public' => true,
+                'tags' => [ 'spaceiscool' ],
                 'nsfw' => [ 1 ],
-                'group_membership' => [ 2000 ],
+                'moderator_guid' => '123',
+                '@moderated' => $now * 1000,
+                'group_membership' => [ 2000 ]
             ]);
     }
 
@@ -108,7 +114,8 @@ class UserMappingSpec extends ObjectBehavior
         $user->isMature()->willReturn(true);
         $user->getMatureContent()->willReturn(false);
         $user->getGroupMembership()->willReturn([ 2000 ]);
-
+        $user->get('moderator_guid')->willReturn(null);
+        $user->get('time_moderated')->willReturn(null);
         $this
             ->setEntity($user)
             ->shouldThrow('Minds\Exceptions\BannedException')

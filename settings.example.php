@@ -9,7 +9,9 @@ $CONFIG->minds_debug = true;
 $CONFIG->cassandra = (object) [
     'keyspace'    => '{{cassandra-keyspace}}',
     'servers'     => [ '{{cassandra-server}}' ],
-    'cql_servers' => [ '{{cassandra-server}}' ]
+    'cql_servers' => [ '{{cassandra-server}}' ],
+    'username' => 'cassandra',
+    'password' => 'cassandra',
 ];
 
 $CONFIG->database = [
@@ -44,7 +46,92 @@ $CONFIG->set('oauth', [
         ],
     ],
     'encryption_key' => '{{ jwt-secret }}',
-]);
+ ]);
+
+$CONFIG->set('report_reasons',
+[
+    [
+      'value' => 1,
+      'label' => 'Illegal',
+      'hasMore' => true,
+      'reasons' => [
+        [ 'value' => 1, 'label' => 'Terrorism' ],
+        [ 'value' => 2, 'label' => 'Paedophilia' ],
+        [ 'value' => 3, 'label' => 'Extortion' ],
+        [ 'value' => 4, 'label' => 'Fraud' ],
+        [ 'value' => 5, 'label' => 'Revenge Porn' ],
+        [ 'value' => 6, 'label' => 'Sex trafficking' ],
+      ],
+    ],
+    [
+      'value' => 2,
+      'label' => 'NSFW (not safe for work)',
+      'hasMore' => true,
+      'reasons' => [ // Explicit reasons
+        [ 'value' => 1, 'label' => 'Nudity' ],
+        [ 'value' => 2, 'label' => 'Pornography' ],
+        [ 'value' => 3, 'label' => 'Profanity' ],
+        [ 'value' => 4, 'label' => 'Violance and Gore' ],
+        [ 'value' => 5, 'label' => 'Race, Religion, Gender' ],
+      ],
+    ],
+    [
+      'value' => 3,
+      'label' => 'Encourages or incites violence',
+      'hasMore' => false,
+    ],
+    [
+      'value' => 4,
+      'label' => 'Harassment',
+      'hasMore' => false,
+    ],
+    [
+      'value' => 5,
+      'label' => 'Personal and confidential information',
+      'hasMore' => false,
+    ],
+    [
+      'value' => 7,
+      'label' => 'Impersonates',
+      'hasMore' => false,
+    ],
+    [
+      'value' => 8,
+      'label' => 'Spam',
+      'hasMore' => false,
+    ],
+    [
+      'value' => 10,
+      'label' => 'Infringes my copyright',
+      'hasMore' => true,
+    ],
+    [
+      'value' => 12,
+      'label' => 'Incorrect use of hashtags',
+      'hasMore' => false,
+    ],
+    [
+      'value' => 13,
+      'label' => 'Malware',
+      'hasMore' => false,
+    ],
+    [
+      'value' => 15,
+      'label' => 'Trademark infringement',
+      'hasMore' => false,
+    ],
+    [
+      'value' => 16,
+      'label' => 'Token manipulation',
+      'hasMore' => false,
+    ],
+    [ 'value' => 11,
+     'label' => 'Another reason',
+     'hasMore' => true,
+    ],
+  ]
+);
+
 
 /**
  * Other Elgg Settings
@@ -60,9 +147,10 @@ $CONFIG->site_name = '{{site-name}}';
 $CONFIG->__site_secret__ = '{{site-secret}}';
 // $CONFIG->cdn_url = 'http://{{domain}}/';
 $CONFIG->site_url = 'http://{{domain}}/';
-$CONFIG->cdn_url = 'http://{{domain}}/en/';
+$CONFIG->cdn_url = 'http://{{domain}}/';
 $CONFIG->cdn_assets_url = 'http://{{domain}}/en/';
 $CONFIG->zmq_server = 'localhost';
+$CONFIG->checkout_url = 'http://{{checkout_domain}}/';
 
 /**
  * Overrides default system cache path from inside data root to custom location.
@@ -203,7 +291,7 @@ $CONFIG->set('payouts', [
     'retentionDays' => 40,
     'minimumAmount' => 100,
     'userPercentage' => 0.8
-]);
+ ]);
 
 $CONFIG->set('payments', [
     'stripe' => [
@@ -233,7 +321,7 @@ $CONFIG->set('blockchain', [
     'rpc_endpoints' => [
         'https://mainnet.infura.io/v3/708b51690a43476092936f9818f8c4fa',
     ],
-    
+
     //'network_address' => 'https://rinkeby.infura.io/',
     'proxy_rpc_endpoint' => 'https://mainnet.infura.io/v3/708b51690a43476092936f9818f8c4fa',
 
@@ -373,3 +461,20 @@ $CONFIG->set('internal_blacklist', []);
 $CONFIG->set('tags', [
     'art', 'music', 'journalism', 'blockchain', 'freespeech', 'news', 'gaming', 'myphoto', 'nature', 'photography', 'politics', 'top', 'bitcoin', 'technology', 'food', 'animals', 'health', 'science', 'philosophy', 'comedy', 'film', 'minds'
 ]);
+
+$CONFIG->set('steward_guid', '');
+$CONFIG->set('steward_autoconfirm', false);
+$CONFIG->set('development_mode', false);
+
+$CONFIG->set('max_video_length', 900);
+
+$CONFIG->set('max_video_length_plus', 1860);
+
+$CONFIG->set('features', [
+    'es-feeds' => false,
+    'helpdesk' => true,
+    'top-feeds' => true,
+    'dark-mode' => true,
+]);
+
+$CONFIG->set('last_tos_update', 1);

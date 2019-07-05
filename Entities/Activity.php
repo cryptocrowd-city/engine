@@ -15,6 +15,8 @@ class Activity extends Entity
 
     protected $dirtyIndexes = false;
 
+    protected $hide_impressions = false;
+
     /**
      * Initialize entity attributes
      * @return null
@@ -215,6 +217,7 @@ class Activity extends Entity
                 'pending',
                 'rating',
                 'ephemeral',
+                'hide_impressions',
             ));
     }
 
@@ -236,6 +239,7 @@ class Activity extends Entity
         if ($this->boosted_guid) {
             $export['boosted'] = (bool) $this->boosted;
             $export['boosted_guid'] = (string) $this->boosted_guid;
+            $export['boosted_onchain'] = $this->boosted_onchain;
         }
 
         $export['impressions'] = $this->getImpressions();
@@ -245,6 +249,9 @@ class Activity extends Entity
             $export['thumbs:up:count'] = Helpers\Counters::get($this->entity_guid, 'thumbs:up');
             $export['thumbs:down:count'] = Helpers\Counters::get($this->entity_guid, 'thumbs:down');
         } elseif ($this->remind_object) {
+            $export['remind_object']['nsfw'] = array_map(function($reason) {
+                return (int) $reason;
+            }, $export['remind_object']['nsfw'] ?? []);
             if ($this->remind_object['entity_guid']) {
                 $export['thumbs:up:count'] = Helpers\Counters::get($this->remind_object['entity_guid'], 'thumbs:up');
                 $export['thumbs:down:count'] = Helpers\Counters::get($this->remind_object['entity_guid'], 'thumbs:down');
@@ -266,6 +273,11 @@ class Activity extends Entity
         $export['boost_rejection_reason'] = $this->getBoostRejectionReason() ?: -1;
         $export['rating'] = $this->getRating();
         $export['ephemeral'] = $this->getEphemeral();
+        $export['ownerObj'] = $this->getOwnerObj();
+
+        if ($this->hide_impressions) {
+            $export['hide_impressions'] = $this->hide_impressions;
+        }
 
         switch($this->custom_type) {
             case 'video':
@@ -675,4 +687,42 @@ class Activity extends Entity
         $this->boost_rejection_reason = (int) $reason;
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function getHideImpressions()
+    {
+        return (bool) $this->hide_impressions;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setHideImpressions($value)
+    {
+        $this->hide_impressions = (bool) $value;
+        return $this;
+    }
+
+    public function getOwnerObj()
+    {
+        if (!$this->ownerObj && $this->owner_guid) {
+            $user = new User($this->owner_guid);
+            $this->ownerObj = $user->export();
+        }
+
+        return $this->ownerObj;
+    }
+
+    /**
+     * Return a preferred urn
+     * @return string
+     */
+    public function getUrn()
+    {
+        return "urn:activity:{$this->getGuid()}";
+    }
+
 }

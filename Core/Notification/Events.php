@@ -75,6 +75,7 @@ class Events
                 ->setToGuid($params['to'])
                 ->setFromGuid($from_user->getGuid())
                 ->setEntityGuid($entityGuid)
+                ->setEntityUrn(method_exists($entity, 'getUrn') ? $entity->getUrn() : "urn:entity:$entityGuid")
                 ->setType($params['notification_view'])
                 ->setData($data);
             
@@ -192,8 +193,9 @@ class Events
 
             foreach ($params['to'] as $to_user) {
 
-                if ($notification->getFromGuid() 
-                    && Core\Security\ACL\Block::_()->isBlocked($notification->getFromGuid(), $notification->getToGuid())
+                if (
+                    $notification->getFromGuid() &&
+                    Core\Security\ACL\Block::_()->isBlocked($notification->getFromGuid(), $to_user)
                 ) {
                     continue;
                 }

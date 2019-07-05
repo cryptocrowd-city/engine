@@ -12,17 +12,32 @@ class Spam
 
     public function check($entity)
     {
-        if ($this->strposa($entity->getBody(), $this->prohibitedDomains())
-            || $this->strposa($entity->getDescription(), $this->prohibitedDomains())
-            || $this->strposa($entity->getBriefDescription, $this->prohibitedDomains())
-        ) {
-            throw new \Exception('Sorry, you included a reference to a domain name linked to spam. You can not use short urls (eg. bit.ly). Please remove it and try again');
-        }
+        $foundSpam = false;
 
-        if ($entity->type == 'group' 
-            && $this->strposa($entity->getBriefDescription(), $this->prohibitedDomains())
-        ) {
-            new \Exception('Sorry, you included a reference to a domain name linked to spam. You can not use short urls (eg. bit.ly). Please remove it and try again');
+        switch ($entity->getType()) {
+            case 'comment':
+                $foundSpam = $this->strposa($entity->getBody(), $this->prohibitedDomains());
+                break;
+            case 'activity':
+            case 'object':
+                if ($entity->getSubtype() === 'blog') {
+                    $foundSpam = $this->strposa($entity->getBody(), $this->prohibitedDomains());
+                    break;
+                }
+                $foundSpam = $this->strposa($entity->getDescription(), $this->prohibitedDomains());
+                break;
+            case 'user':
+                $foundSpam = $this->strposa($entity->briefdescription, $this->prohibitedDomains());
+                break;
+            case 'group':
+                $foundSpam = $this->strposa($entity->getBriefDescription(), $this->prohibitedDomains());
+                break;
+            default:
+                error_log("[spam-check]: $entity->type:$entity->subtype not supported");
+         }
+
+         if ($foundSpam) {
+            throw new \Exception('Sorry, you included a reference to a domain name linked to spam. You can not use short urls (eg. bit.ly). Please remove it and try again');
         }
     }
 
@@ -391,7 +406,17 @@ class Spam
             '/cadcamoffices.co.uk',
             '/carpetexperts.net',
             '/media4.picsearch.com',
-            'slotsbonus777.com'
+            'slotsbonus777.com',
+            'nudegirls.info',
+            'aidagirls.com',
+            'alsoloves.com',
+            'hotswishes.com',
+            'instaphoto.club',
+            'intimspace.com',
+            'pornopoisk.info',
+            'localmodels.online',
+            'kaikki-mallit.com',
+            'hotswishes.com',
         ];
     }
 

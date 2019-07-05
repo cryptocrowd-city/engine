@@ -29,6 +29,7 @@ class ElasticRepository
         $opts = array_merge([
             'rating' => 3,
             'token' => 0,
+            'offset' => null,
         ], $opts);
         
         $must = [];
@@ -46,6 +47,24 @@ class ElasticRepository
                 'type' => $opts['type'],
             ],
         ];
+
+        if ($opts['offset']) {
+            $must[] = [
+                'range' => [
+                    '@timestamp' => [
+                        'gt' => $opts['offset'],
+                    ],
+                ],
+            ];
+        }
+
+        if ($opts['entity_guid']) {
+            $must[] = [
+                'term' => [
+                    'entity_guid' => $opts['entity_guid']
+                ]
+            ];
+        }
 
         if ($opts['state'] === 'approved') {
             $must[] = [
@@ -68,7 +87,7 @@ class ElasticRepository
                     'field' => '@reviewed',
                 ],
             ];
-            $sort = [ '@timestamp' => 'asc' ];
+            $sort = ['@timestamp' => 'asc'];
         }
 
         if ($opts['state'] === 'approved' || $opts['state'] === 'review') {
@@ -112,6 +131,7 @@ class ElasticRepository
         
         $response = new Response;
 
+        $offset = 0;
         foreach ($result['hits']['hits'] as $doc) {
             $boost = new Boost();
             $boost
@@ -130,10 +150,11 @@ class ElasticRepository
                 ->setImpressionsMet($doc['_source']['impressions_met'])
                 ->setBid($doc['_source']['bid'])
                 ->setBidType($doc['_source']['bid_type']);
+            $offset = $boost->getCreatedTimestamp();
             $response[] = $boost;
         }
 
-        $response->setPagingToken(count($response) + (int) $opts['token']);
+        $response->setPagingToken($offset);
         return $response;
     }
 
@@ -151,6 +172,7 @@ class ElasticRepository
      * Add a boost
      * @param Boost $boost
      * @return bool
+     * @throws \Exception
      */
     public function add($boost)
     {
@@ -210,6 +232,7 @@ class ElasticRepository
      * Update a boost
      * @param Boost $boost
      * @return bool
+     * @throws \Exception
      */
     public function update($boost, $fields = [])
     {
