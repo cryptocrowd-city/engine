@@ -201,7 +201,7 @@ class comments implements Interfaces\Api
             }
 
             if ($entity instanceof Entities\Group) {
-                if ($entity->isConversationDisabled() == 1) {
+                if ($entity->isConversationDisabled()) {
                     return Factory::response([
                         'status' => 'error',
                         'message' => 'Conversation has been disabled for this group',
