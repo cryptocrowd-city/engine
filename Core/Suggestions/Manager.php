@@ -84,6 +84,8 @@ class Manager
         // TODO: make this a bulk request vs sequential
         foreach ($response as $suggestion) {
             $entity = $suggestion->getEntity() ?: $this->entitiesBuilder->single($suggestion->getEntityGuid());
+            if ($entity->getBanned() || $entity->getDeleted())
+                break;
             $suggestion->setEntity($entity);
         }
 
