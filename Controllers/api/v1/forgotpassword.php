@@ -94,7 +94,12 @@ class forgotpassword implements Interfaces\Api, Interfaces\ApiIgnorePam
               break;
           }
 
-          if (!preg_match('/[A-Z]/', $password) || !preg_match('/\d/', $password) || !preg_match('/[^a-zA-Z\d]/', $password) || preg_match("/\\s/", $password)) {
+          try {
+            if (!validate_password($_POST['password'])) {
+                $response['status'] = "error";
+                $response['message'] = "Password must have more than 8 characters. Including uppercase, numbers, special characters (ie. !,#,@), and cannot have spaces.";    
+            }  
+          } catch (\Exception $e) {
               $response['status'] = "error";
               $response['message'] = "Password must have more than 8 characters. Including uppercase, numbers, special characters (ie. !,#,@), and cannot have spaces.";
               break;
