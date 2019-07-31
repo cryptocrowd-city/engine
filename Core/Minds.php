@@ -19,9 +19,11 @@ class Minds extends base
         Experiments\Module::class,
         Helpdesk\Module::class,
         Onboarding\Module::class,
+        Permissions\Module::class,
         Subscriptions\Module::class,
         SendWyre\Module::class,
         Suggestions\Module::class,
+        Referrals\Module::class,
         Reports\Module::class,
         VideoChat\Module::class,
     ];
@@ -99,6 +101,7 @@ class Minds extends base
         (new Hashtags\HashtagsProvider())->register();
         (new Feeds\FeedsProvider())->register();
         (new Analytics\AnalyticsProvider())->register();
+        (new Channels\ChannelsProvider())->register();
     }
 
     /**
