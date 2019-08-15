@@ -242,13 +242,6 @@ class blog implements Interfaces\Api
             }
         }
 
-        if (!$blog->isPublished()) {
-            $blog->setAccessId(Access::UNLISTED);
-            $blog->setDraftAccessId($_POST['access_id']);
-        } elseif ($blog->getTimePublished() == '') {
-            $blog->setTimePublished(time());
-        }
-
         $blog->setLastSave(time());
 
         if (isset($_POST['wire_threshold'])) {
@@ -293,6 +286,25 @@ class blog implements Interfaces\Api
                 $user->setMatureContent(true);
                 $user->save();
             }
+        }
+
+        
+        if (isset($_POST['time_created'])) {
+            $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
+
+            if ($editing) {
+                $timeCreatedDelegate->onUpdate($blog, $_POST['time_created'], time());
+            } else {
+                $timeCreatedDelegate->onAdd($blog, $_POST['time_created'], time());
+            }
+                
+        }
+
+        if (!$blog->isPublished()) {
+            $blog->setAccessId(Access::UNLISTED);
+            $blog->setDraftAccessId($_POST['access_id']);
+        } elseif ($blog->getTimePublished() == '') {
+            $blog->setTimePublished($blog->getTimeCreated() ?: time());
         }
 
         if (!$blog->canEdit()) {

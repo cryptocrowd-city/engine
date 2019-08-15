@@ -518,6 +518,11 @@ class newsfeed implements Interfaces\Api
 
                     $attachmentPaywallDelegate = new Core\Feeds\Activity\Delegates\AttachmentPaywallDelegate();
                     $attachmentPaywallDelegate->onUpdate($activity);
+
+                    if (isset($_POST['time_created'])) {
+                        $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
+                        $timeCreatedDelegate->onUpdate($activity, $_POST['time_created'], time());
+                    }
                     
                     $save->setEntity($activity)
                         ->save();
@@ -656,6 +661,11 @@ class newsfeed implements Interfaces\Api
 
                 if (isset($_POST['tags'])) {
                     $activity->setTags($_POST['tags']);
+                }
+
+                if (isset($_POST['time_created'])) {
+                    $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
+                    $timeCreatedDelegate->onAdd($activity, $_POST['time_created'], time());
                 }
 
                 $nsfw = $_POST['nsfw'] ?? [];
