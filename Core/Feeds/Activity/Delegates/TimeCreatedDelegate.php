@@ -29,30 +29,30 @@ class TimeCreatedDelegate
 
     /**
      * Validates time_created date and set it to activity
-     * @param $entitie
+     * @param $entity
      * @param string $time_created
      * @return bool
      */
-    public function onAdd($entitie, $time_created, $time_sent)
+    public function onAdd($entity, $time_created, $time_sent)
     {
-        $this->validate($entitie, $time_created, $time_sent);
+        $this->validate($entity, $time_created, $time_sent);
         return true;
     }
 
     /**
      * Validates time_created date and set it to activity
-     * @param $entitie
+     * @param $entity
      * @param string $time_created
      * @return bool
      */
-    public function onUpdate($entitie, $time_created, $time_sent)
+    public function onUpdate($entity, $time_created, $time_sent)
     {
-        $this->validate($entitie, $time_created, $time_sent);
+        $this->validate($entity, $time_created, $time_sent);
         return true;
     }
 
 
-    private function validate($entitie, $time_created, $time_sent)
+    private function validate($entity, $time_created, $time_sent)
     {
         if ($time_created > strtotime('+3 Months')) {
             throw new \InvalidParameterException();
@@ -62,8 +62,8 @@ class TimeCreatedDelegate
             $time_created = $time_sent;
         }
 
-        $entitie->setTimeCreated($time_created);
-        $entitie->setTimeSent($time_sent);
+        $entity->setTimeCreated($time_created);
+        $entity->setTimeSent($time_sent);
     }
 
 }
