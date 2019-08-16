@@ -536,6 +536,12 @@ class newsfeed implements Interfaces\Api
                 $activity->setMature(isset($_POST['mature']) && !!$_POST['mature']);
 
                 $user = Core\Session::getLoggedInUser();
+
+                if (isset($_POST['time_created'])) {
+                    $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
+                    $timeCreatedDelegate->onAdd($activity, $_POST['time_created'], time());
+                }
+
                 if ($user->isMature()) {
                     $activity->setMature(true);
                 }
@@ -606,6 +612,8 @@ class newsfeed implements Interfaces\Api
 
                     $attachment->setNsfw($activity->getNsfw());
 
+                    $attachment->set('time_created', $activity->getTimeCreated());
+
                     $save->setEntity($attachment)->save();
 
                     switch ($attachment->subtype) {
@@ -661,11 +669,6 @@ class newsfeed implements Interfaces\Api
 
                 if (isset($_POST['tags'])) {
                     $activity->setTags($_POST['tags']);
-                }
-
-                if (isset($_POST['time_created'])) {
-                    $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
-                    $timeCreatedDelegate->onAdd($activity, $_POST['time_created'], time());
                 }
 
                 $nsfw = $_POST['nsfw'] ?? [];
