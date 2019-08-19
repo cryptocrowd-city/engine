@@ -102,7 +102,7 @@ class CreateActivitySpec extends ObjectBehavior
             ->shouldReturn(true);
     }
 
-    function it_should_not_save_when_previous_activity(
+    function it_should_save_when_previous_activity(
         Blog $blog
     )
     {
@@ -118,8 +118,16 @@ class CreateActivitySpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(['activity1']);
 
+        $this->saveAction->setEntity(Argument::type(Activity::class))
+        ->shouldBeCalled()
+        ->willReturn($this->saveAction);
+
+        $this->saveAction->save()
+            ->shouldBeCalled()
+            ->willReturn(true);
+
         $this
             ->save($blog)
-            ->shouldReturn(false);
+            ->shouldReturn(true);
     }
 }
