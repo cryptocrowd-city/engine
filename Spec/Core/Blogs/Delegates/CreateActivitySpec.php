@@ -81,6 +81,10 @@ class CreateActivitySpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(1000);
 
+        $blog->getTimeCreated()
+            ->shouldBeCalled()
+            ->willReturn(9999);
+
         $this->db->getRow("activity:entitylink:9999")
             ->shouldBeCalled()
             ->willReturn([]);
@@ -103,6 +107,10 @@ class CreateActivitySpec extends ObjectBehavior
     )
     {
         $blog->getGuid()
+            ->shouldBeCalled()
+            ->willReturn(9999);
+
+        $blog->getTimeCreated()
             ->shouldBeCalled()
             ->willReturn(9999);
 

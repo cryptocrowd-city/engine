@@ -96,7 +96,7 @@ use Minds\Traits\MagicAttributes;
  * @method Blog setAllowComments(bool $allowComments)
  * @method bool getAllowComments()
  * @method int getTimeSent()
- * @method Blog setTimeSent(int $timeSent)
+ * @method Blog setTimeSent(int $time_sent)
  */
 class Blog extends RepositoryEntity
 {
@@ -243,7 +243,7 @@ class Blog extends RepositoryEntity
     protected $allowComments = true;
 
     /** @var int */
-    protected $time_sent;
+    protected $timeSent;
 
     /**
      * Blog constructor.
