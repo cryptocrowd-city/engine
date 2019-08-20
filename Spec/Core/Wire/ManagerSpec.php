@@ -17,81 +17,59 @@ use Prophecy\Argument;
 
 class ManagerSpec extends ObjectBehavior
 {
-    protected $cache;
+    protected $cacheDelegate;
     protected $repo;
-    protected $subscriptionsManager;
     protected $txManager;
     protected $txRepo;
     protected $config;
-    protected $queue;
     protected $client;
     protected $token;
     protected $cap;
-    protected $dispatcher;
 
     protected $call;
-
-    protected $balance;
-    protected $redisLock;
 
     protected $plusDelegate;
     protected $offchainTxs;
 
     public function let(
-        Redis $cache,
         Repository $repo,
-        SubscriptionsManager $subscriptionsManager,
         BlockchainManager $txManager,
         Core\Blockchain\Transactions\Repository $txRepo,
         Config $config,
-        Client $queue,
         Core\Blockchain\Services\Ethereum $client,
         Core\Blockchain\Token $token,
         Core\Blockchain\Wallets\OffChain\Cap $cap,
-        Core\Events\EventsDispatcher $dispatcher,
-        Core\Data\Call $call,
-        Core\Blockchain\Wallets\OffChain\Balance $balance,
-        Core\Data\Locks\Redis $redisLock,
         Core\Wire\Delegates\Plus $plusDelegate,
-        Core\Blockchain\Wallets\OffChain\Transactions $offchainTxs
+        Core\Wire\Delegates\RecurringDelegate $recurringDelegate,
+        Core\Wire\Delegates\NotificationDelegate $notificationDelegate,
+        Core\Wire\Delegates\CacheDelegate $cacheDelegate,
+        Core\Blockchain\Wallets\OffChain\Transactions $offchainTxs,
+        Core\Payments\Stripe\Intents\Manager $stripeIntentsManager
     ) {
-        $this->beConstructedWith($cache, $repo, $subscriptionsManager, $txManager, $txRepo, $config, $queue, $client,
-            $token, $cap, $dispatcher, $plusDelegate, $offchainTxs);
+        $this->beConstructedWith(
+            $repo,
+            $txManager,
+            $txRepo,
+            $config,
+            $client,
+            $token,
+            $cap,
+            $plusDelegate,
+            $recurringDelegate,
+            $notificationDelegate,
+            $cacheDelegate,
+            $offchainTxs,
+            $stripeIntentsManager
+        );
 
-        Core\Di\Di::_()->bind('Database\Cassandra\Entities', function ($di) use ($call) {
-            return $call->getWrappedObject();
-        });
-
-        Core\Di\Di::_()->bind('Database\Cassandra\UserIndexes', function ($di) use ($call) {
-            return $call->getWrappedObject();
-        });
-
-        Core\Di\Di::_()->bind('Blockchain\Transactions\Repository', function ($di) use ($txRepo) {
-            return $txRepo->getWrappedObject();
-        });
-        Core\Di\Di::_()->bind('Blockchain\Wallets\OffChain\Balance', function ($di) use ($balance) {
-            return $balance->getWrappedObject();
-        });
-        Core\Di\Di::_()->bind('Database\Locks', function ($di) use ($redisLock) {
-            return $redisLock->getWrappedObject();
-        });
-
-        $this->cache = $cache;
+        $this->cacheDelegate = $cacheDelegate;
         $this->repo = $repo;
-        $this->subscriptionsManager = $subscriptionsManager;
         $this->txManager = $txManager;
         $this->txRepo = $txRepo;
         $this->config = $config;
-        $this->queue = $queue;
         $this->client = $client;
         $this->token = $token;
         $this->cap = $cap;
-        $this->dispatcher = $dispatcher;
-
-        $this->call = $call;
-
-        $this->balance = $balance;
-        $this->redisLock = $redisLock;
 
         $this->plusDelegate = $plusDelegate;
         $this->offchainTxs = $offchainTxs;
@@ -155,16 +133,17 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
-        $this->queue->setQueue(Argument::any())
+        /*$this->queue->setQueue(Argument::any())
             ->shouldBeCalled()
             ->willReturn($this->queue);
         $this->queue->send(Argument::any())
-            ->shouldBeCalled();
+            ->shouldBeCalled();*/
 
         $receiver = new User();
         $receiver->guid = 123;
         $sender = new User();
         $sender->guid = 123;
+
         $wire = new WireModel();
         $wire->setReceiver($receiver)
             ->setSender($sender)
