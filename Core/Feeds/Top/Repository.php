@@ -33,7 +33,7 @@ class Repository
      * @return \Generator|ScoredGuid[]
      * @throws \Exception
      */
-    public function getList(array $opts = [], bool $filter_by_time_created = true)
+    public function getList(array $opts = [])
     {
         $opts = array_merge([
             'offset' => 0,
@@ -54,7 +54,7 @@ class Repository
             'exclude_moderated' => false,
             'moderation_reservations' => null,
             'pinned_guids' => null,
-            'time_created_upper' => $filter_by_time_created ? time() : null,
+            'time_created_upper' => time(),
         ], $opts);
 
         if (!$opts['type']) {
@@ -257,19 +257,18 @@ class Repository
         }
 
         // Filter by time created to cut out scheduled feeds
-        if ($opts['time_created_upper']) {
-            if (!isset($body['query']['function_score']['query']['bool']['must'])) {
-                $body['query']['function_score']['query']['bool']['must'] = [];
-            }
-
-            $body['query']['function_score']['query']['bool']['must'][] = [
-                'range' => [
-                    'time_created' => [
-                        'lte' => (int) $opts['time_created_upper'],
-                    ],
-                ],
-            ];
+        $time_created_upper = $opts['time_created_upper'] ? 'lte' : 'gt';
+        if (!isset($body['query']['function_score']['query']['bool']['must'])) {
+            $body['query']['function_score']['query']['bool']['must'] = [];
         }
+
+        $body['query']['function_score']['query']['bool']['must'][] = [
+            'range' => [
+                'time_created' => [
+                    $time_created_upper => (int) ($opts['time_created_upper'] ?: time()),
+                ],
+            ],
+        ];
 
         //
         if ($opts['query']) {
