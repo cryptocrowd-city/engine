@@ -57,9 +57,17 @@ class scheduled implements Interfaces\Api
             case 'blogs':
                 $type = 'object:blog';
                 break;
-        }
+            case 'count':
+                $type = 'activity';
 
-        //
+                /** @var Core\Feeds\Scheduled\Manager $manager */
+                $manager = new Core\Feeds\Scheduled\Manager;
+
+                return Factory::response([
+                    'status' => 'success',
+                    'count' => $manager->getScheduledCount(['container_guid' => $container_guid, 'type' => $type])
+                ]);
+        }
 
         $hardLimit = 5000;
         $offset = 0;

@@ -29,7 +29,6 @@ class Repository
 
     /**
      * @param array $opts
-     * @param bool $filter_by_created_time
      * @return \Generator|ScoredGuid[]
      * @throws \Exception
      */
