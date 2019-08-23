@@ -4,7 +4,7 @@
  * @author juanmsolaro
  */
 
-namespace Minds\Core\Feeds\Activity\Delegates;
+namespace Minds\Core\Blogs\Delegates;
 
 use Minds\Core\Feeds\Scheduled\EntityTimeCreated;
 

@@ -290,7 +290,7 @@ class blog implements Interfaces\Api
 
         
         if (isset($_POST['time_created'])) {
-            $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
+            $timeCreatedDelegate = new Core\Blogs\Delegates\TimeCreatedDelegate();
 
             if ($editing) {
                 $timeCreatedDelegate->onUpdate($blog, $_POST['time_created'], time());
