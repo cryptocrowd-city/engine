@@ -520,8 +520,15 @@ class newsfeed implements Interfaces\Api
                     $attachmentPaywallDelegate->onUpdate($activity);
 
                     if (isset($_POST['time_created'])) {
-                        $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
-                        $timeCreatedDelegate->onUpdate($activity, $_POST['time_created'], time());
+                        try {
+                            $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
+                            $timeCreatedDelegate->onUpdate($activity, $_POST['time_created'], time());
+                        } catch (\Exception $e) {
+                            return Factory::response([
+                                'status' => 'error',
+                                'message' => $e->getMessage(),
+                            ]);
+                        } 
                     }
                     
                     $save->setEntity($activity)
@@ -538,8 +545,15 @@ class newsfeed implements Interfaces\Api
                 $user = Core\Session::getLoggedInUser();
 
                 if (isset($_POST['time_created'])) {
-                    $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
-                    $timeCreatedDelegate->onAdd($activity, $_POST['time_created'], time());
+                    try {
+                        $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
+                        $timeCreatedDelegate->onAdd($activity, $_POST['time_created'], time());
+                    } catch (\Exception $e) {
+                        return Factory::response([
+                            'status' => 'error',
+                            'message' => $e->getMessage(),
+                        ]);
+                    } 
                 }
 
                 if ($user->isMature()) {
