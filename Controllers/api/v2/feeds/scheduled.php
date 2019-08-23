@@ -1,6 +1,6 @@
 <?php
 
-namespace Minds\Controllers\api\v2\channel;
+namespace Minds\Controllers\api\v2\feeds;
 
 use Minds\Api\Exportable;
 use Minds\Api\Factory;
