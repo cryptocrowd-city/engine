@@ -67,11 +67,11 @@ prepare:all:sentry:
   stage: prepare
   image: getsentry/sentry-cli
   script:
-    - echo "Create a new release $CI_COMMIT_SHA"
-    - sentry-cli releases new $CI_COMMIT_SHA
-    - sentry-cli releases set-commits --auto $CI_COMMIT_SHA
-    - sentry-cli releases finalize $CI_COMMIT_SHA
-    - echo "Finalized release for $CI_COMMIT_SHA"
+    - echo "Create a new release $CI_PIPELINE_ID"
+    - sentry-cli releases new $CI_PIPELINE_ID
+    - sentry-cli releases set-commits --auto $CI_PIPELINE_ID
+    - sentry-cli releases finalize $CI_PIPELINE_ID
+    - echo "Finalized release for $CI_PIPELINE_ID"
 
 review:start:
   stage: review
@@ -91,7 +91,7 @@ review:start:
         --wait \
         $CI_BUILD_REF_SLUG \
         ./helm-charts/minds"
-    - sentry-cli releases deploys $CI_COMMIT_SHA new -e review-$CI_COMMIT_REF_SLUG
+    - sentry-cli releases deploys $CI_PIPELINE_ID new -e review-$CI_COMMIT_REF_SLUG
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: https://$CI_BUILD_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
@@ -136,7 +136,7 @@ staging:fpm:
     # Deploy to staging
     - aws ecs update-service --service=$ECS_APP_STAGING_SERVICE --force-new-deployment --region us-east-1 --cluster=$ECS_CLUSTER
     # Update sentry
-    - sentry-cli releases deploys $CI_COMMIT_SHA new -e $IMAGE_LABEL
+    - sentry-cli releases deploys $CI_PIPELINE_ID new -e $IMAGE_LABEL
   environment:
     name: staging
     url: https://www.minds.com/?staging=1
@@ -162,7 +162,7 @@ canary:fpm:
     # Deploy to ECS
     - aws ecs update-service --service=$ECS_APP_CANARY_SERVICE --force-new-deployment --region us-east-1 --cluster=$ECS_CLUSTER
     # Update sentry
-    - sentry-cli releases deploys $CI_COMMIT_SHA new -e $IMAGE_LABEL
+    - sentry-cli releases deploys $CI_PIPELINE_ID new -e $IMAGE_LABEL
   only:
     refs:
       - master
@@ -190,7 +190,7 @@ production:fpm:
     # Delpoy to ECS
     - aws ecs update-service --service=$ECS_APP_PRODUCTION_SERVICE --force-new-deployment --region us-east-1 --cluster=$ECS_CLUSTER
     # Update sentry
-    - sentry-cli releases deploys $CI_COMMIT_SHA new -e $IMAGE_LABEL
+    - sentry-cli releases deploys $CI_PIPELINE_ID new -e $IMAGE_LABEL
   only:
     refs:
       - master
