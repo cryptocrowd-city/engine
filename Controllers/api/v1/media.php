@@ -92,9 +92,20 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
                         $response['entity']['canEdit'] = $entity->canEdit();
                         Security\ACL::$ignore = $ignore;
                     }
+
+                    
                 }
         }
 
+        $currentUser = Core\Session::getLoggedinUser();
+        //Calculate new permissions object with the entities
+        if (Di::_()->get('Features\Manager')->has('permissions')) {
+            $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
+            $permissions = $permissionsManager->getList(['user_guid' => $currentUser,
+                                                        'entities' => [$entity]]);
+            $response['permissions'] = $permissions->export();
+        }
+        
         return Factory::response($response);
     }
 

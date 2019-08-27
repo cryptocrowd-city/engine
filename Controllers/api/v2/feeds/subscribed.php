@@ -6,16 +6,18 @@ use Minds\Api\Exportable;
 use Minds\Api\Factory;
 use Minds\Core;
 use Minds\Core\Di\Di;
-use Minds\Entities\Factory as EntitiesFactory;
 use Minds\Entities\User;
 use Minds\Interfaces;
 
 class subscribed implements Interfaces\Api
 {
     /**
-     * Equivalent to HTTP GET method
+     * Equivalent to HTTP GET method.
+     *
      * @param array $pages
+     *
      * @return mixed|null
+     *
      * @throws \Exception
      */
     public function get($pages)
@@ -40,8 +42,6 @@ class subscribed implements Interfaces\Api
                 $type = 'object:blog';
                 break;
         }
-
-        //
 
         $hardLimit = 5000;
         $offset = 0;
@@ -68,8 +68,6 @@ class subscribed implements Interfaces\Api
                 'overflow' => true,
             ]);
         }
-
-        //
 
         $sync = (bool) ($_GET['sync'] ?? false);
 
@@ -121,32 +119,33 @@ class subscribed implements Interfaces\Api
                     $result = $result->map([$entities, 'cast']);
                 }
             }
-            
 
             $permissions = null;
             //Calculate new permissions object with the entities
             if (Di::_()->get('Features\Manager')->has('permissions')) {
                 $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
-                $permissions = $permissionsManager->getList(['user_guid' => Core\Session::getLoggedInUserGuid(),
+                $permissions = $permissionsManager->getList(['user_guid' => $currentUser,
                                                         'entities' => $result->toArray()]);
-                $response['permissions'] = $permissions;
             }
 
             return Factory::response([
                 'status' => 'success',
                 'entities' => Exportable::_($result),
                 'load-next' => $result->getPagingToken(),
-                'permissions' => $permissions
+                'permissions' => $permissions,
             ]);
         } catch (\Exception $e) {
             error_log($e);
+
             return Factory::response(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 
     /**
-     * Equivalent to HTTP POST method
+     * Equivalent to HTTP POST method.
+     *
      * @param array $pages
+     *
      * @return mixed|null
      */
     public function post($pages)
@@ -155,8 +154,10 @@ class subscribed implements Interfaces\Api
     }
 
     /**
-     * Equivalent to HTTP PUT method
+     * Equivalent to HTTP PUT method.
+     *
      * @param array $pages
+     *
      * @return mixed|null
      */
     public function put($pages)
@@ -165,8 +166,10 @@ class subscribed implements Interfaces\Api
     }
 
     /**
-     * Equivalent to HTTP DELETE method
+     * Equivalent to HTTP DELETE method.
+     *
      * @param array $pages
+     *
      * @return mixed|null
      */
     public function delete($pages)

@@ -13,17 +13,18 @@ use Minds\Interfaces;
 class container implements Interfaces\Api
 {
     /**
-     * Equivalent to HTTP GET method
+     * Equivalent to HTTP GET method.
+     *
      * @param array $pages
+     *
      * @return mixed|null
+     *
      * @throws \Exception
      */
     public function get($pages)
     {
         /** @var User $currentUser */
         $currentUser = Core\Session::getLoggedinUser();
-
-        //
 
         $container_guid = $pages[0] ?? null;
 
@@ -59,8 +60,6 @@ class container implements Interfaces\Api
                 break;
         }
 
-        //
-
         $hardLimit = 5000;
         $offset = 0;
 
@@ -86,8 +85,6 @@ class container implements Interfaces\Api
                 'overflow' => true,
             ]);
         }
-
-        //
 
         $sync = (bool) ($_GET['sync'] ?? false);
 
@@ -154,20 +151,32 @@ class container implements Interfaces\Api
                 }
             }
 
+            $permissions = null;
+            //Calculate new permissions object with the entities
+            if (Di::_()->get('Features\Manager')->has('permissions')) {
+                $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
+                $permissions = $permissionsManager->getList(['user_guid' => Core\Session::getLoggedInUserGuid(),
+                                                        'entities' => $result->toArray(), ]);
+            }
+
             return Factory::response([
                 'status' => 'success',
                 'entities' => Exportable::_($result),
                 'load-next' => $result->getPagingToken(),
+                'permissions' => $permissions,
             ]);
         } catch (\Exception $e) {
             error_log($e);
+
             return Factory::response(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 
     /**
-     * Equivalent to HTTP POST method
+     * Equivalent to HTTP POST method.
+     *
      * @param array $pages
+     *
      * @return mixed|null
      */
     public function post($pages)
@@ -176,8 +185,10 @@ class container implements Interfaces\Api
     }
 
     /**
-     * Equivalent to HTTP PUT method
+     * Equivalent to HTTP PUT method.
+     *
      * @param array $pages
+     *
      * @return mixed|null
      */
     public function put($pages)
@@ -186,8 +197,10 @@ class container implements Interfaces\Api
     }
 
     /**
-     * Equivalent to HTTP DELETE method
+     * Equivalent to HTTP DELETE method.
+     *
      * @param array $pages
+     *
      * @return mixed|null
      */
     public function delete($pages)

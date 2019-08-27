@@ -60,5 +60,6 @@ class Roles extends Rbac
         $this->addRole(new GroupNonSubscriberRole());
         $this->addRole(new GroupOwnerRole());
         $this->addRole(new GroupSubscriberRole());
+        $this->addRole(new LoggedOutRole());
     }
 }

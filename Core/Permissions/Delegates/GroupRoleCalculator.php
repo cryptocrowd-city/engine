@@ -17,7 +17,7 @@ class GroupRoleCalculator extends BaseRoleCalculator
     /** @var array */
     private $groups = [];
 
-    public function __construct(User $user, Roles $roles, EntitiesBuilder $entitiesBuilder = null)
+    public function __construct(User $user = null, Roles $roles, EntitiesBuilder $entitiesBuilder = null)
     {
         parent::__construct($user, $roles);
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
@@ -39,7 +39,9 @@ class GroupRoleCalculator extends BaseRoleCalculator
         }
         $group = $this->entitiesBuilder->single($entity->getAccessId());
         $role = null;
-        if ($group->isCreator($this->user)) {
+        if ($this->user === null) {
+            $role = $this->roles->getRole(Roles::ROLE_LOGGED_OUT);
+        } elseif ($group->isCreator($this->user)) {
             $role = $this->roles->getRole(Roles::ROLE_GROUP_OWNER);
         } elseif ($group->isOwner($this->user)) {
             $role = $this->roles->getRole(Roles::ROLE_GROUP_ADMIN);

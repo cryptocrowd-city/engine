@@ -36,17 +36,17 @@ class Manager
             'entities' => [],
         ], $opts);
 
-        if ($opts['user_guid'] === null) {
-            throw new \InvalidArgumentException('user_guid is required');
+        //Null user results in logged out permissions
+        $user = null;
+        if ($opts['user_guid'] !== null) {
+            $user = $this->entitiesBuilder->single($opts['user_guid']);
+            if ($user->getType() !== 'user') {
+                throw new \InvalidArgumentException('Entity is not a user');
+            }
         }
-
-        $user = $this->entitiesBuilder->single($opts['user_guid']);
+        
         $entities = $this->entitiesBuilder->get($opts);
         $entities = array_merge($entities, $opts['entities']);
-
-        if ($user->getType() !== 'user') {
-            throw new \InvalidArgumentException('Entity is not a user');
-        }
 
         /** @var Permissions */
         $permissions = new Permissions($user);

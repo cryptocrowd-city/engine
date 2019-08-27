@@ -12,16 +12,7 @@ use Minds\Common\Access;
 use Minds\Core\Di\Di;
 use Minds\Exceptions\ImmutableException;
 
-<<<<<<< HEAD
 class Permissions implements \JsonSerializable
-=======
-/**
-* Class Permissions
-* @method Permissions setAllowComments(bool $allowComments)
-* @method bool getAllowComments();
-*/
-class Permissions
->>>>>>> origin/master
 {
     use MagicAttributes;
 
@@ -42,22 +33,24 @@ class Permissions
     /** @var EntitiesBuilder */
     private $entitiesBuilder;
 
-    public function setUser(User $user)
+    public function setUser(User $user = null)
     {
         throw new ImmutableException('User can only be set in the constructor');
     }
 
-    public function __construct(User $user, Roles $roles = null, EntitiesBuilder $entitiesBuilder = null)
+    public function __construct(User $user = null, Roles $roles = null, EntitiesBuilder $entitiesBuilder = null)
     {
-        $this->roles = $roles ?: new Roles();
-        $this->user = $user;
-        $this->isAdmin = $user->isAdmin();
-        $this->isBanned = $user->isBanned();
         $this->groups = [];
         $this->channels = [];
         $this->entities = [];
+        $this->roles = $roles ?: new Roles();
+        $this->user = $user;
+        if ($this->user) {
+            $this->isAdmin =  $user->isAdmin();
+            $this->isBanned = $user->isBanned();
+            $this->channels[$user->getGuid()] = $user;
+        }
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
-        $this->channels[$user->getGUID()] = $user;
         $this->channelRoleCalculator = new ChannelRoleCalculator($this->user, $this->roles);
         $this->groupRoleCalculator = new GroupRoleCalculator($this->user, $this->roles, $entitiesBuilder);
     }
@@ -81,6 +74,7 @@ class Permissions
     private function getRoleForEntity($entity)
     {
         $role = null;
+
         //Access id is the best way to determine what the parent entity is
         //Any of the access flags are a channel
         //Anything else is a group guid
@@ -113,7 +107,9 @@ class Permissions
     public function export()
     {
         $export = [];
-        $export['user'] = $this->user->export();
+        if ($this->user) {
+            $export['user'] = $this->user->export();
+        }
         $export['channels'] = $this->getChannels();
         $export['groups'] = $this->getGroups();
         $export['entities'] = $this->entities;

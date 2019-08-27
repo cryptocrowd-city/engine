@@ -22,18 +22,20 @@ class ChannelRoleCalculator extends BaseRoleCalculator
      */
     public function calculate($entity)
     {
-        if (isset($this->channels[$entity->getOwnerGUID()])) {
-            return $this->channels[$entity->getOwnerGUID()];
+        if (isset($this->channels[$entity->getOwnerGuid()])) {
+            return $this->channels[$entity->getOwnerGuid()];
         }
         $role = null;
-        if ($entity->getOwnerGUID() === $this->user->getGUID()) {
+        if ($this->user === null) {
+            $role = $this->roles->getRole(Roles::ROLE_LOGGED_OUT);
+        } elseif ($entity->getOwnerGuid() === $this->user->getGuid()) {
             $role = $this->roles->getRole(Roles::ROLE_CHANNEL_OWNER);
-        } elseif ($this->user->isSubscribed($entity->getOwnerGUID())) {
+        } elseif ($this->user->isSubscribed($entity->getOwnerGuid())) {
             $role = $this->roles->getRole(Roles::ROLE_CHANNEL_SUBSCRIBER);
         } else {
             $role = $this->roles->getRole(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
         }
-        $this->channels[$entity->getOwnerGUID()] = $role;
+        $this->channels[$entity->getOwnerGuid()] = $role;
 
         return $role;
     }
