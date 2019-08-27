@@ -8,6 +8,7 @@ use Minds\Entities\User;
 use Minds\Traits\MagicAttributes;
 
 /**
+ * @method Account setId(): Account
  * @method Account getDateOfBirth(): string
  * @method Account getCountry(): string
  * @method Account getFirstName(): string

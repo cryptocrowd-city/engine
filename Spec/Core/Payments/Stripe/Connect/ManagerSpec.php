@@ -65,6 +65,10 @@ class ManagerSpec extends ObjectBehavior
                 'id' => 'account_id',
             ]);
 
+        $account->setId('account_id')
+            ->shouldBeCalled()
+            ->willReturn($account);
+
         $user = new User();
         $account->getUser()
             ->willReturn($user);
@@ -79,7 +83,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled();
 
         $this->add($account)
-            ->shouldReturn('account_id');
+            ->shouldReturn($account);
     }
 
     public function it_should_get_an_account_by_an_id()
