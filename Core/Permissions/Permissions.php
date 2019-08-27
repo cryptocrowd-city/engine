@@ -12,7 +12,16 @@ use Minds\Common\Access;
 use Minds\Core\Di\Di;
 use Minds\Exceptions\ImmutableException;
 
+<<<<<<< HEAD
 class Permissions implements \JsonSerializable
+=======
+/**
+* Class Permissions
+* @method Permissions setAllowComments(bool $allowComments)
+* @method bool getAllowComments();
+*/
+class Permissions
+>>>>>>> origin/master
 {
     use MagicAttributes;
 
