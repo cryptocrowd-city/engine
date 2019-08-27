@@ -42,12 +42,12 @@ prepare:fpm:
     - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${CI_REGISTRY} 
     - |
       docker build \
-        -t $CI_REGISTRY_IMAGE/fpm:$CI_BUILD_REF \
+        -t $CI_REGISTRY_IMAGE/fpm:$CI_PIPELINE_ID \
         -f containers/php-fpm/Dockerfile \
-        --build-arg MINDS_VERSION=$CI_BUILD_REF \
+        --build-arg MINDS_VERSION=$CI_PIPELINE_ID \
         --build-arg SENTRY_DSN=$SENTRY_DSN \
         .
-    - docker push $CI_REGISTRY_IMAGE/fpm:$CI_BUILD_REF
+    - docker push $CI_REGISTRY_IMAGE/fpm:$CI_PIPELINE_ID
 
 prepare:runners:
   stage: prepare
@@ -128,12 +128,12 @@ staging:fpm:
     - IMAGE_LABEL="staging"
     - $(aws ecr get-login --no-include-email --region us-east-1)
     - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${CI_REGISTRY}
-    - docker pull $CI_REGISTRY_IMAGE/fpm:$CI_BUILD_REF
+    - docker pull $CI_REGISTRY_IMAGE/fpm:$CI_PIPELINE_ID
     # Push to AWS registry
-    - docker tag $CI_REGISTRY_IMAGE/fpm:$CI_BUILD_REF $ECR_REPOSITORY_URL_FPM:$IMAGE_LABEL
+    - docker tag $CI_REGISTRY_IMAGE/fpm:$CI_PIPELINE_ID $ECR_REPOSITORY_URL_FPM:$IMAGE_LABEL
     - docker push $ECR_REPOSITORY_URL_FPM:$IMAGE_LABEL
     # Push to Gitlab registry
-    - docker tag $CI_REGISTRY_IMAGE/fpm:$CI_BUILD_REF $CI_REGISTRY_IMAGE/fpm:$IMAGE_LABEL
+    - docker tag $CI_REGISTRY_IMAGE/fpm:$CI_PIPELINE_ID $CI_REGISTRY_IMAGE/fpm:$IMAGE_LABEL
     - docker push $CI_REGISTRY_IMAGE/fpm:$IMAGE_LABEL
     # Deploy to staging
     - aws ecs update-service --service=$ECS_APP_STAGING_SERVICE --force-new-deployment --region us-east-1 --cluster=$ECS_CLUSTER
@@ -154,12 +154,12 @@ canary:fpm:
     - IMAGE_LABEL="canary"
     - $(aws ecr get-login --no-include-email --region us-east-1)
     - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${CI_REGISTRY}
-    - docker pull $CI_REGISTRY_IMAGE/fpm:$CI_BUILD_REF
+    - docker pull $CI_REGISTRY_IMAGE/fpm:$CI_PIPELINE_ID
     # Push to AWS registry
-    - docker tag $CI_REGISTRY_IMAGE/fpm:$CI_BUILD_REF $ECR_REPOSITORY_URL_FPM:$IMAGE_LABEL
+    - docker tag $CI_REGISTRY_IMAGE/fpm:$CI_PIPELINE_ID $ECR_REPOSITORY_URL_FPM:$IMAGE_LABEL
     - docker push $ECR_REPOSITORY_URL_FPM:$IMAGE_LABEL
     # Push to Gitlab registry
-    - docker tag $CI_REGISTRY_IMAGE/fpm:$CI_BUILD_REF $CI_REGISTRY_IMAGE/fpm:$IMAGE_LABEL
+    - docker tag $CI_REGISTRY_IMAGE/fpm:$CI_PIPELINE_ID $CI_REGISTRY_IMAGE/fpm:$IMAGE_LABEL
     - docker push $CI_REGISTRY_IMAGE/fpm:$IMAGE_LABEL
     # Deploy to ECS
     - aws ecs update-service --service=$ECS_APP_CANARY_SERVICE --force-new-deployment --region us-east-1 --cluster=$ECS_CLUSTER
