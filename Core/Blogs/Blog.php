@@ -257,8 +257,7 @@ class Blog extends RepositoryEntity
         $config = null,
         $header = null,
         $acl = null
-    )
-    {
+    ) {
         $this->_eventsDispatcher = $eventsDispatcher ?: Di::_()->get('EventsDispatcher');
         $this->_config = $config ?: Di::_()->get('Config');
         $this->_header = $header ?: new Header();
@@ -268,7 +267,8 @@ class Blog extends RepositoryEntity
     /**
      * @return array
      */
-    function __sleep() {
+    public function __sleep()
+    {
         return array_diff(array_keys(get_object_vars($this)), [
             '_eventsDispatcher',
             '_config',
@@ -280,7 +280,8 @@ class Blog extends RepositoryEntity
     /**
      * @return void
      */
-    function __wakeup() {
+    public function __wakeup()
+    {
         $this->__construct();
     }
 
@@ -304,7 +305,7 @@ class Blog extends RepositoryEntity
     {
         if (is_string($value) && $value) {
             $value = json_decode($value, true);
-        } else if ($value instanceof User) {
+        } elseif ($value instanceof User) {
             $value = $value->export();
         }
 
@@ -368,7 +369,8 @@ class Blog extends RepositoryEntity
      * Gets the slug
      * @return string
      */
-    public function getSlug() {
+    public function getSlug()
+    {
         return $this->slug ?: '';
     }
 
@@ -377,7 +379,8 @@ class Blog extends RepositoryEntity
      * @param $text
      * @return $this
      */
-    public function setSlug($text) {
+    public function setSlug($text)
+    {
         $oldSlug = $this->getSlug();
 
         $this->slug = Text::slug($text, 60);
@@ -436,7 +439,7 @@ class Blog extends RepositoryEntity
             return strip_tags($this->excerpt);
         }
 
-        $this->setExcerpt(str_replace("&nbsp;","", $this->getBody()));
+        $this->setExcerpt(str_replace("&nbsp;", "", $this->getBody()));
         return strip_tags($this->excerpt);
     }
 
@@ -469,10 +472,10 @@ class Blog extends RepositoryEntity
         return $this;
     }
 
-   /**
-     * Get NSFW options
-     * @return array
-     */
+    /**
+      * Get NSFW options
+      * @return array
+      */
     public function getNsfw()
     {
         $array = [];
@@ -501,7 +504,7 @@ class Blog extends RepositoryEntity
         $this->nsfw = $array;
         return $this;
     }
-	
+    
     /**
      * Get NSFW Lock options.
      *
@@ -519,7 +522,7 @@ class Blog extends RepositoryEntity
 
         return $array;
     }
-	
+    
     /**
      * Set NSFW lock tags for administrators. Users cannot remove these themselves.
      *

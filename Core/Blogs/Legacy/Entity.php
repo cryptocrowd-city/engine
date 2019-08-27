@@ -13,7 +13,7 @@ use Minds\Helpers\Counters;
 
 class Entity
 {
-    static $attributeMap = [
+    public static $attributeMap = [
         'type' => 'type',
         'subtype' => 'subtype',
         'guid' => 'guid',
@@ -55,7 +55,7 @@ class Entity
         'timeSent' => 'time_sent'
     ];
 
-    static $jsonEncodedFields = [
+    public static $jsonEncodedFields = [
         'categories',
         'tags',
         'nsfw',
@@ -64,7 +64,7 @@ class Entity
         'ownerObj',
     ];
 
-    static $boolFields = [
+    public static $boolFields = [
         // 'published' is a special case
         'mature',
         'spam',
@@ -96,9 +96,9 @@ class Entity
                 $setter = 'set' . ucfirst($attribute);
                 $value = $data[$column];
 
-                if (in_array($column, static::$jsonEncodedFields) && is_string($value)) {
+                if (in_array($column, static::$jsonEncodedFields, true) && is_string($value)) {
                     $value = json_decode($value, true);
-                } elseif (in_array($column, static::$boolFields)) {
+                } elseif (in_array($column, static::$boolFields, true)) {
                     $value = !!$value;
                 } elseif ($column == 'published') {
                     $value = $value === '' || !!$value;

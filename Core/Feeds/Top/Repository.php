@@ -64,7 +64,7 @@ class Repository
             throw new \Exception('Algorithm must be provided');
         }
 
-        if (!in_array($opts['period'], ['12h', '24h', '7d', '30d', '1y'])) {
+        if (!in_array($opts['period'], ['12h', '24h', '7d', '30d', '1y'], true)) {
             throw new \Exception('Unsupported period');
         }
 
@@ -227,7 +227,7 @@ class Repository
                     ],
                 ];
 
-                if (in_array(6, $nsfw)) { // 6 is legacy 'mature'
+                if (in_array(6, $nsfw, true)) { // 6 is legacy 'mature'
                     $body['query']['function_score']['query']['bool']['must_not'][] = [
                         'term' => [
                             'mature' => true,
@@ -319,7 +319,7 @@ class Repository
         if ($opts['moderation_reservations']) {
             $body['query']['function_score']['query']['bool']['must_not'][] = [
                 'terms' => [
-                    'guid' => $opts['moderation_reservations'], 
+                    'guid' => $opts['moderation_reservations'],
                 ],
             ];
         }
@@ -450,5 +450,4 @@ class Repository
             $this->pendingBulkInserts = [];
         }
     }
-
 }
