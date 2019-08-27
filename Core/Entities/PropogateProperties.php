@@ -55,7 +55,7 @@ class PropogateProperties
 
         foreach ($this->propogators as $propogator) {
             if ($propogator->willActOnEntity($attachment)) {
-                $attachment = $propogator->fromActivity($activity, $attachment);
+                $propogator->fromActivity($activity, $attachment);
                 $this->changed |= $propogator->changed();
             }
         }
@@ -69,7 +69,7 @@ class PropogateProperties
     {
         $activities = $this->getActivitiesForEntity($entity->getGuid());
         foreach ($activities as $activity) {
-            $activity = $this->propogateToActivity($entity, $activity);
+            $this->propogateToActivity($entity, $activity);
             if ($this->changed) {
                 $this->save->setEntity($activity)->save();
             }
@@ -91,16 +91,14 @@ class PropogateProperties
         return $activities;
     }
 
-    public function propogateToActivity($entity, Activity $activity): Activity
+    public function propogateToActivity($entity, Activity &$activity): void
     {
         $this->changed = false;
         foreach ($this->propogators as $propogator) {
             if ($propogator->willActOnEntity($entity)) {
-                $activity = $propogator->toActivity($entity, $activity);
+                $propogator->toActivity($entity, $activity);
                 $this->changed |= $propogator->changed();
             }
         }
-
-        return $activity;
     }
 }

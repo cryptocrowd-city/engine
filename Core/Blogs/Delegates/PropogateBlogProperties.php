@@ -9,7 +9,7 @@ class PropogateBlogProperties extends Properties
 {
     protected $actsOnSubtype = 'blog';
 
-    public function toActivity($from, Activity $to): Activity
+    public function toActivity($from, Activity &$to): void
     {
         if ($this->valueHasChanged($from->getTitle(), $to->get('title'))) {
             $to->set('title', $from->getTitle());
@@ -27,12 +27,10 @@ class PropogateBlogProperties extends Properties
         if ($this->valueHasChanged($from->getIconUrl(), $to->get('thumbnail_src'))) {
             $to->set('thumbnail_src', $from->getIconUrl());
         }
-
-        return $to;
     }
 
-    public function fromActivity(Activity $from, $to)
+    public function fromActivity(Activity $from, &$to): void
     {
-        return $to;
+        // TODO: Implement fromActivity() method.
     }
 }

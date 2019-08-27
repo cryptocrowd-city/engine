@@ -41,6 +41,7 @@ abstract class Properties
         return $this->changed;
     }
 
-    abstract public function toActivity($from, Activity $to): Activity;
-    abstract public function fromActivity(Activity $from, $to);
+    abstract public function toActivity($from, Activity &$to): void;
+
+    abstract public function fromActivity(Activity $from, &$to): void;
 }
