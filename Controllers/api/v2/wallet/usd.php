@@ -74,7 +74,7 @@ class usd implements Interfaces\Api
         $response = array();
 
         switch ($pages[0]) {
-            case "onboard":
+            case "onboarding":
                 $account = (new Payments\Stripe\Connect\Account())
                     ->setUserGuid(Core\Session::getLoggedInUser()->guid)
                     ->setUser(Core\Session::getLoggedInUser())
@@ -95,7 +95,8 @@ class usd implements Interfaces\Api
 
                 try {
                     $stripeConnectManager = Core\Di\Di::_()->get('Stripe\Connect\Manager');
-                    $id = $stripeConnectManager->add($account);
+                    $account = $stripeConnectManager->add($account);
+                    $response['account'] = $account->export();
 
                 } catch (\Exception $e) {
                     $response['status'] = "error";

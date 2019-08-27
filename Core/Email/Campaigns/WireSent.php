@@ -40,7 +40,6 @@ class WireSent extends EmailCampaign
         ];
 
         $timestamp = gettype($this->wire->getTimestamp()) === 'object' ? $this->wire->getTimestamp()->time() : $this->wire->getTimestamp();
-        $amount = $this->wire->getMethod() === 'tokens' ? BigNumber::fromPlain($this->wire->getAmount(), 18)->toDouble() : $this->wire->getAmount();
 
         $contract = $this->wire->getMethod() === 'onchain' ? 'wire' : 'offchain:wire';
 
@@ -72,11 +71,9 @@ class WireSent extends EmailCampaign
     public function send()
     {
         if ($this->canSend()) {
-            $this->mailer->queue($this->build());
+            $this->mailer->send($this->build());
         }
     }
-<<<<<<< HEAD
-=======
 
     private function getAmountString($wire)
     {
@@ -94,5 +91,4 @@ class WireSent extends EmailCampaign
 
         return "$amount $currency";
     }
->>>>>>> d85a52e... (feat): wire emails support multiple currencies
 }

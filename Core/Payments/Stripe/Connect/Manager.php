@@ -33,10 +33,10 @@ class Manager
     /**
      * Add a conenct account to stripe
      * @param Account $account
-     * @return string
+     * @return Account
      */
-    public function add(Account $account): string
-    {
+    public function add(Account $account) : Account
+    { 
         $dob = explode('-', $account->getDateOfBirth());
         $data = [
           'managed' => true,
@@ -89,14 +89,14 @@ class Manager
             throw new \Exception($result->message);
         }
 
-        $id = $result->id;
+        $account->setId($result->id);
 
         // Save reference directly to user entity
 
         $user = $account->getUser();
         $user->setMerchant([
             'service' => 'stripe',
-            'id' => $id
+            'id' => $result->id,
         ]);
 
         $this->save->setEntity($user)
@@ -106,7 +106,7 @@ class Manager
 
         $this->notificationDelegate->onAccepted($account);
 
-        return $id;
+        return $account;
     }
 
     /**
@@ -269,7 +269,7 @@ class Manager
         // Delete id from user entity
 
         $user = $account->getUser();
-        $user->setMerchant([]);
+        $user->setMerchant([ 'deleted' => true ]);
         $this->save->setEntity($user)
             ->save();
 

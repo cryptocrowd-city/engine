@@ -2,7 +2,7 @@
     $wireUrl = "{$vars['site_url']}wallet/tokens/transactions/{$vars['contract']}?{$vars['tracking']}";
     $avatarUrl = "{$vars['receiver']->getIconUrl()}";
     $wireDate = date('M d, Y', ($vars['timestamp']));
-    $amount = number_format($vars['amount'], 2);
+    $amount = $vars['amount'];
 ?>
 <table cellspacing="8" cellpadding="8" border="0" width="600" align="center">
   <tbody>

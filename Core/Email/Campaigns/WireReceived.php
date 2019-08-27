@@ -69,7 +69,7 @@ class WireReceived extends EmailCampaign
     public function send()
     {
         if ($this->canSend()) {
-            $this->mailer->queue($this->build());
+            $this->mailer->send($this->build());
         }
     }
 
