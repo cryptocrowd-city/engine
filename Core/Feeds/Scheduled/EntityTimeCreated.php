@@ -6,11 +6,10 @@ class EntityTimeCreated
 {
     /**
      * EntityTimeCreated constructor.
-     * 
+     *
      */
     public function __construct()
     {
-
     }
 
     public function validate($entity, $time_created, $time_sent)

@@ -101,7 +101,7 @@ class CreateActivitySpec extends ObjectBehavior
             ->shouldReturn(true);
     }
 
-    function it_should_save_when_previous_activity(
+    public function it_should_save_when_previous_activity(
         Blog $blog
     ) {
         $blog->getGuid()

@@ -306,7 +306,7 @@ class blog implements Interfaces\Api
                     'status' => 'error',
                     'message' => $e->getMessage(),
                 ]);
-            }    
+            }
         }
 
         if (!$blog->isPublished()) {

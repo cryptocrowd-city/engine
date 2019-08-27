@@ -732,10 +732,10 @@ class Activity extends Entity
         return "urn:activity:{$this->getGuid()}";
     }
 
-     /**
-     * Return time_sent
-     * @return int
-     */
+    /**
+    * Return time_sent
+    * @return int
+    */
     public function getTimeSent()
     {
         return $this->time_sent;

@@ -10,7 +10,6 @@ use Minds\Core\Feeds\Scheduled\EntityTimeCreated;
 
 class TimeCreatedDelegate
 {
-
     /** @var Core\Feeds\Scheduled\EntityTimeCreated $entityTimeCreated */
     protected $entityTimeCreated;
 
@@ -46,5 +45,4 @@ class TimeCreatedDelegate
         $this->entityTimeCreated->validate($entity, $time_created, $time_sent);
         return true;
     }
-
 }

@@ -17,7 +17,7 @@ class RepositorySpec extends ObjectBehavior
     /** @var Config */
     protected $config;
 
-    function let(Client $client, Config $config)
+    public function let(Client $client, Config $config)
     {
         $this->client = $client;
         $this->config = $config;
@@ -29,12 +29,12 @@ class RepositorySpec extends ObjectBehavior
         $this->beConstructedWith($client, $config);
     }
 
-    function it_is_initializable()
+    public function it_is_initializable()
     {
         $this->shouldHaveType(Repository::class);
     }
 
-    function it_should_count_scheduled_activities()
+    public function it_should_count_scheduled_activities()
     {
         $opts = ['container_guid' => 9999, 'type' => 'activity'];
 

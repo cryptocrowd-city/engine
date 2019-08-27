@@ -12,12 +12,12 @@ use Minds\Interfaces;
 
 class scheduled implements Interfaces\Api
 {
-   /**
-     * Equivalent to HTTP GET method
-     * @param array $pages
-     * @return mixed|null
-     * @throws \Exception
-     */
+    /**
+      * Equivalent to HTTP GET method
+      * @param array $pages
+      * @return mixed|null
+      * @throws \Exception
+      */
     public function get($pages)
     {
         /** @var User $currentUser */

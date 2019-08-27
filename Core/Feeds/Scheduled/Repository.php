@@ -71,5 +71,4 @@ class Repository
 
         return $result['count'] ?? 0;
     }
-
 }

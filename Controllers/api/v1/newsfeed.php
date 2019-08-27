@@ -526,7 +526,7 @@ class newsfeed implements Interfaces\Api
                                 'status' => 'error',
                                 'message' => $e->getMessage(),
                             ]);
-                        } 
+                        }
                     }
                     
                     $save->setEntity($activity)
@@ -551,7 +551,7 @@ class newsfeed implements Interfaces\Api
                             'status' => 'error',
                             'message' => $e->getMessage(),
                         ]);
-                    } 
+                    }
                 }
 
                 if ($user->isMature()) {

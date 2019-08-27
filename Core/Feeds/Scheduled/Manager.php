@@ -9,8 +9,7 @@ class Manager
 
     public function __construct(
         $repository = null
-    )
-    {
+    ) {
         $this->repository = $repository ?: new Repository;
     }
 
@@ -22,5 +21,4 @@ class Manager
     {
         return $this->repository->getScheduledCount($opts) ;
     }
-
 }

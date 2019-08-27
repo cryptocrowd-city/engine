@@ -10,7 +10,6 @@ use PhpSpec\ObjectBehavior;
 
 class ManagerSpec extends ObjectBehavior
 {
-
     /** @var Repository */
     protected $repository;
 
@@ -20,15 +19,14 @@ class ManagerSpec extends ObjectBehavior
     /** @var Search */
     protected $search;
 
-    function let(
+    public function let(
         Repository $repository
-    )
-    {
+    ) {
         $this->repository = $repository;
         $this->beConstructedWith($repository);
     }
 
-    function it_is_initializable()
+    public function it_is_initializable()
     {
         $this->shouldHaveType(Manager::class);
     }
