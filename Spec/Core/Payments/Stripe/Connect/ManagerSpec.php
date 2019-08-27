@@ -17,7 +17,7 @@ class ManagerSpec extends ObjectBehavior
     private $notificationDelegate;
     private $accountInstance;
 
-    function let(Save $save, NotificationDelegate $notificationDelegate, AccountInstance $accountInstance)
+    public function let(Save $save, NotificationDelegate $notificationDelegate, AccountInstance $accountInstance)
     {
         $this->beConstructedWith($save, $notificationDelegate, $accountInstance);
         $this->save = $save;
@@ -25,12 +25,12 @@ class ManagerSpec extends ObjectBehavior
         $this->accountInstance = $accountInstance;
     }
 
-    function it_is_initializable()
+    public function it_is_initializable()
     {
         $this->shouldHaveType(Manager::class);
     }
 
-    function it_should_add_a_new_account_to_stripe(Account $account)
+    public function it_should_add_a_new_account_to_stripe(Account $account)
     {
         $account->getDateOfBirth()
             ->willReturn('1943-02-25');
@@ -188,7 +188,7 @@ class ManagerSpec extends ObjectBehavior
         $account = $this->getByUser($user);
     }
 
-    function it_should_not_get_an_account_if_not_stripe_service()
+    public function it_should_not_get_an_account_if_not_stripe_service()
     {
         $user = new User();
         $user->setMerchant([
@@ -199,5 +199,4 @@ class ManagerSpec extends ObjectBehavior
         $account = $this->getByUser($user);
         $account->shouldBe(null);
     }
-
 }

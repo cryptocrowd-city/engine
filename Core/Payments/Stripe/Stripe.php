@@ -93,7 +93,7 @@ class Stripe implements SubscriptionPaymentServiceInterface
 
             if ($sale->getFee()) {
                 $opts['application_fee'] = $sale->getAmount() * $sale->getFee();
-              //  $opts['destination']['amount'] = $sale->getAmount() - ($sale->getFee() * $sale->getAmount());
+                //  $opts['destination']['amount'] = $sale->getAmount() - ($sale->getFee() * $sale->getAmount());
             }
 
             if ($opts['customer']) {
@@ -173,7 +173,7 @@ class Stripe implements SubscriptionPaymentServiceInterface
         $opts = [];
 
         if ($sale->getMerchant()) {
-          $opts['stripe_account'] = $sale->getMerchant()->getMerchant()['id'];
+            $opts['stripe_account'] = $sale->getMerchant()->getMerchant()['id'];
         }
 
         StripeSDK\Refund::create([
@@ -191,7 +191,7 @@ class Stripe implements SubscriptionPaymentServiceInterface
         $opts = [];
 
         if ($sale->getMerchant()) {
-          $opts['stripe_account'] = $sale->getMerchant()->getMerchant()['id'];
+            $opts['stripe_account'] = $sale->getMerchant()->getMerchant()['id'];
         }
 
         StripeSDK\Refund::create([
@@ -205,7 +205,7 @@ class Stripe implements SubscriptionPaymentServiceInterface
      * @param array $options - limit, offset
      * @return array
      */
-    public function getSales(Merchant $merchant, array $options = array())
+    public function getSales(Merchant $merchant, array $options = [])
     {
         $results = StripeSDK\Charge::all(
             [
@@ -232,7 +232,7 @@ class Stripe implements SubscriptionPaymentServiceInterface
 
     public function getGrossVolume($merchant)
     {
-      $results = StripeSDK\BalanceTransaction::all(
+        $results = StripeSDK\BalanceTransaction::all(
         [
           //'type' => 'payment'
         ],
@@ -240,25 +240,25 @@ class Stripe implements SubscriptionPaymentServiceInterface
           'stripe_account' => $merchant->getId()
         ]);
 
-      $total = [
+        $total = [
         'net' => 0,
         'gross' => 0
       ];
 
-      foreach($results->autoPagingIterator() as $balance){
-        if ($balance->type == 'payout') {
-          continue; //we don't want to show the payouts in our total balance
+        foreach ($results->autoPagingIterator() as $balance) {
+            if ($balance->type == 'payout') {
+                continue; //we don't want to show the payouts in our total balance
+            }
+            $total['net'] += $balance->net / 100;
+            $total['gross'] += $balance->amount / 100;
         }
-        $total['net'] += $balance->net / 100;
-        $total['gross'] += $balance->amount / 100;
-      }
 
-      return $total;
+        return $total;
     }
 
     public function getTotalPayouts($merchant)
     {
-      $results = StripeSDK\BalanceTransaction::all(
+        $results = StripeSDK\BalanceTransaction::all(
         [
           'type' => 'payout'
         ],
@@ -266,13 +266,13 @@ class Stripe implements SubscriptionPaymentServiceInterface
           'stripe_account' => $merchant->getId()
         ]);
 
-      $total = 0;
+        $total = 0;
 
-      foreach($results->autoPagingIterator() as $balance){
-        $total += $balance->amount / 100;
-      }
+        foreach ($results->autoPagingIterator() as $balance) {
+            $total += $balance->amount / 100;
+        }
 
-      return $total * -1;
+        return $total * -1;
     }
 
     public function getPayouts(Merchant $merchant, array $options = [])
@@ -294,7 +294,7 @@ class Stripe implements SubscriptionPaymentServiceInterface
 
         $results = [];
 
-        foreach($transactions->autoPagingIterator() as $transaction){
+        foreach ($transactions->autoPagingIterator() as $transaction) {
             $transaction->amount = $transaction->amount;
             $results[] = $transaction;
         }
@@ -344,7 +344,7 @@ class Stripe implements SubscriptionPaymentServiceInterface
             }
 
             foreach ($charges as $charge) {
-                if($charge->balance_transaction == $transaction->id){
+                if ($charge->balance_transaction == $transaction->id) {
                     $transaction->metadata = $charge->metadata;
                     $transaction->refunded = $charge->refunded;
                     $transaction->dispute = $charge->dispute;
@@ -465,13 +465,13 @@ class Stripe implements SubscriptionPaymentServiceInterface
         return $results;
     }
 
-   /**
-     * Get a list of transactions
-     * @param Merchant $merchant - the merchant
-     * @param array $options - limit, offset
-     * @return array
-     */
-    public function getBalance(Merchant $merchant, array $options = array())
+    /**
+      * Get a list of transactions
+      * @param Merchant $merchant - the merchant
+      * @param array $options - limit, offset
+      * @return array
+      */
+    public function getBalance(Merchant $merchant, array $options = [])
     {
         $results = StripeSDK\BalanceTransaction::all(
             [
@@ -489,8 +489,8 @@ class Stripe implements SubscriptionPaymentServiceInterface
       * @param array $options - limit, offset
       * @return array
       */
-     public function getTotalBalance(Merchant $merchant, array $options = array())
-     {
+    public function getTotalBalance(Merchant $merchant, array $options = [])
+    {
         $results = StripeSDK\Balance::retrieve([
           'stripe_account' => $merchant->getId()
         ]);
@@ -507,7 +507,7 @@ class Stripe implements SubscriptionPaymentServiceInterface
             }
         }
         return $totals;
-     }
+    }
 
     public function verifyMerchant($id, $file)
     {
@@ -528,7 +528,6 @@ class Stripe implements SubscriptionPaymentServiceInterface
 
     public function createCustomer(Customer $customer)
     {
-
         $opts = [
             'metadata' => [
                 'user_guid' => $customer->getUser()->getGuid()
@@ -629,7 +628,6 @@ class Stripe implements SubscriptionPaymentServiceInterface
 
     public function createSubscription(Subscription $subscription)
     {
-
         $customer = new Customer;
         $customer->setUser($subscription->getUser());
 
@@ -648,7 +646,6 @@ class Stripe implements SubscriptionPaymentServiceInterface
         }
 
         try {
-
             if ($subscription->getMerchant()) {
                 $merchant = $subscription->getMerchant(); //@todo clean this up
                 //subscriptions need to clone customers
@@ -683,7 +680,6 @@ class Stripe implements SubscriptionPaymentServiceInterface
               $params,
               $extras
             );
-
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -693,21 +689,21 @@ class Stripe implements SubscriptionPaymentServiceInterface
 
     public function getSubscription(Subscription $subscription)
     {
-      try {
-          $result = StripeSDK\Subscription::retrieve(
+        try {
+            $result = StripeSDK\Subscription::retrieve(
             $subscription->getId(),
             [
               'stripe_account' => $subscription->getMerchant()['id']
             ]);
 
-          $subscription->setAmount(($result->quantity * $result->plan->amount) / 100);
-          $subscription->setNextBillingDate($result->current_period_end);
+            $subscription->setAmount(($result->quantity * $result->plan->amount) / 100);
+            $subscription->setNextBillingDate($result->current_period_end);
 
-          return $subscription;
-      } catch (StripeSDK\Error\InvalidRequest $e) {
-          return false;
-      }
-      return false;
+            return $subscription;
+        } catch (StripeSDK\Error\InvalidRequest $e) {
+            return false;
+        }
+        return false;
     }
 
     public function cancelSubscription(Subscription $subscription)
@@ -773,5 +769,4 @@ class Stripe implements SubscriptionPaymentServiceInterface
 
         return $countryToCurrency[$country];
     }
-
 }

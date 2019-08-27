@@ -15,10 +15,10 @@ class Events
         /**
          * Removes important export fields if marked as paywall
          */
-        Dispatcher::register('export:extender', 'activity', function($event) {
+        Dispatcher::register('export:extender', 'activity', function ($event) {
             $params = $event->getParameters();
             $activity = $params['entity'];
-            if($activity->type != 'activity'){
+            if ($activity->type != 'activity') {
                 return;
             }
             $export = $event->response() ?: [];
@@ -62,13 +62,12 @@ class Events
             if (!$currentUser) {
                 return;
             }
-
         });
 
         /**
          * Blogs need more exportable fields for paywall
          */
-        Dispatcher::register('export:extender', 'blog', function(Event $event) {
+        Dispatcher::register('export:extender', 'blog', function (Event $event) {
             $params = $event->getParameters();
             /** @var Core\Blogs\Blog $blog */
             $blog = $params['entity'];
@@ -95,7 +94,7 @@ class Events
         /**
          * Wire paywall hooks. Allows access if sent wire or is plus
          */
-        Dispatcher::register('acl:read', 'object', function($event) {
+        Dispatcher::register('acl:read', 'object', function ($event) {
             $params = $event->getParameters();
             $entity = $params['entity'];
             $user = $params['user'];
@@ -120,7 +119,8 @@ class Events
 
             try {
                 $isAllowed = Di::_()->get('Wire\Thresholds')->isAllowed($user, $entity);
-            } catch (\Exception $e) { }
+            } catch (\Exception $e) {
+            }
 
             if ($isAllowed) {
                 return $event->setResponse(true);

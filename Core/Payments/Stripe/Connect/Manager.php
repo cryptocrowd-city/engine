@@ -23,10 +23,9 @@ class Manager
         Save $save = null,
         NotificationDelegate $notificationDelegate = null,
         AccountInstance $accountInstance = null
-    )
-    {
+    ) {
         $this->save = $save ?: new Save();
-        $this->notificationDelegate = $notificationDelegate ?: new NotificationDelegate(); 
+        $this->notificationDelegate = $notificationDelegate ?: new NotificationDelegate();
         $this->accountInstance = $accountInstance ?: new AccountInstance();
     }
 
@@ -36,7 +35,7 @@ class Manager
      * @return Account
      */
     public function add(Account $account) : Account
-    { 
+    {
         $dob = explode('-', $account->getDateOfBirth());
         $data = [
           'managed' => true,
@@ -275,5 +274,4 @@ class Manager
 
         return true;
     }
-
 }

@@ -34,5 +34,4 @@ class Customer
             'user' => $this->user ? $this->user->export() : null,
         ];
     }
-
 }

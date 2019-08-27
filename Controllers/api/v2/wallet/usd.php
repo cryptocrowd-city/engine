@@ -71,7 +71,7 @@ class usd implements Interfaces\Api
     {
         Factory::isLoggedIn();
 
-        $response = array();
+        $response = [];
 
         switch ($pages[0]) {
             case "onboarding":
@@ -97,7 +97,6 @@ class usd implements Interfaces\Api
                     $stripeConnectManager = Core\Di\Di::_()->get('Stripe\Connect\Manager');
                     $account = $stripeConnectManager->add($account);
                     $response['account'] = $account->export();
-
                 } catch (\Exception $e) {
                     $response['status'] = "error";
                     $response['message'] = $e->getMessage();
@@ -157,12 +156,11 @@ class usd implements Interfaces\Api
 
     public function put($pages)
     {
-        return Factory::response(array());
+        return Factory::response([]);
     }
 
     public function delete($pages)
     {
-        return Factory::response(array());
+        return Factory::response([]);
     }
-
 }

@@ -126,7 +126,7 @@ class Account
      */
     public function setDestination($destination)
     {
-        if (!in_array($destination, array('bank', 'email'))) {
+        if (!in_array($destination, ['bank', 'email'], true)) {
             throw new \Exception("$destination is not a valid payout method");
         }
         $this->destination = $destination;

@@ -4,7 +4,6 @@ namespace Minds\Core\Payments\Stripe;
 
 class Currencies
 {
-
     /**
      * Return the currency by country code
      * @param string $country
@@ -29,5 +28,4 @@ class Currencies
 
         return $countryToCurrency[$country];
     }
-
 }

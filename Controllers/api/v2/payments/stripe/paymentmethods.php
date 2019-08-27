@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  */
 namespace Minds\Controllers\api\v2\payments\stripe;
 
@@ -14,7 +14,6 @@ use Minds\Core\Payments\Stripe;
 
 class paymentmethods implements Interfaces\Api
 {
-
     public function get($pages)
     {
         $user = Session::getLoggedInUser();
@@ -76,8 +75,4 @@ class paymentmethods implements Interfaces\Api
         $paymentMethodsManager->delete($pages[0]);
         return Factory::response([]);
     }
-    
 }
-
-
-

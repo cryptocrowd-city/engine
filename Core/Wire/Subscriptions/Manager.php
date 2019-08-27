@@ -2,7 +2,6 @@
 
 namespace Minds\Core\Wire\Subscriptions;
 
-
 use Minds\Core;
 use Minds\Core\Di\Di;
 use Minds\Core\Wire\Exceptions\WalletNotSetupException;
@@ -121,13 +120,13 @@ class Manager
         $amount = $subscription->getAmount();
 
         $id = $subscription->getId();
-        if (strpos($id, 'urn:', 0) !== 0)  {
+        if (strpos($id, 'urn:', 0) !== 0) {
             error_log("[wire][recurring]: $id was expecting a urn");
             return false;
         }
 
         $urn = new Urn($id);
-        list ($address, , ,) = explode('-', $urn->getNss());
+        list($address, , , ) = explode('-', $urn->getNss());
 
         switch ($address) {
             case "offchain":

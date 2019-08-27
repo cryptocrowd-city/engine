@@ -8,7 +8,6 @@ use Minds\Core\Payments\Subscriptions\Subscription;
 
 class RecurringDelegate
 {
-
     /** @var $subscriptionsManager */
     private $subscriptionsManager;
 
@@ -24,7 +23,6 @@ class RecurringDelegate
      */
     public function onAdd(Wire $wire): void
     {
-
         $urn = "urn:subscription:" . implode('-', [
             $wire->getAddress(), //offchain or onchain wallet or usd
             $wire->getSender()->getGuid(),
@@ -40,7 +38,6 @@ class RecurringDelegate
             ->setEntity($wire->getReceiver());
 
         $this->subscriptionsManager->setSubscription($subscription);
-        $this->subscriptionsManager->create();       
+        $this->subscriptionsManager->create();
     }
-
 }

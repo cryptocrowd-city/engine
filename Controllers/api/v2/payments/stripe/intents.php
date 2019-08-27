@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  */
 namespace Minds\Controllers\api\v2\payments\stripe;
 
@@ -14,7 +14,6 @@ use Minds\Core\Payments\Stripe;
 
 class intents implements Interfaces\Api
 {
-
     public function get($pages)
     {
         return Factory::response([
@@ -60,7 +59,7 @@ class intents implements Interfaces\Api
         $intent = new Stripe\Intents\SetupIntent();
 
         $intentManager = new Stripe\Intents\Manager();
-        $intent = $intentManager->add($intent);        
+        $intent = $intentManager->add($intent);
  
         
         return Factory::response([
@@ -75,8 +74,4 @@ class intents implements Interfaces\Api
         $user->save();
         return Factory::response([]);
     }
-    
 }
-
-
-

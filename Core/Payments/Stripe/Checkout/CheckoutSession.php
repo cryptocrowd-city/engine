@@ -24,5 +24,4 @@ class CheckoutSession
             'sessionId' => (string) $this->sessionId,
         ];
     }
-
 }

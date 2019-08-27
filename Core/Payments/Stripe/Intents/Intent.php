@@ -37,5 +37,4 @@ class Intent
             'client_secret' => $this->clientSecret,
         ];
     }
-
 }

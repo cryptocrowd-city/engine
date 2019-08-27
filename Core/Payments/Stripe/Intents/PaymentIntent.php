@@ -47,5 +47,4 @@ class PaymentIntent extends Intent
         return [
         ];
     }
-
 }

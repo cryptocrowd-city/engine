@@ -19,5 +19,4 @@ class SetupIntent extends Intent
     {
         return parent::export($extend);
     }
-
 }

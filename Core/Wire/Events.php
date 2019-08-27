@@ -54,5 +54,4 @@ class Events
             return $event->setResponse(true);
         });
     }
-
 }

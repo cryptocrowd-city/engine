@@ -11,12 +11,10 @@ use Minds\Core\Di\Di;
  */
 class AccountInstance extends StaticToInstance
 {
-
     public function __construct(Config $config = null)
     {
         $config = $config ?? Di::_()->get('Config');
         \Stripe\Stripe::setApiKey($config->get('payments')['stripe']['api_key']);
         $this->setClass(new \Stripe\Account);
     }
-
 }

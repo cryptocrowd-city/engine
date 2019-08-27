@@ -6,12 +6,9 @@ namespace Minds\Core\Di;
 
 class Registry
 {
-
-    private array $providers = [];
+    private $providers = [];
 
     public static function get()
     {
-
     }
-
 }

@@ -16,7 +16,6 @@ use Minds\Helpers\Counters;
 
 class Stripe extends Cli\Controller implements Interfaces\CliControllerInterface
 {
-
     private $db;
     private $es;
     private $elasticRepository;
@@ -58,7 +57,6 @@ class Stripe extends Cli\Controller implements Interfaces\CliControllerInterface
         $intent = $intentManager->add($intent);
 
         var_dump($intent->getClientSecret());
-
     }
 
     public function get_setup_intent_payment_method()
@@ -69,6 +67,4 @@ class Stripe extends Cli\Controller implements Interfaces\CliControllerInterface
         $intent = $intentManager->get($id);
         var_dump($intent);
     }
-
 }
-

@@ -10,7 +10,6 @@ use Minds\Core\Payments\Stripe\Instances\PaymentMethodInstance;
 
 class Manager
 {
-
     /** @var Lookup $lookup */
     private $lookup;
 
@@ -91,5 +90,4 @@ class Manager
         $stripePaymentMethod = $this->paymentMethodInstance->retrieve($id);
         return (bool) $stripePaymentMethod->detach();
     }
-
 }

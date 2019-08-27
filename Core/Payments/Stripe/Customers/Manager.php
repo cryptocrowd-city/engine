@@ -8,7 +8,6 @@ use Minds\Core\Payments\Stripe\Instances\PaymentMethodInstance;
 
 class Manager
 {
-
     /** @var Lookup $lookup */
     private $lookup;
 
@@ -59,7 +58,7 @@ class Manager
     {
         $stripeCustomer = $this->customerInstance->create([
             'payment_method' => $customer->getPaymentMethod(),
-        ]); 
+        ]);
 
         $this->lu->set("{$customer->getUserGuid()}:payments", [
             'customer_id' => (string) $stripeCustomer->id
@@ -70,5 +69,4 @@ class Manager
 
         return $customer;
     }
-
 }

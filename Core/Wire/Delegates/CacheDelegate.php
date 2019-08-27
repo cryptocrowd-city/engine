@@ -25,6 +25,4 @@ class CacheDelegate
     {
         $this->cache->destroy(Counter::getIndexName($wire->getEntity()->guid, null, 'tokens', null, true));
     }
-
 }
-

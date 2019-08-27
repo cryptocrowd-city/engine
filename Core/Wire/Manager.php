@@ -276,7 +276,7 @@ class Manager
                     ->setStripeAccountId($this->receiver->getMerchant()['id']);
 
                 // Charge stripe
-                $this->stripeIntentsManager->add($intent);    
+                $this->stripeIntentsManager->add($intent);
 
                 $wire->setAddress('stripe')
                     ->setMethod('usd');
@@ -336,6 +336,4 @@ class Manager
 
         return $success;
     }
-
-
 }

@@ -31,7 +31,7 @@ class btc implements Interfaces\Api
 
         switch ($pages[0]) {
             case "address":
-                $response['address'] = Core\Session::getLoggedInUser()->getBtcAddress(); 
+                $response['address'] = Core\Session::getLoggedInUser()->getBtcAddress();
                 break;
         }
 
@@ -60,12 +60,11 @@ class btc implements Interfaces\Api
 
     public function put($pages)
     {
-        return Factory::response(array());
+        return Factory::response([]);
     }
 
     public function delete($pages)
     {
-        return Factory::response(array());
+        return Factory::response([]);
     }
-
 }

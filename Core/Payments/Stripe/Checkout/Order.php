@@ -57,5 +57,4 @@ class Order
             'stripe_account_id' => $this->getStripeAccount(),
         ];
     }
-
 }

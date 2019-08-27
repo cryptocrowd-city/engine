@@ -25,5 +25,4 @@ class NotificationDelegate
             'params' => [ 'program' => 'monetization' ],
         ]);
     }
-
 }

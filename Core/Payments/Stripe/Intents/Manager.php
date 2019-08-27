@@ -8,7 +8,6 @@ use Minds\Core\Payments\Stripe\Instances\SetupIntentInstance;
 
 class Manager
 {
-
     /** @var CustomersManager $customersManager */
     private $customersManager;
 
@@ -22,8 +21,7 @@ class Manager
         CustomersManager $customersManager = null,
         PaymentIntentInstance $paymentIntentInstance = null,
         SetupIntentInstance $setupIntentInstance = null
-    )
-    {
+    ) {
         $this->customersManager = $customersManager ?? new CustomersManager;
         $this->paymentIntentInstance = $paymentIntentInstance ?: new PaymentIntentInstance();
         $this->setupIntentInstance = $setupIntentInstance ?: new SetupIntentInstance();
@@ -102,5 +100,4 @@ class Manager
 
         return $intent;
     }
-
 }

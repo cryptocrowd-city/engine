@@ -18,5 +18,4 @@ class Module implements ModuleInterface
         $events = new Events();
         $events->register();
     }
-
 }

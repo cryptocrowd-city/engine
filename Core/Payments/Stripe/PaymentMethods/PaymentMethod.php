@@ -48,5 +48,4 @@ class PaymentMethod
             'card_last4' => $this->cardLast4,
         ];
     }
-
 }

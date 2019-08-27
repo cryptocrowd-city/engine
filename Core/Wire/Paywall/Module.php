@@ -5,7 +5,6 @@ use Minds\Interfaces\ModuleInterface;
 
 class Module implements ModuleInterface
 {
-
     /**
      * Executed onInit
      */
@@ -14,5 +13,4 @@ class Module implements ModuleInterface
         $events = new Events();
         $events->register();
     }
-
 }

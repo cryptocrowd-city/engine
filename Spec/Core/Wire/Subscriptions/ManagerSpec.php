@@ -13,17 +13,15 @@ use Prophecy\Argument;
 
 class ManagerSpec extends ObjectBehavior
 {
-
-    function it_is_initializable()
+    public function it_is_initializable()
     {
         $this->shouldHaveType('Minds\Core\Wire\Subscriptions\Manager');
     }
 
-    function it_should_create_a_subscription(
+    public function it_should_create_a_subscription(
         WireManager $wireManager,
         SubscriptionsManager $subscriptionsManager
-    )
-    {
+    ) {
         $this->beConstructedWith($wireManager, $subscriptionsManager);
 
 
@@ -32,11 +30,11 @@ class ManagerSpec extends ObjectBehavior
         $receiver = new User();
         $receiver->guid = 456;
 
-        $subscriptionsManager->setSubscription(Argument::that(function($subscription) {
+        $subscriptionsManager->setSubscription(Argument::that(function ($subscription) {
             return $subscription->getUser()->guid == 123
                 && $subscription->getEntity()->guid == 456
                 && $subscription->getAmount() == 5;
-            }))
+        }))
             ->willReturn(123);
         $subscriptionsManager->create()->shouldBeCalled();
         
@@ -45,5 +43,4 @@ class ManagerSpec extends ObjectBehavior
             ->setReceiver($receiver);
         $this->create()->shouldBeString();
     }
-
 }

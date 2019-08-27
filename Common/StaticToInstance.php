@@ -35,5 +35,4 @@ class StaticToInstance
         $instance = $this->class->newInstanceWithoutConstructor();
         return $instance::$method(...$arguments);
     }
-
 }

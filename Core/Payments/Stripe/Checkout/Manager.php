@@ -6,7 +6,6 @@ use Stripe\Checkout\Session;
 
 class Manager
 {
-
     /**
      * Get a checkout session id
      * @param Order $order
@@ -40,5 +39,4 @@ class Manager
 
         return $session;
     }
-
 }
