@@ -121,11 +121,22 @@ class subscribed implements Interfaces\Api
                     $result = $result->map([$entities, 'cast']);
                 }
             }
+            
+
+            $permissions = null;
+             //Calculate new permissions object with the entities
+            if (Di::_()->get('Features\Manager')->has('permissions')) {
+                $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
+                $permissions = $permissionsManager->getList(['user_guid' => Core\Session::getLoggedInUserGuid(),
+                                                        'entities' => $result->toArray()]);
+                $response['permissions'] = $permissions;
+             }
 
             return Factory::response([
                 'status' => 'success',
                 'entities' => Exportable::_($result),
                 'load-next' => $result->getPagingToken(),
+                'permissions' => $permissions
             ]);
         } catch (\Exception $e) {
             error_log($e);

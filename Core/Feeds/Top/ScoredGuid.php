@@ -22,6 +22,8 @@ use Minds\Traits\MagicAttributes;
  * @method ScoredGuid setTimestamp(int $timestamp)
  * @method string getType()
  * @method ScoredGuid setType(string $type)
+ * @method int getAccessId()
+ * @method ScoredGuid setAccessId(int $accessId)
  */
 class ScoredGuid
 {
@@ -41,6 +43,9 @@ class ScoredGuid
 
     /** @var int */
     protected $timestamp;
+
+    /** @var int */
+    protected $accessId;
 
     /**
      * @param $score

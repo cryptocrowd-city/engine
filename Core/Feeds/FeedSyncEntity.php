@@ -21,6 +21,8 @@ use Minds\Traits\MagicAttributes;
  * @method FeedSyncEntity setTimestamp(int $timestamp)
  * @method string getUrn()
  * @method FeedSyncEntity setUrn(string $urn)
+ * @method int getAccessId()
+ * @method FeedSyncEntity setAccessId(int $accessId)
  */
 class FeedSyncEntity
 {
@@ -34,6 +36,9 @@ class FeedSyncEntity
 
     /** @var int */
     protected $timestamp;
+
+    /** @var int */
+    protected $accessId;
 
     /** @var string */
     protected $urn;
@@ -50,6 +55,7 @@ class FeedSyncEntity
         return [
             'guid' => (string) $this->guid,
             'owner_guid' =>  (string) $this->ownerGuid,
+            'access_id' => $this->accessId,
             'timestamp' => $this->timestamp,
             'urn' => $this->urn,
             'entity' => $this->entity ? $this->entity->export() : null,

@@ -25,6 +25,7 @@ class Manager
      * @param array $opts
      *    - user_guid: long, the user's guid for calculating permissions
      *    - guids: array long, the list of entities to permit 
+     *    - entities: fetched objects to permit
      * @return Permissions A map of channels, groups and entities with the user's role for each
      */
     public function getList(array $opts = [])
@@ -32,6 +33,7 @@ class Manager
         $opts = array_merge([
             'user_guid' => null,
             'guids' => [],
+            'entities' => [],
         ], $opts);
 
         if ($opts['user_guid'] === null) {
@@ -40,6 +42,7 @@ class Manager
 
         $user = $this->entitiesBuilder->single($opts['user_guid']);
         $entities = $this->entitiesBuilder->get($opts);
+        $entities = array_merge($entities, $opts['entities']);
 
         if ($user->getType() !== 'user') {
             throw new \InvalidArgumentException('Entity is not a user');

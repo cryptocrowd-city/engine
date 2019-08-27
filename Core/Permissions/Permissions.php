@@ -64,7 +64,7 @@ class Permissions implements \JsonSerializable
     public function calculate(array $entities = [])
     {
         foreach ($entities as $entity) {
-            $this->entities[$entity->getGUID()] = $this->getRoleForEntity($entity);
+            $this->entities[$entity->getGuid()] = $this->getRoleForEntity($entity);
         }
     }
 
