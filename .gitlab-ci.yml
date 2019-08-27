@@ -79,6 +79,7 @@ review:start:
   script:
     - aws eks update-kubeconfig --name=sandbox
     - git clone --branch=sandbox-wip https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/minds/helm-charts.git
+    - echo "Upgraing helm for pipeline ${CI_PIPELINE_ID}"
     - "helm upgrade \
         --install \
         --reuse-values \
