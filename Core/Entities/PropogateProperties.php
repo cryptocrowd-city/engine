@@ -2,13 +2,13 @@
 
 namespace Minds\Core\Entities;
 
-use Minds\Core\Blogs\Delegates\PropogateBlogProperties;
 use Minds\Core\Data\Call;
 use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Entities\Propogator\Properties;
 use Minds\Core\EntitiesBuilder;
 use Minds\Entities\Activity;
+use Minds\Core;
 
 class PropogateProperties
 {
@@ -46,7 +46,15 @@ class PropogateProperties
         $this->propogators[] = $obj;
     }
 
-    public function fromActivity(Activity $activity): void
+    public function from($entity): void
+    {
+        if ($entity instanceof Activity)
+            $this->fromActivity($entity);
+        else
+            $this->toActivities($entity);
+    }
+
+    protected function fromActivity(Activity $activity): void
     {
         $this->changed = false;
         $attachment = $this->entitiesBuilder->single($activity->get('entity_guid'));
@@ -65,7 +73,7 @@ class PropogateProperties
         }
     }
 
-    public function toActivities($entity): void
+    protected function toActivities($entity): void
     {
         $activities = $this->getActivitiesForEntity($entity->getGuid());
         foreach ($activities as $activity) {

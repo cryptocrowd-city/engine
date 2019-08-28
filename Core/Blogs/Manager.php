@@ -178,7 +178,7 @@ class Manager
             }
 
             $this->paywallReview->queue($blog);
-            $this->propogateProperties->toActivities($blog);
+            $this->propogateProperties->from($blog);
         }
 
         return $saved;
