@@ -9,7 +9,7 @@
 namespace Minds\Core\Blogs;
 
 use Minds\Core\Di\Di;
-use Minds\Core\Entities\PropogateProperties;
+use Minds\Core\Entities\PropagateProperties;
 use Minds\Core\Security\Spam;
 
 class Manager
@@ -32,8 +32,8 @@ class Manager
     /** @var Delegates\Search */
     protected $search;
 
-    /** @var PropogateProperties */
-    protected $propogateProperties;
+    /** @var PropagateProperties */
+    protected $propagateProperties;
 
     /**
      * Manager constructor.
@@ -43,7 +43,7 @@ class Manager
      * @param null $feeds
      * @param null $spam
      * @param null $search
-     * @param PropogateProperties $propogateProperties
+     * @param PropagateProperties $propagateProperties
      * @throws \Exception
      */
     public function __construct(
@@ -53,7 +53,7 @@ class Manager
         $feeds = null,
         $spam = null,
         $search = null,
-        PropogateProperties $propogateProperties = null
+        PropagateProperties $propagateProperties = null
     ) {
         $this->repository = $repository ?: new Repository();
         $this->paywallReview = $paywallReview ?: new Delegates\PaywallReview();
@@ -61,7 +61,7 @@ class Manager
         $this->feeds = $feeds ?: new Delegates\Feeds();
         $this->spam = $spam ?: Di::_()->get('Security\Spam');
         $this->search = $search ?: new Delegates\Search();
-        $this->propogateProperties = $propogateProperties ?? Di::_()->get('PropogateProperties');
+        $this->propagateProperties = $propagateProperties ?? Di::_()->get('PropagateProperties');
     }
 
     /**
@@ -177,7 +177,7 @@ class Manager
             }
 
             $this->paywallReview->queue($blog);
-            $this->propogateProperties->from($blog);
+            $this->propagateProperties->from($blog);
         }
 
         return $saved;

@@ -4,22 +4,23 @@ namespace Minds\Core\Permissions;
 
 use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
+use Minds\Core\Entities\PropagateProperties;
 use Minds\Exceptions\StopEventException;
 
 class Manager
 {
     /** @var Save */
     protected $save;
-    /** @var \Minds\Core\Entities\PropogateProperties */
-    protected $propogateProperties;
+    /** @var PropagateProperties */
+    protected $propagateProperties;
 
     public function __construct(
         Save $save = null,
-        \Minds\Core\Entities\PropogateProperties $propogateProperties = null
+        PropagateProperties $propagateProperties = null
     )
     {
         $this->save = $save ?: new Save();
-        $this->propogateProperties = $propogateProperties ?? Di::_()->get('PropogateProperties');
+        $this->propagateProperties = $propagateProperties ?? Di::_()->get('PropagateProperties');
     }
 
 
@@ -37,6 +38,6 @@ class Manager
             ->setEntity($entity)
             ->save();
 
-        $this->propogateProperties->from($entity);
+        $this->propagateProperties->from($entity);
     }
 }

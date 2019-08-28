@@ -5,15 +5,15 @@ namespace Minds\Core\Entities;
 use Minds\Core\Data\Call;
 use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
-use Minds\Core\Entities\Propogator\Properties;
+use Minds\Core\Entities\Propagator\Properties;
 use Minds\Core\EntitiesBuilder;
 use Minds\Entities\Activity;
 use Minds\Core;
 
-class PropogateProperties
+class PropagateProperties
 {
     /**  @var Properties[] */
-    protected $propogators;
+    protected $propagators;
     /** @var Call */
     private $db;
     /** @var Save */
@@ -28,25 +28,27 @@ class PropogateProperties
         $this->db = $db ?? new Call('entities_by_time');
         $this->save = $save ?? new Save();
         $this->entitiesBuilder = $entitiesBuilder ?? Di::_()->get('EntitiesBuilder');
-        $this->registerPropogators();
+        $this->registerPropagators();
     }
 
-    protected function registerPropogators(): void
+    protected function registerPropagators(): void
     {
-        /* Register PropertyPropogator classes here */
-        $this->addPropogator(Core\Blogs\Delegates\PropogateProperties::class);
-        $this->addPropogator(Core\Feeds\Delegates\PropogateProperties::class);
-        $this->addPropogator(Core\Media\Delegates\PropogateProperties::class);
+        /* Register PropertyPropagator classes here */
+        $this->addPropagator(Core\Blogs\Delegates\PropagateProperties::class);
+        $this->addPropagator(Core\Feeds\Delegates\PropagateProperties::class);
+        $this->addPropagator(Core\Media\Delegates\PropagateProperties::class);
+        $this->addPropagator(Core\Entities\Delegates\PropagateProperties::class);
+        $this->addPropagator(Core\Permissions\Delegates\PropagateProperties::class);
     }
 
-    protected function addPropogator(string $class): void
+    protected function addPropagator(string $class): void
     {
         $obj = new $class();
         if (!$obj instanceof Properties) {
-            throw new \Exception('Propogator class is not a Property Propogator');
+            throw new \Exception('Propagator class is not a Property Propagator');
         }
 
-        $this->propogators[] = $obj;
+        $this->propagators[] = $obj;
     }
 
     public function from($entity): void
@@ -66,10 +68,10 @@ class PropogateProperties
             return;
         }
 
-        foreach ($this->propogators as $propogator) {
-            if ($propogator->willActOnEntity($attachment)) {
-                $propogator->fromActivity($activity, $attachment);
-                $this->changed |= $propogator->changed();
+        foreach ($this->propagators as $propagator) {
+            if ($propagator->willActOnEntity($attachment)) {
+                $propagator->fromActivity($activity, $attachment);
+                $this->changed |= $propagator->changed();
             }
         }
 
@@ -82,7 +84,7 @@ class PropogateProperties
     {
         $activities = $this->getActivitiesForEntity($entity->getGuid());
         foreach ($activities as $activity) {
-            $this->propogateToActivity($entity, $activity);
+            $this->propagateToActivity($entity, $activity);
             if ($this->changed) {
                 $this->save->setEntity($activity)->save();
             }
@@ -104,13 +106,13 @@ class PropogateProperties
         return $activities;
     }
 
-    public function propogateToActivity($entity, Activity &$activity): void
+    public function propagateToActivity($entity, Activity &$activity): void
     {
         $this->changed = false;
-        foreach ($this->propogators as $propogator) {
-            if ($propogator->willActOnEntity($entity)) {
-                $propogator->toActivity($entity, $activity);
-                $this->changed |= $propogator->changed();
+        foreach ($this->propagators as $propagator) {
+            if ($propagator->willActOnEntity($entity)) {
+                $propagator->toActivity($entity, $activity);
+                $this->changed |= $propagator->changed();
             }
         }
     }

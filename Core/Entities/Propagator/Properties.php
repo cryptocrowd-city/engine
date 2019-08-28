@@ -1,6 +1,6 @@
 <?php
 
-namespace Minds\Core\Entities\Propogator;
+namespace Minds\Core\Entities\Propagator;
 
 use Minds\Entities\Activity;
 

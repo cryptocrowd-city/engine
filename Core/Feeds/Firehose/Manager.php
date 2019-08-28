@@ -2,15 +2,11 @@
 
 namespace Minds\Core\Feeds\Firehose;
 
-use Minds\Entities\Activity;
 use Minds\Entities\User;
-use Minds\Entities\Entity;
-use Minds\Core\EntitiesBuilder;
-use Minds\Core\Data\Call;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Di\Di;
 use Minds\Core\Feeds\Top\Manager as TopFeedsManager;
-use Minds\Core\Entities\PropogateProperties;
+use Minds\Core\Entities\PropagateProperties;
 
 class Manager
 {
@@ -20,19 +16,19 @@ class Manager
     protected $moderationCache;
     /** @var Save */
     protected $save;
-    /** @var PropogateProperties */
-    protected $propogateProperties;
+    /** @var PropagateProperties */
+    protected $propagateProperties;
 
     public function __construct(
         TopFeedsManager $topFeedsManager = null,
         ModerationCache $moderationCache = null,
         Save $save = null,
-        PropogateProperties $propogateProperties = null
+        PropagateProperties $propagateProperties = null
     ) {
         $this->topFeedsManager = $topFeedsManager ?: Di::_()->get('Feeds\Top\Manager');
         $this->moderationCache = $moderationCache ?: new ModerationCache();
-        $this->save = $save ?: new Save(); //Mockable, else instantiate a new one on save.
-        $this->propogateProperties = $propogateProperties ?? Di::_()->get('PropogateProperties');
+        $this->save = $save ?: new Save();
+        $this->propagateProperties = $propagateProperties ?? Di::_()->get('PropagateProperties');
     }
 
     /**
@@ -90,7 +86,7 @@ class Manager
         }
 
         $this->saveEntity($entity, $moderator, $time);
-        $this->propogateProperties->from($entity);
+        $this->propagateProperties->from($entity);
     }
 
     private function saveEntity(

@@ -9,11 +9,11 @@ use Minds\Helpers;
 class Feeds
 {
     protected $entity;
-    protected $propogateProperties;
+    protected $propagateProperties;
 
-    public function __construct(Core\Entities\PropogateProperties $propogateProperties = null)
+    public function __construct(Core\Entities\PropagateProperties $propagateProperties = null)
     {
-        $this->propogateProperties = $propogateProperties ?? Core\Di\Di::_()->get('PropogateProperties');
+        $this->propagateProperties = $propagateProperties ?? Core\Di\Di::_()->get('PropagateProperties');
     }
 
     public function setEntity($entity)
@@ -52,7 +52,7 @@ class Feeds
             throw new \Exception('Entity not set');
         }
 
-        $this->propogateProperties->from($this->entity);
+        $this->propagateProperties->from($this->entity);
     }
 
     public function dispatch(array $targets = [])

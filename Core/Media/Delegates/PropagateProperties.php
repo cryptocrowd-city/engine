@@ -2,10 +2,10 @@
 
 namespace Minds\Core\Media\Delegates;
 
-use Minds\Core\Entities\Propogator\Properties;
+use Minds\Core\Entities\Propagator\Properties;
 use Minds\Entities\Activity;
 
-class PropogateProperties extends Properties
+class PropagateProperties extends Properties
 {
     protected $actsOnType = 'object';
     protected $actsOnSubtype = ['image', 'video'];
