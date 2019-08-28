@@ -6,6 +6,13 @@ namespace Minds\Core\Payments\Stripe\Intents;
 
 use Minds\Traits\MagicAttributes;
 
+/**
+ * @method Intent getId(): string
+ * @method Intent getCustomerId(): string
+ * @method Intent getPaymentMethod(): string
+ * @method Intent getStripeAccountId(): string
+ * @method Intent getClientSecret(): string
+ */
 class Intent
 {
     use MagicAttributes;
@@ -30,7 +37,7 @@ class Intent
      * @param array $extend
      * @return array
      */
-    public function export($extend = [])
+    public function export(array $extend = []) : array
     {
         return [
             'id' => $this->id,

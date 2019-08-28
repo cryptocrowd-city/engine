@@ -15,7 +15,7 @@ class SetupIntent extends Intent
      * @param array $extend
      * @return array
      */
-    public function export($extend = [])
+    public function export(array $extend = []) : array
     {
         return parent::export($extend);
     }

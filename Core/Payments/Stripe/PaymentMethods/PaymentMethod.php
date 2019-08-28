@@ -6,6 +6,15 @@ namespace Minds\Core\Payments\Stripe\PaymentMethods;
 
 use Minds\Traits\MagicAttributes;
 
+/**
+ * @method PaymentMethod getId(): string
+ * @method PaymentMethod getCustomerId(): string
+ * @method PaymentMethod getUserGuid(): string
+ * @method PaymentMethod getCardBrand(): string
+ * @method PaymentMethod getCardExpires(): string
+ * @method PaymentMethod getCardCountry(): string
+ * @method PaymentMethod getCardLast4(): string
+ */
 class PaymentMethod
 {
     use MagicAttributes;
@@ -36,7 +45,7 @@ class PaymentMethod
      * @param array $extend
      * @return array
      */
-    public function export($extend = [])
+    public function export(array $extend = []) : array
     {
         return [
             'id' => $this->id,

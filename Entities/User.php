@@ -1106,7 +1106,7 @@ class User extends \ElggUser
      * Returns btc_address
      * @return string
      */
-    public function getBtcAddress()
+    public function getBtcAddress() : string
     {
         return (string) $this->btc_address;
     }
@@ -1115,7 +1115,7 @@ class User extends \ElggUser
      * Set btc_address
      * @param string $btc_address
      */
-    public function setBtcAddress($btc_address)
+    public function setBtcAddress(string $btc_address) : User
     {
         $this->btc_address = (string) $btc_address;
         return $this;

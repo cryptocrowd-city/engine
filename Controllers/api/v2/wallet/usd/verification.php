@@ -5,7 +5,7 @@
  * @version 1
  * @author Mark Harding
  */
-namespace Minds\Controllers\api\v2\wallet;
+namespace Minds\Controllers\api\v2\wallet\usd;
 
 use Minds\Core;
 use Minds\Helpers;
@@ -14,7 +14,7 @@ use Minds\Api\Factory;
 use Minds\Core\Payments;
 use Minds\Entities;
 
-class usd implements Interfaces\Api
+class verification implements Interfaces\Api
 {
     /**
      * @param array $pages
@@ -29,7 +29,18 @@ class usd implements Interfaces\Api
      */
     public function post($pages)
     {
-        return Factory::response([]);
+        Factory::isLoggedIn();
+        $response = [];
+
+        try {
+            $stripe = Core\Di\Di::_()->get('StripePayments');
+            $stripe->verifyMerchant(Core\Session::getLoggedInUser()->getMerchant()['id'], $_FILES['file']);
+        } catch (\Exception $e) {
+            $response['status'] = "error";
+            $response['message'] = $e->getMessage();
+        }
+           
+        return Factory::response($response);
     }
 
     /**

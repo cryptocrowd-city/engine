@@ -31,36 +31,6 @@ class paymentmethods implements Interfaces\Api
 
     public function post($pages)
     {
-        $user = Session::getLoggedInUser();
-        switch ($pages[0]) {
-            case 'apply':
-                $intent = new Stripe\Intents\SetupIntent();
-                $intent->setId($_POST['intent_id']);
-
-                $intentManager = new Stripe\Intents\Manager();
-                $paymentMethodsManager = new Stripe\PaymentMethods\Manager();
-                $customersManager = new Stripe\Customers\Manager();
-
-                // Get the intent
-                $intent = $intentManager->get($_POST['intent_id']);
-
-                // Grab our customerId
-                $customer = $customersManager->getFromUserGuid($user->getGuid());
-
-                // Build a payment method
-                $paymentMethod = new Stripe\PaymentMethods\PaymentMethod();
-                $paymentMethod->setId($intent->getPaymentMethod())
-                    ->setUserGuid($user->getGuid());
-
-                if ($customer) {
-                    $paymentMethod->setCustomerId($customer->getId());
-                }
-
-                // Save the payment method
-                $paymentMethodsManager->add($paymentMethod);
-
-            break;
-        }
         return Factory::response([]);
     }
 

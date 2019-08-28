@@ -6,6 +6,9 @@ namespace Minds\Core\Payments\Stripe\Checkout;
 
 use Minds\Traits\MagicAttributes;
 
+/**
+ * @method CheckoutSession getSessionId(): string
+ */
 class CheckoutSession
 {
     use MagicAttributes;
@@ -18,7 +21,7 @@ class CheckoutSession
      * @param array $extend
      * @return array
      */
-    public function export($extend = [])
+    public function export(array $extend = []) : array
     {
         return [
             'sessionId' => (string) $this->sessionId,

@@ -179,7 +179,7 @@ class Manager
      * @throws WalletNotSetupException
      * @throws \Exception
      */
-    public function create()
+    public function create() : bool
     {
         if ($this->payload['method'] == 'onchain' && (!$this->receiver->getEthWallet() || $this->receiver->getEthWallet() != $this->payload['receiver'])) {
             throw new WalletNotSetupException();

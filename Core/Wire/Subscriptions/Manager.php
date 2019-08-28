@@ -49,31 +49,31 @@ class Manager
         $this->config = $config ?: Di::_()->get('Config');
     }
 
-    public function setAmount($amount)
+    public function setAmount($amount) : Manager
     {
         $this->amount = $amount;
         return $this;
     }
 
-    public function setSender(User $sender)
+    public function setSender(User $sender) : Manager
     {
         $this->sender = $sender;
         return $this;
     }
 
-    public function setReceiver(User $receiver)
+    public function setReceiver(User $receiver) : Manager
     {
         $this->receiver = $receiver;
         return $this;
     }
 
-    public function setAddress($address)
+    public function setAddress(string $address) : Manager
     {
         $this->address = $address;
         return $this;
     }
 
-    public function setMethod($method)
+    public function setMethod(string $method) : Manager
     {
         $this->method = $method;
         return $this;
@@ -83,8 +83,9 @@ class Manager
      * @return mixed
      * @throws WalletNotSetupException
      * @throws \Exception
+     * @return string
      */
-    public function create()
+    public function create() : string
     {
         $this->cancelSubscription();
 
@@ -112,8 +113,9 @@ class Manager
      * Call when a recurring wire is triggered.
      *
      * @param Core\Payments\Subscriptions\Subscription $subscription
+     * @return bool
      */
-    public function onRecurring($subscription)
+    public function onRecurring($subscription) : bool
     {
         $sender = $subscription->getUser();
         $receiver = new User($subscription->getEntity()->guid);
@@ -140,7 +142,8 @@ class Manager
                 ]);
                 break;
             default:
-                $txHash = $this->client->sendRawTransaction($this->config->get('blockchain')['contracts']['wire']['wallet_pkey'],
+                $txHash = $this->client->sendRawTransaction(
+                    $this->config->get('blockchain')['contracts']['wire']['wallet_pkey'],
                     [
                         'from' => $this->config->get('blockchain')['contracts']['wire']['wallet_address'],
                         'to' => $this->config->get('blockchain')['contracts']['wire']['contract_address'],
@@ -150,7 +153,8 @@ class Manager
                             $receiver->getEthWallet(),
                             BigNumber::_($this->token->toTokenUnit($amount))->toHex(true),
                         ]),
-                    ]);
+                    ]
+                );
                 $this->setPayload([
                     'method' => 'onchain',
                     'address' => $address, //sender address
@@ -167,9 +171,15 @@ class Manager
 
         // Create the wire
         $this->wireManager->create();
+
+        return true;
     }
 
-    protected function cancelSubscription()
+    /**
+     * Cancel a subscription
+     * @return bool
+     */
+    protected function cancelSubscription() : bool
     {
         $subscriptions = $this->subscriptionsRepository->getList([
             'plan_id' => 'wire',
@@ -188,5 +198,7 @@ class Manager
 
         // Cancel old subscription first
         $this->subscriptionsManager->cancel();
+
+        return true;
     }
 }

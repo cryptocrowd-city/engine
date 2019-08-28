@@ -125,7 +125,7 @@ class Account
      * @param string $destination
      * @return $this
      */
-    public function setDestination($destination)
+    public function setDestination(string $destination) : Account
     {
         if (!in_array($destination, ['bank', 'email'], true)) {
             throw new \Exception("$destination is not a valid payout method");
@@ -138,7 +138,7 @@ class Account
      * Expose to public API
      * @return array
      */
-    public function export()
+    public function export(array $extend = []) : array
     {
         $export = [];
 

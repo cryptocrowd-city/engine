@@ -6,6 +6,15 @@ namespace Minds\Core\Payments\Stripe\Checkout;
 
 use Minds\Traits\MagicAttributes;
 
+/**
+ * @method Order getName(): string
+ * @method Order getAmount(): int
+ * @method Order getQuantity(): int
+ * @method Order getCurrency(): string
+ * @method Order getServiceFeePct(): int
+ * @method Order getCustomerId(): string
+ * @method Order getStripeAccountId(): string
+ */
 class Order
 {
     use MagicAttributes;
@@ -45,7 +54,7 @@ class Order
      * @param array $extend
      * @return array
      */
-    public function export($extend = [])
+    public function export(array $extend = []) : array
     {
         return [
             'name' => (string) $this->name,

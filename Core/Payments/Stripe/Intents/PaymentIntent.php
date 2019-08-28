@@ -6,6 +6,14 @@ namespace Minds\Core\Payments\Stripe\Intents;
 
 use Minds\Traits\MagicAttributes;
 
+/**
+ * @method PaymentIntent getAmount(): int
+ * @method PaymentIntent getQuantity(): int
+ * @method PaymentIntent getCurrency(): string
+ * @method PaymentIntent getConfirm(): bool
+ * @method PaymentIntent getOffSession(): bool
+ * @method PaymentIntent getServiceFeePct(): int
+ */
 class PaymentIntent extends Intent
 {
     use MagicAttributes;
@@ -42,7 +50,7 @@ class PaymentIntent extends Intent
      * @param array $extend
      * @return array
      */
-    public function export($extend = [])
+    public function export(array $extend = []) : array
     {
         return [
         ];

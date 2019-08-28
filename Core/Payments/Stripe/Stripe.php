@@ -25,10 +25,7 @@ class Stripe implements SubscriptionPaymentServiceInterface
 
     public function __construct(Config $config = null)
     {
-        if (!$config) {
-            $config = new Config;
-        }
-        $this->config = $config;
+        $this->config = $config ?? new Config;
         if ($config->payments && isset($config->payments['stripe'])) {
             $this->setConfig($config->payments['stripe']);
         }
@@ -99,12 +96,13 @@ class Stripe implements SubscriptionPaymentServiceInterface
             if ($opts['customer']) {
                 //we need to clone the customer
                 $token = StripeSDK\Token::create(
-                  [
+                    [
                     'customer' => $opts['customer']
                   ],
-                  [
+                    [
                     'stripe_account' => $user->getMerchant()['id']
-                  ]);
+                  ]
+                );
                 $opts['customer'] = null;
                 $opts['card'] = null;
                 $opts['source'] = $token->id;
@@ -213,7 +211,8 @@ class Stripe implements SubscriptionPaymentServiceInterface
             ],
             [
                 'stripe_account' => $merchant->getId()
-            ]);
+            ]
+        );
 
         $sales = [];
         foreach ($results->data as $transaction) {
@@ -233,12 +232,13 @@ class Stripe implements SubscriptionPaymentServiceInterface
     public function getGrossVolume($merchant)
     {
         $results = StripeSDK\BalanceTransaction::all(
-        [
+            [
           //'type' => 'payment'
         ],
-        [
+            [
           'stripe_account' => $merchant->getId()
-        ]);
+        ]
+        );
 
         $total = [
         'net' => 0,
@@ -259,12 +259,13 @@ class Stripe implements SubscriptionPaymentServiceInterface
     public function getTotalPayouts($merchant)
     {
         $results = StripeSDK\BalanceTransaction::all(
-        [
+            [
           'type' => 'payout'
         ],
-        [
+            [
           'stripe_account' => $merchant->getId()
-        ]);
+        ]
+        );
 
         $total = 0;
 
@@ -287,10 +288,11 @@ class Stripe implements SubscriptionPaymentServiceInterface
         }
 
         $transactions = StripeSDK\Payout::all(
-          $options,
-          [
+            $options,
+            [
             'stripe_account' => $merchant->getId()
-          ]);
+          ]
+        );
 
         $results = [];
 
@@ -479,7 +481,8 @@ class Stripe implements SubscriptionPaymentServiceInterface
             ],
             [
                 'stripe_account' => $merchant->getId()
-            ]);
+            ]
+        );
         return $results;
     }
 
@@ -511,11 +514,13 @@ class Stripe implements SubscriptionPaymentServiceInterface
 
     public function verifyMerchant($id, $file)
     {
-        $result = StripeSDK\FileUpload::create([
+        $result = StripeSDK\FileUpload::create(
+            [
             'purpose' => "identity_document",
             'file' => fopen($file['tmp_name'], 'r')
         ],
-            ['stripe_account' => $id]);
+            ['stripe_account' => $id]
+        );
 
         $account = StripeSDK\Account::retrieve($id);
         $account->legal_entity->verification->document = $result->id;
@@ -650,22 +655,22 @@ class Stripe implements SubscriptionPaymentServiceInterface
                 $merchant = $subscription->getMerchant(); //@todo clean this up
                 //subscriptions need to clone customers
                 $token = StripeSDK\Token::create(
-                  [
+                    [
                     'customer' => $customer->getId()
                   ],
-                  [
+                    [
                     'stripe_account' => $merchant['id']
                   ]
                 );
 
                 $customer = StripeSDK\Customer::create(
-                  [
+                    [
                     'source' => $token->id,
                     'metadata' => [
                       'user_guid' =>  $subscription->getUser()->getGuid()
                     ]
                   ],
-                  [
+                    [
                     'stripe_account' => $merchant['id']
                   ]
                 );
@@ -677,8 +682,8 @@ class Stripe implements SubscriptionPaymentServiceInterface
             }
 
             $result = StripeSDK\Subscription::create(
-              $params,
-              $extras
+                $params,
+                $extras
             );
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
@@ -691,10 +696,11 @@ class Stripe implements SubscriptionPaymentServiceInterface
     {
         try {
             $result = StripeSDK\Subscription::retrieve(
-            $subscription->getId(),
-            [
+                $subscription->getId(),
+                [
               'stripe_account' => $subscription->getMerchant()['id']
-            ]);
+            ]
+            );
 
             $subscription->setAmount(($result->quantity * $result->plan->amount) / 100);
             $subscription->setNextBillingDate($result->current_period_end);
@@ -710,10 +716,11 @@ class Stripe implements SubscriptionPaymentServiceInterface
     {
         try {
             return StripeSDK\Subscription::retrieve(
-              $subscription->getId(),
-              [
+                $subscription->getId(),
+                [
                 'stripe_account' => $subscription->getMerchant()['id']
-            ])->cancel();
+            ]
+            )->cancel();
         } catch (StripeSDK\Error\InvalidRequest $e) {
             return false;
         } catch (\Exception $e) {

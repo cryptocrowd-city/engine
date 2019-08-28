@@ -18,44 +18,19 @@ use Minds\Entities;
 class btc implements Interfaces\Api
 {
     /**
-     * Returns merchant information
      * @param array $pages
-     *
-     * API:: /v1/merchant/:slug
      */
     public function get($pages)
     {
-        Factory::isLoggedIn();
-
-        $response = [];
-
-        switch ($pages[0]) {
-            case "address":
-                $response['address'] = Core\Session::getLoggedInUser()->getBtcAddress();
-                break;
-        }
-
-        return Factory::response($response);
+        return Factory::response([]);
     }
 
+    /**
+     * @param array $pages
+     */
     public function post($pages)
     {
-        Factory::isLoggedIn();
-
-        $response = [];
-
-        $user = Core\Session::getLoggedInUser();
-        $save = new Actions\Save();
-            
-        switch ($pages[0]) {
-            case "address":
-                $user->setBtcAddress($_POST['address']);
-                $save->setEntity($user)
-                    ->save();
-                break;
-        }
-
-        return Factory::response($response);
+        return Factory::response([]);
     }
 
     public function put($pages)

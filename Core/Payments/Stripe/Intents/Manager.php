@@ -90,7 +90,12 @@ class Manager
         return $intent;
     }
 
-    public function get($id)
+    /**
+     * Return an intent
+     * @param string $id
+     * @return SetupIntent
+     */
+    public function get(string $id) : SetupIntent
     {
         $stripeIntent = $this->setupIntentInstance->retrieve($id);
 

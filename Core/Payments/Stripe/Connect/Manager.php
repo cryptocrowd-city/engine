@@ -114,7 +114,7 @@ class Manager
      * @return string Account id
      * @throws \Exception
      */
-    public function update(Account $account)
+    public function update(Account $account) : string
     {
         try {
             $stripeAccount = $this->accountInstance->retrieve($account->getId());
@@ -171,7 +171,7 @@ class Manager
      * @param Account $account
      * @return boolean
      */
-    public function addBankAccount(Account $account)
+    public function addBankAccount(Account $account) : bool
     {
         $stripeAccount = $this->accountInstance->retrieve($account->getId());
         $stripeAccount->external_account = [
@@ -195,7 +195,7 @@ class Manager
      * @param string $id
      * @return Account
      */
-    public function getByAccountId($id)
+    public function getByAccountId(string $id) : Account
     {
         try {
             $result = $this->accountInstance->retrieve($id);
@@ -256,7 +256,7 @@ class Manager
      * @param Account $account
      * @return boolean
      */
-    public function delete(Account $account)
+    public function delete(Account $account) : bool
     {
         $stripeAccount = $this->accountInstance->retrieve($account->getId());
         $result = $stripeAccount->delete();
