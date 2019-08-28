@@ -2,6 +2,7 @@
 
 namespace Minds\Core\Feeds\Firehose;
 
+use Minds\Entities\Activity;
 use Minds\Entities\User;
 use Minds\Entities\Entity;
 use Minds\Core\EntitiesBuilder;
@@ -9,6 +10,7 @@ use Minds\Core\Data\Call;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Di\Di;
 use Minds\Core\Feeds\Top\Manager as TopFeedsManager;
+use Minds\Core\Entities\PropogateProperties;
 
 class Manager
 {
@@ -16,25 +18,21 @@ class Manager
     protected $topFeedsManager;
     /** @var ModerationCache */
     protected $moderationCache;
-    /** @var EntitiesBuilder $entitiesBuilder */
-    protected $entitiesBuilder;
-    /** @var Call */
-    protected $db;
     /** @var Save */
     protected $save;
+    /** @var PropogateProperties */
+    protected $propogateProperties;
 
     public function __construct(
         TopFeedsManager $topFeedsManager = null,
         ModerationCache $moderationCache = null,
-        EntitiesBuilder $entitiesBuilder = null,
-        Call $db = null,
-        Save $save = null
+        Save $save = null,
+        PropogateProperties $propogateProperties = null
     ) {
         $this->topFeedsManager = $topFeedsManager ?: Di::_()->get('Feeds\Top\Manager');
         $this->moderationCache = $moderationCache ?: new ModerationCache();
-        $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
-        $this->db = $db ?: new Call('entities_by_time');
         $this->save = $save ?: new Save(); //Mockable, else instantiate a new one on save.
+        $this->propogateProperties = $propogateProperties ?? Di::_()->get('PropogateProperties');
     }
 
     /**
@@ -79,7 +77,7 @@ class Manager
      * Marks an entity as moderated.
      *
      * @param $entity the entity to mark as moderated, typeless because images do not inherit entity
-     * @param User $user the moderator
+     * @param User $moderator the moderator
      * @param int  $time
      */
     public function save(
@@ -91,22 +89,8 @@ class Manager
             $time = time();
         }
 
-        //Save the entity
         $this->saveEntity($entity, $moderator, $time);
-
-        if (method_exists($entity, 'getType') 
-            && $entity->getType() == 'activity'
-            && $entity->get('entity_guid')
-        ) {
-            $attachment = $this->entitiesBuilder->single($entity->get('entity_guid'));
-            $this->saveEntity($attachment, $moderator, $time);
-        }
-
-        //Moderate parents
-        foreach ($this->db->getRow('activity:entitylink:'.$entity->getGUID()) as $parentGuid => $ts) {
-            $activity = $this->entitiesBuilder->single($parentGuid);
-            $this->saveEntity($activity, $moderator, $time);
-        }
+        $this->propogateProperties->from($entity);
     }
 
     private function saveEntity(

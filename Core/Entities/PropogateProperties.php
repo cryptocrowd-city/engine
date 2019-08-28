@@ -34,7 +34,9 @@ class PropogateProperties
     protected function registerPropogators(): void
     {
         /* Register PropertyPropogator classes here */
-        $this->addPropogator(PropogateBlogProperties::class);
+        $this->addPropogator(Core\Blogs\Delegates\PropogateProperties::class);
+        $this->addPropogator(Core\Feeds\Delegates\PropogateProperties::class);
+        $this->addPropogator(Core\Media\Delegates\PropogateProperties::class);
     }
 
     protected function addPropogator(string $class): void

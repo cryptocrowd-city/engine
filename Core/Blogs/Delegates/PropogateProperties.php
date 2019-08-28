@@ -5,7 +5,7 @@ namespace Minds\Core\Blogs\Delegates;
 use Minds\Core\Entities\Propogator\Properties;
 use Minds\Entities\Activity;
 
-class PropogateBlogProperties extends Properties
+class PropogateProperties extends Properties
 {
     protected $actsOnSubtype = 'blog';
 
