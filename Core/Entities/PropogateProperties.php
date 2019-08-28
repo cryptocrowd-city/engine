@@ -42,26 +42,29 @@ class PropogateProperties
     protected function addPropogator(string $class): void
     {
         $obj = new $class();
-        if (!$obj instanceof Properties)
+        if (!$obj instanceof Properties) {
             throw new \Exception('Propogator class is not a Property Propogator');
+        }
 
         $this->propogators[] = $obj;
     }
 
     public function from($entity): void
     {
-        if ($entity instanceof Activity)
+        if ($entity instanceof Activity) {
             $this->fromActivity($entity);
-        else
+        } else {
             $this->toActivities($entity);
+        }
     }
 
     protected function fromActivity(Activity $activity): void
     {
         $this->changed = false;
         $attachment = $this->entitiesBuilder->single($activity->get('entity_guid'));
-        if ($attachment === false)
+        if ($attachment === false) {
             return;
+        }
 
         foreach ($this->propogators as $propogator) {
             if ($propogator->willActOnEntity($attachment)) {
