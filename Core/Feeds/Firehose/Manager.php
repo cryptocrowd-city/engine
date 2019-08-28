@@ -58,7 +58,7 @@ class Manager
 
         $response = $this->topFeedsManager->getList($opts);
 
-        $response = $response->map(function($entity) {
+        $response = $response->map(function ($entity) {
             return $entity->getEntity();
         });
 

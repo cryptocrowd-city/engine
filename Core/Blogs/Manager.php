@@ -54,8 +54,7 @@ class Manager
         $spam = null,
         $search = null,
         PropogateProperties $propogateProperties = null
-    )
-    {
+    ) {
         $this->repository = $repository ?: new Repository();
         $this->paywallReview = $paywallReview ?: new Delegates\PaywallReview();
         $this->slug = $slug ?: new Delegates\Slug();
