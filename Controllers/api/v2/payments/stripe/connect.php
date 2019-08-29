@@ -20,41 +20,15 @@ class connect implements Interfaces\Api
 
         $connectManager = new Stripe\Connect\Manager();
 
-        switch ($pages[0]) {
-            case 'bank':
-                break;
-            default:
-                $account = $connectManager->getByUser($user);
-                return Factory::response([
-                    'account' => $account->export(),
-                ]);
-        }
+        $account = $connectManager->getByUser($user);
 
         return Factory::response([
+            'account' => $account->export(),
         ]);
     }
 
     public function post($pages)
     {
-        $user = Session::getLoggedInUser();
-        $connectManager = new Stripe\Connect\Manager();
-
-        switch ($pages[0]) {
-            case 'bank':
-                $account = $connectManager->getByUser($user);
-                if (!$account) {
-                    return Factory::response([
-                        'status' => 'error',
-                        'message' => 'You must have a USD account to add a bank account',
-                    ]);
-                }
-
-                $account->setAccountNumber($_POST['accountNumber'])
-                    ->setCountry($_POST['country'])
-                    ->setRoutingNumber($_POST['routingNumber']);
-                $connectManager->addBankAccount($account);
-            break;
-        }
         return Factory::response([]);
     }
 

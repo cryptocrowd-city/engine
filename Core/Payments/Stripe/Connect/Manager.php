@@ -6,6 +6,7 @@ use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Payments\Stripe\Connect\Delegates\NotificationDelegate;
 use Minds\Core\Payments\Stripe\Currencies;
 use Minds\Core\Payments\Stripe\Instances\AccountInstance;
+use Stripe;
 use Minds\Entities\User;
 
 class Manager
@@ -185,7 +186,11 @@ class Manager
             $stripeAccount->external_account['routing_number'] = $account->getRoutingNumber();
         }
 
-        $stripeAccount->save();
+        try {
+            $stripeAccount->save();
+        } catch (Stripe\Error\InvalidRequest $e) {
+            throw new \Exception($e->getMessage());
+        }
 
         return true;
     }
