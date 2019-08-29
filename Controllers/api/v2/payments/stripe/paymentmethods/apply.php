@@ -46,7 +46,14 @@ class apply implements Interfaces\Api
         }
 
         // Save the payment method
-        $paymentMethodsManager->add($paymentMethod);
+        try {
+            $paymentMethodsManager->add($paymentMethod);
+        } catch (\Exception $e) {
+            return Factory::response([
+                'status' => 'error',
+                'message' => 'Sorry, there was an error. Please try again',
+            ]);
+        }
 
         return Factory::response([]);
     }
