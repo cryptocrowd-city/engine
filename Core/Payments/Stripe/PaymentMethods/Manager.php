@@ -41,6 +41,10 @@ class Manager
         }
         $customer = $this->customersManager->getFromUserGuid($opts['user_guid']);
 
+        if (!$customer) {
+            return new Response();
+        }
+
         $stripePaymentMethods = $this->paymentMethodInstance->all([
             'customer' => $customer->getId(),
             'type' => 'card',
