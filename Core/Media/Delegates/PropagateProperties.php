@@ -10,7 +10,7 @@ class PropagateProperties extends Properties
     protected $actsOnType = 'object';
     protected $actsOnSubtype = ['image', 'video'];
 
-    public function toActivity($from, Activity &$to): void
+    public function toActivity($from, Activity $to): Activity
     {
         if ($this->valueHasChanged($from->title, $to->getMessage())) {
             $to->setMessage($from->title);
@@ -18,13 +18,15 @@ class PropagateProperties extends Properties
 
         $fromData = $from->getActivityParameters();
         $toData = $to->getCustom();
-        if ($this->valueHasChanged($fromData[1], $toData[1])) {
+        if ((!isset($toData[1])) || (isset($toData[1]) && $this->valueHasChanged($fromData[1], $toData[1]))) {
             $to->setCustom($fromData[0], $fromData[1]);
         }
+
+        return $to;
     }
 
-    public function fromActivity(Activity $from, &$to): void
+    public function fromActivity(Activity $from, $to)
     {
-        // TODO: Implement fromActivity() method.
+        return $to;
     }
 }

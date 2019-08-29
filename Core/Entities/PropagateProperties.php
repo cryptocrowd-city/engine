@@ -41,6 +41,11 @@ class PropagateProperties
         $this->addPropagator(Core\Permissions\Delegates\PropagateProperties::class);
     }
 
+    public function clearPropogators()
+    {
+        $this->propagators = [];
+    }
+
     protected function addPropagator(string $class): void
     {
         $obj = new $class();

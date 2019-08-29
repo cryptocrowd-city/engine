@@ -9,7 +9,7 @@ class PropagateProperties extends Properties
 {
     protected $actsOnSubtype = 'blog';
 
-    public function toActivity($from, Activity &$to): void
+    public function toActivity($from, Activity $to): Activity
     {
         if ($this->valueHasChanged($from->getTitle(), $to->get('title'))) {
             $to->set('title', $from->getTitle());
@@ -20,17 +20,19 @@ class PropagateProperties extends Properties
             $to->set('blurb', $blurb);
         }
 
-        if ($this->valueHasChanged($from->getURL(), $to->getURL())) {
-            $to->setURL($from->getURL());
+        if ($this->valueHasChanged($from->getUrl(), $to->getURL())) {
+            $to->setURL($from->getUrl());
         }
 
         if ($this->valueHasChanged($from->getIconUrl(), $to->get('thumbnail_src'))) {
             $to->set('thumbnail_src', $from->getIconUrl());
         }
+
+        return $to;
     }
 
-    public function fromActivity(Activity $from, &$to): void
+    public function fromActivity(Activity $from, $to)
     {
-        // TODO: Implement fromActivity() method.
+        return $to;
     }
 }

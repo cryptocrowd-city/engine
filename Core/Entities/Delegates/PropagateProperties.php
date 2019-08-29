@@ -7,7 +7,7 @@ use Minds\Entities\Activity;
 
 class PropagateProperties extends Properties
 {
-    public function toActivity($from, Activity &$to): void
+    public function toActivity($from, Activity $to): Activity
     {
         if ($this->valueHasChanged($from->getNsfw(), $to->getNsfw())) {
             $to->setNsfw($from->getNsfw());
@@ -16,9 +16,11 @@ class PropagateProperties extends Properties
         if ($this->valueHasChanged($from->getNsfwLock(), $to->getNsfwLock())) {
             $to->setNsfwLock($from->getNsfwLock());
         }
+
+        return $to;
     }
 
-    public function fromActivity(Activity $from, &$to): void
+    public function fromActivity(Activity $from, $to)
     {
         if ($this->valueHasChanged($from->getNsfw(), $to->getNsfw())) {
             $to->setNsfw($from->getNsfw());
@@ -27,5 +29,7 @@ class PropagateProperties extends Properties
         if ($this->valueHasChanged($from->getNsfwLock(), $to->getNsfwLock())) {
             $to->setNsfwLock($from->getNsfwLock());
         }
+
+        return $to;
     }
 }

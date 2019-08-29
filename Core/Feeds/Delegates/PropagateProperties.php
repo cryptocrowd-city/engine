@@ -7,25 +7,29 @@ use Minds\Entities\Activity;
 
 class PropagateProperties extends Properties
 {
-    public function toActivity($from, Activity &$to): void
+    public function toActivity($from, Activity $to): Activity
     {
         if ($this->valueHasChanged($from->getModeratorGuid(), $to->getModeratorGuid())) {
             $to->setModeratorGuid($from->getModeratorGuid());
         }
 
-        if ($this->valueHasChanged($from->getTimeModerated(), $to->getModeratorGuid())) {
+        if ($this->valueHasChanged($from->getTimeModerated(), $to->getTimeModerated())) {
             $to->setTimeModerated($from->getTimeModerated());
         }
+
+        return $to;
     }
 
-    public function fromActivity(Activity $from, &$to): void
+    public function fromActivity(Activity $from, $to)
     {
         if ($this->valueHasChanged($from->getModeratorGuid(), $to->getModeratorGuid())) {
             $to->setModeratorGuid($from->getModeratorGuid());
         }
 
-        if ($this->valueHasChanged($from->getTimeModerated(), $to->getModeratorGuid())) {
+        if ($this->valueHasChanged($from->getTimeModerated(), $to->getTimeModerated())) {
             $to->setTimeModerated($from->getTimeModerated());
         }
+
+        return $to;
     }
 }
