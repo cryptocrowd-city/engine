@@ -10,6 +10,10 @@ use Minds\Core\EntitiesBuilder;
 use Minds\Entities\Activity;
 use Minds\Core;
 
+/**
+ * Class PropagateProperties
+ * @package Minds\Core\Entities
+ */
 class PropagateProperties
 {
     /**  @var Properties[] */
@@ -23,6 +27,12 @@ class PropagateProperties
     /** @var bool */
     private $changed = false;
 
+    /**
+     * PropagateProperties constructor.
+     * @param Call|null $db
+     * @param Save|null $save
+     * @param EntitiesBuilder|null $entitiesBuilder
+     */
     public function __construct(Call $db = null, Save $save = null, EntitiesBuilder $entitiesBuilder = null)
     {
         $this->db = $db ?? new Call('entities_by_time');
@@ -31,9 +41,12 @@ class PropagateProperties
         $this->registerPropagators();
     }
 
+    /**
+     * Register PropagateProperties classes
+     * @throws \Exception
+     */
     protected function registerPropagators(): void
     {
-        /* Register PropertyPropagator classes here */
         $this->addPropagator(Core\Blogs\Delegates\PropagateProperties::class);
         $this->addPropagator(Core\Feeds\Delegates\PropagateProperties::class);
         $this->addPropagator(Core\Media\Delegates\PropagateProperties::class);
@@ -41,11 +54,16 @@ class PropagateProperties
         $this->addPropagator(Core\Permissions\Delegates\PropagateProperties::class);
     }
 
-    public function clearPropogators()
+    public function clearPropogators(): void
     {
         $this->propagators = [];
     }
 
+    /**
+     * Add a propagator to be called in the chain
+     * @param string $class
+     * @throws \Exception
+     */
     protected function addPropagator(string $class): void
     {
         $obj = new $class();
@@ -56,6 +74,10 @@ class PropagateProperties
         $this->propagators[] = $obj;
     }
 
+    /**
+     * Propagate the properties from the passed entity
+     * @param $entity
+     */
     public function from($entity): void
     {
         if ($entity instanceof Activity) {
@@ -65,6 +87,11 @@ class PropagateProperties
         }
     }
 
+    /**
+     * Propagate properties from an Activity to to it's attachment
+     * @param Activity $activity
+     * @throws \Minds\Exceptions\StopEventException
+     */
     protected function fromActivity(Activity $activity): void
     {
         $this->changed = false;
@@ -75,7 +102,7 @@ class PropagateProperties
 
         foreach ($this->propagators as $propagator) {
             if ($propagator->willActOnEntity($attachment)) {
-                $propagator->fromActivity($activity, $attachment);
+                $attachment = $propagator->fromActivity($activity, $attachment);
                 $this->changed |= $propagator->changed();
             }
         }
@@ -85,6 +112,11 @@ class PropagateProperties
         }
     }
 
+    /**
+     * Propagate properties from an Entity to it's activities
+     * @param $entity
+     * @throws \Minds\Exceptions\StopEventException
+     */
     protected function toActivities($entity): void
     {
         $activities = $this->getActivitiesForEntity($entity->getGuid());
@@ -97,6 +129,7 @@ class PropagateProperties
     }
 
     /**
+     * Get activities for an entity
      * @param string $entityGuid
      * @return Activity[]
      */
@@ -111,12 +144,17 @@ class PropagateProperties
         return $activities;
     }
 
+    /**
+     * Propagate properties from and entity to an activity
+     * @param $entity
+     * @param Activity $activity
+     */
     public function propagateToActivity($entity, Activity &$activity): void
     {
         $this->changed = false;
         foreach ($this->propagators as $propagator) {
             if ($propagator->willActOnEntity($entity)) {
-                $propagator->toActivity($entity, $activity);
+                $activity = $propagator->toActivity($entity, $activity);
                 $this->changed |= $propagator->changed();
             }
         }

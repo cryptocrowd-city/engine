@@ -5,10 +5,20 @@ namespace Minds\Core\Blogs\Delegates;
 use Minds\Core\Entities\Propagator\Properties;
 use Minds\Entities\Activity;
 
+/**
+ * Class PropagateProperties
+ * @package Minds\Core\Blogs\Delegates
+ */
 class PropagateProperties extends Properties
 {
     protected $actsOnSubtype = 'blog';
 
+    /**
+     * Propagate Entity properties to activity
+     * @param $from
+     * @param Activity $to
+     * @return Activity
+     */
     public function toActivity($from, Activity $to): Activity
     {
         if ($this->valueHasChanged($from->getTitle(), $to->get('title'))) {
@@ -31,6 +41,12 @@ class PropagateProperties extends Properties
         return $to;
     }
 
+    /**
+     * Propagate activity properties to entity
+     * @param Activity $from
+     * @param $to
+     * @return mixed
+     */
     public function fromActivity(Activity $from, $to)
     {
         return $to;
