@@ -159,11 +159,11 @@ class recommended implements Interfaces\Api
     {
         $guids = [];
         $entities = array_filter($entities, function ($entity) use (&$guids, $exclude) {
-            if (in_array($entity->guid, $guids, true)) {
+            if (in_array($entity->guid, $guids, false)) {
                 return false;
             }
 
-            if (in_array($entity->guid, $exclude, true)) {
+            if (in_array($entity->guid, $exclude, false)) {
                 return false;
             }
 
