@@ -17,8 +17,7 @@ class PropagatePropertiesSpec extends ObjectBehavior
     public function let(
         Blog $blog,
         Activity $activity
-    )
-    {
+    ) {
         $this->blog = $blog;
         $this->activity = $activity;
     }

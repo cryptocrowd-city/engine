@@ -17,8 +17,7 @@ class Manager
     public function __construct(
         Save $save = null,
         PropagateProperties $propagateProperties = null
-    )
-    {
+    ) {
         $this->save = $save ?: new Save();
         $this->propagateProperties = $propagateProperties ?? Di::_()->get('PropagateProperties');
     }

@@ -24,8 +24,7 @@ class PropagatePropertiesSpec extends ObjectBehavior
         EntitiesBuilder $entitiesBuilder,
         Activity $activity,
         Entity $entity
-    )
-    {
+    ) {
         $this->beConstructedWith($db, $save, $entitiesBuilder);
         $this->db = $db;
         $this->save = $save;
