@@ -44,10 +44,10 @@ class bank implements Interfaces\Api
         try {
             $connectManager->addBankAccount($account);
         } catch (\Exception $e) {
-             return Factory::response([
-                 'status' => 'error',
-                 'message' => $e->getMessage(),
-             ]);
+            return Factory::response([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
         }
 
         return Factory::response([]);
