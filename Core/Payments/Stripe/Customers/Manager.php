@@ -27,7 +27,7 @@ class Manager
      * @param string $userGuid
      * @return Customer
      */
-    public function getFromUserGuid($userGuid): Customer
+    public function getFromUserGuid($userGuid): ?Customer
     {
         $customerId = $this->lookup->get("{$userGuid}:payments")['customer_id'];
 
@@ -60,7 +60,7 @@ class Manager
             'payment_method' => $customer->getPaymentMethod(),
         ]);
 
-        $this->lu->set("{$customer->getUserGuid()}:payments", [
+        $this->lookup->set("{$customer->getUserGuid()}:payments", [
             'customer_id' => (string) $stripeCustomer->id
         ]);
 
