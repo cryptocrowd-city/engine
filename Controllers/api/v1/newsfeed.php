@@ -520,6 +520,8 @@ class newsfeed implements Interfaces\Api
                     $save->setEntity($activity)
                         ->save();
 
+                    (new Core\Entities\PropagateProperties())->from($activity);
+
                     $activity->setExportContext(true);
                     return Factory::response(['guid' => $activity->guid, 'activity' => $activity->export(), 'edited' => true]);
                 }

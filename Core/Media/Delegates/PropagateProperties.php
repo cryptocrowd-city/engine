@@ -22,8 +22,8 @@ class PropagateProperties extends Properties
      */
     public function toActivity($from, Activity $to): Activity
     {
-        if ($this->valueHasChanged($from->title, $to->getMessage())) {
-            $to->setMessage($from->title);
+        if ($this->valueHasChanged($from->title, $to->get('title'))) {
+            $to->set('title', $from->title);
         }
 
         $fromData = $from->getActivityParameters();
@@ -43,6 +43,10 @@ class PropagateProperties extends Properties
      */
     public function fromActivity(Activity $from, $to)
     {
+        if ($this->valueHasChanged($from->get('title'), $to->title)) {
+            $to->title = $from->get('title');
+        }
+
         return $to;
     }
 }
