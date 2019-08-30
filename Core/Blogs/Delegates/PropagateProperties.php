@@ -11,7 +11,7 @@ use Minds\Entities\Activity;
  */
 class PropagateProperties extends Properties
 {
-    protected $actsOnSubtype = 'blog';
+    protected $actsOnSubtype = ['blog'];
 
     /**
      * Propagate Entity properties to activity

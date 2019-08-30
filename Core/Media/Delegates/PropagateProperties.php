@@ -11,7 +11,7 @@ use Minds\Entities\Activity;
  */
 class PropagateProperties extends Properties
 {
-    protected $actsOnType = 'object';
+    protected $actsOnType = ['object'];
     protected $actsOnSubtype = ['image', 'video'];
 
     /**

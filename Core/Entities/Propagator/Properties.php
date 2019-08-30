@@ -11,30 +11,30 @@ use Minds\Entities\Activity;
 abstract class Properties
 {
     /**
-     * @var string
+     * @var array
      */
-    protected $actsOnType = 'any';
+    protected $actsOnType = [];
     /**
-     * @var string
+     * @var array
      */
-    protected $actsOnSubtype = 'any';
+    protected $actsOnSubtype = [];
     /**
      * @var bool
      */
     protected $changed = false;
 
     /**
-     * @return string
+     * @return array
      */
-    public function actsOnType(): string
+    public function actsOnType(): array
     {
         return $this->actsOnType;
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function actsOnSubType(): string
+    public function actsOnSubType(): array
     {
         return $this->actsOnSubtype;
     }
@@ -42,11 +42,20 @@ abstract class Properties
     /**
      * @param $entity
      * @return bool
+     * @throws \Exception
      */
     public function willActOnEntity($entity): bool
     {
-        if ($this->actsOnType === 'any' || $this->actsOnType === $entity->getType()) {
-            return $this->actsOnSubtype === 'any' || $this->actsOnSubtype === $entity->getSubtype();
+        if (!is_array($this->actsOnType)) {
+            throw new \Exception('actsOnType must be an array');
+        }
+
+        if (!is_array($this->actsOnSubtype)) {
+            throw new \Exception('actsOnSubType must be an array');
+        }
+
+        if ($this->actsOnType === [] || in_array($entity->getType(), $this->actsOnType)) {
+            return $this->actsOnSubtype === [] || in_array($entity->getSubtype(), $this->actsOnSubtype);
         }
 
         return false;

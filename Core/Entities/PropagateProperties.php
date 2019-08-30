@@ -91,6 +91,7 @@ class PropagateProperties
      * Propagate properties from an Activity to to it's attachment
      * @param Activity $activity
      * @throws \Minds\Exceptions\StopEventException
+     * @throws \Exception
      */
     protected function fromActivity(Activity $activity): void
     {
@@ -104,6 +105,9 @@ class PropagateProperties
             if ($propagator->willActOnEntity($attachment)) {
                 $attachment = $propagator->fromActivity($activity, $attachment);
                 $this->changed |= $propagator->changed();
+                if (!is_object($attachment)) {
+                    throw new \Exception(get_class($propagator) . ' fromActivity method did not return a modified object');
+                }
             }
         }
 
