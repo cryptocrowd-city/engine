@@ -29,8 +29,8 @@ class PropagatePropertiesSpec extends ObjectBehavior
     public function it_should_propagate_changes_to_activity()
     {
         $this->entity->get('title')->shouldBeCalled()->willReturn('new title');
-        $this->activity->getMessage()->shouldBeCalled()->willReturn('old title');
-        $this->activity->setMessage('new title')->shouldBeCalled();
+        $this->activity->get('title')->shouldBeCalled()->willReturn('old title');
+        $this->activity->set('title', 'new title')->shouldBeCalled();
 
         $activityParameters = [
             'batch',
