@@ -49,6 +49,10 @@ class PropagatePropertiesSpec extends ObjectBehavior
 
     public function it_should_propogate_properties_from_activity()
     {
+        $this->activity->get('title')->shouldBeCalled()->willReturn('new title');
+        $this->entity->get('title')->shouldbeCalled()->willReturn('old title');
+        $this->entity->set('title', 'new title')->shouldBeCalled();
+
         $this->fromActivity($this->activity, $this->entity);
     }
 }
