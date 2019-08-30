@@ -54,8 +54,8 @@ abstract class Properties
             throw new \Exception('actsOnSubType must be an array');
         }
 
-        if ($this->actsOnType === [] || in_array($entity->getType(), $this->actsOnType)) {
-            return $this->actsOnSubtype === [] || in_array($entity->getSubtype(), $this->actsOnSubtype);
+        if ($this->actsOnType === [] || in_array($entity->getType(), $this->actsOnType, true)) {
+            return $this->actsOnSubtype === [] || in_array($entity->getSubtype(), $this->actsOnSubtype, true);
         }
 
         return false;
