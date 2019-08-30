@@ -219,7 +219,7 @@ class Activity extends Entity
                 'ephemeral',
                 'hide_impressions',
                 'pinned',
-                'time_sent'
+                'time_sent',
             ]);
     }
 

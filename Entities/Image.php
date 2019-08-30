@@ -192,7 +192,7 @@ class Image extends File
             'width',
             'height',
             'gif',
-            'time_sent'
+            'time_sent',
         ]);
     }
 
@@ -281,7 +281,7 @@ class Image extends File
             'mature',
             'boost_rejection_reason',
             'rating',
-            'time_sent'
+            'time_sent',
         ];
 
         foreach ($allowed as $field) {

@@ -67,6 +67,12 @@ class scheduled implements Interfaces\Api
                     'status' => 'success',
                     'count' => $manager->getScheduledCount(['container_guid' => $container_guid, 'type' => $type])
                 ]);
+            default:
+                return Factory::response([
+                    'status' => 'error',
+                    'message' => 'Invalid type',
+                ]);
+            
         }
 
         $hardLimit = 5000;

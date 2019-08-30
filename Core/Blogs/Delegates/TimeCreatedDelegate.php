@@ -23,7 +23,7 @@ class TimeCreatedDelegate
     }
 
     /**
-     * Validates time_created date and set it to activity
+     * Validates time_created date and sets it to activity
      * @param $entity
      * @param string $time_created
      * @return bool
