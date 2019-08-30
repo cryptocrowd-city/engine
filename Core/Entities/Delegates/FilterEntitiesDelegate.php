@@ -10,7 +10,7 @@ namespace Minds\Core\Entities\Delegates;
 use Minds\Core\Security\ACL;
 use Minds\Entities\User;
 
-class FilterEntitiesDelegate 
+class FilterEntitiesDelegate
 {
     /** @var ACL */
     protected $acl;
@@ -32,7 +32,8 @@ class FilterEntitiesDelegate
      * @param array $entities
      * @return array
      */
-    public function filter($entities) {
+    public function filter($entities)
+    {
         return array_values(array_filter($entities, function ($entity) {
             $filterByScheduled = false;
             if ($this->shouldFilterScheduled($entity->getType())) {
@@ -43,7 +44,8 @@ class FilterEntitiesDelegate
         }));
     }
 
-    private function shouldFilterScheduled($type) {
+    private function shouldFilterScheduled($type)
+    {
         return $type == 'activity'
             || $type == 'blog'
             || $type == 'video'
