@@ -48,6 +48,15 @@ class PropagatePropertiesSpec extends ObjectBehavior
         $this->activity->getTimeModerated()->shouldBeCalled()->willReturn(12345);
         $this->entity->getTimeModerated()->shouldBeCalled()->willReturn(6789);
         $this->entity->setTimeModerated(12345)->shouldBeCalled();
+        $this->entity->get('owner_guid')->shouldBeCalled()->willReturn(123);
+        $this->activity->get('owner_guid')->shouldBeCalled()->willReturn(123);
+        $this->activity->isPayWall()->shouldBeCalled()->willReturn(true);
+        $this->activity->get('access_id')->shouldBeCalled()->willReturn(0);
+        $this->entity->get('access_id')->shouldBeCalled()->willReturn(2);
+        $this->entity->set('access_id', 0)->shouldBeCalled();
+        $this->entity->getSubtype()->shouldBeCalled()->willReturn('image');
+        $this->entity->get('hidden')->shouldBeCalled()->willReturn(false);
+        $this->entity->set('hidden', true)->shouldBeCalled();
 
         $this->fromActivity($this->activity, $this->entity);
     }
