@@ -48,8 +48,8 @@ class Repository
                         'must' => [
                             [
                                 'range' => [
-                                    'time_created' => [
-                                        'gt' => time(),
+                                    '@timestamp' => [
+                                        'gt' => time() * 1000,
                                     ]
                                 ]
                             ],

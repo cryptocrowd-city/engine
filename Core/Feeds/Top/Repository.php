@@ -263,8 +263,8 @@ class Repository
 
         $body['query']['function_score']['query']['bool']['must'][] = [
             'range' => [
-                'time_created' => [
-                    $time_created_upper => (int) ($opts['time_created_upper'] ?: time()),
+                '@timestamp' => [
+                    $time_created_upper => ((int) ($opts['time_created_upper'] ?: time())) * 1000,
                 ],
             ],
         ];

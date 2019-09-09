@@ -37,8 +37,8 @@ class FilterEntitiesDelegate
         return array_values(array_filter($entities, function ($entity) {
             $filterByScheduled = false;
             if ($this->shouldFilterScheduled($entity->getType())) {
-                $filterByScheduled = !ACL::_()->write($entity, $this->user)
-                    || !($entity->getTimeCreated() <= $this->time);
+                $filterByScheduled = !ACL::_()->write($entity, $this->user) 
+                    && !($entity->getTimeCreated() <= $this->time);
             }
             return $this->acl->read($entity, $this->user) && !$filterByScheduled;
         }));
