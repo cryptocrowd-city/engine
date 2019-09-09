@@ -12,6 +12,7 @@ use Minds\Helpers;
 use Minds\Interfaces;
 use Minds\Entities;
 use Minds\Api\Factory;
+use Minds\Common\ChannelMode;
 use ElggFile;
 
 class channel implements Interfaces\Api
@@ -242,6 +243,10 @@ class channel implements Interfaces\Api
                     }
                 }
 
+                if (isset($_POST['mode']) && ChannelMode::isValid($_POST['mode'])) {
+                    $update['mode'] = $_POST['mode'];
+                }
+
                 if (isset($_POST['social_profiles']) && is_array($_POST['social_profiles'])) {
                     $profiles = [];
 
@@ -304,14 +309,6 @@ class channel implements Interfaces\Api
                 $channel->enabled = 'no';
                 $channel->save();
 
-                $customer = (new Core\Payments\Customer())
-                    ->setUser($channel);
-
-                $stripe = Core\Di\Di::_()->get('StripePayments');
-                $customer = $stripe->getCustomer($customer);
-                if ($customer) {
-                    $stripe->deleteCustomer($customer);
-                }
                 (new Core\Data\Sessions())->destroyAll($channel->guid);
         }
 
