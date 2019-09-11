@@ -517,7 +517,7 @@ class newsfeed implements Interfaces\Api
                     $attachmentPaywallDelegate = new Core\Feeds\Activity\Delegates\AttachmentPaywallDelegate();
                     $attachmentPaywallDelegate->onUpdate($activity);
 
-                    if (isset($_POST['time_created'])) {
+                    if (isset($_POST['time_created']) && ($_POST['time_created'] != $activity->getTimeCreated())) {
                         try {
                             $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
                             $timeCreatedDelegate->onUpdate($activity, $_POST['time_created'], time());
