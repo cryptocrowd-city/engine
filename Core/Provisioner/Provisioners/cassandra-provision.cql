@@ -1453,13 +1453,6 @@ CREATE TABLE minds.pro (
     PRIMARY KEY (user_guid)
 );
 
-CREATE MATERIALIZED VIEW minds.pro_by_domain AS
-    SELECT domain, user_guid, json_data
-    FROM minds.pro
-    WHERE user_guid IS NOT NULL AND domain IS NOT NULL
-    PRIMARY KEY (domain, user_guid)
-    WITH CLUSTERING ORDER BY (user_guid ASC);
-
 CREATE TABLE minds.moderation_reports (
     entity_urn text,
     reason_code tinyint,
