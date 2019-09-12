@@ -1446,13 +1446,6 @@ CREATE TABLE minds.email_campaign_logs (
   PRIMARY KEY (receiver_guid, time_sent)
 ) WITH CLUSTERING ORDER BY (time_sent desc);
 
-CREATE TABLE minds.pro (
-    user_guid bigint,
-    domain text,
-    json_data text,
-    PRIMARY KEY (user_guid)
-);
-
 CREATE TABLE minds.moderation_reports (
     entity_urn text,
     reason_code tinyint,
