@@ -67,7 +67,7 @@ class S3 implements ServiceInterface
         $mimeType = $finfo->buffer($data);
 
         $write =  $this->s3->putObject([
-          'ACL' => 'public-read',
+          // 'ACL' => 'public-read',
           'Bucket' => Config::_()->aws['bucket'],
           'Key' => $this->filepath,
           'ContentType' => $mimeType,
