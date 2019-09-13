@@ -48,6 +48,8 @@ class Manager
                     case "batch":
                         $asset_guid = $entity->get('entity_guid');
                         break;
+                    default:
+                        $asset_guid = $entity->get('entity_guid');
                 }
                 break;
             case Image::class:
