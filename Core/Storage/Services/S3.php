@@ -121,6 +121,20 @@ class S3 implements ServiceInterface
         }
     }
 
+    /**
+     * Return a signed url
+     * @return string
+     */
+    public function getSignedUrl(): string
+    {
+        $cmd = $this->s3->getCommand('GetObject', [
+           'Bucket' => Config::_()->aws['bucket'],
+           'Key' => $this->filepath,
+        ]);
+        $request = $this->s3->createPresignedRequest($cmd, '+20 minutes');
+        return (string) $request->getUri();
+    }
+
     public function seek($offset = 0)
     {
         //not supported
