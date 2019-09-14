@@ -5,6 +5,7 @@ namespace Minds\Core\Permissions;
 use Minds\Core\Di\Di;
 use Minds\Core\Permissions\Permissions;
 use Minds\Core\EntitiesBuilder;
+use Minds\Core\Permissions\Roles\Roles;
 
 /*
 * Manager for managing role based permissions
@@ -23,13 +24,14 @@ class Manager
      * Takes a user_guid and list of entity guids
      * Builds up a permissions object
      * Permissions contains the user's role per entity, channel and group
+     *
      * @param array $opts
-     *    - user_guid: long, the user's guid for calculating permissions
-     *    - guids: array long, the list of entities to permit
-     *    - entities: fetched objects to permit
+     *                    - user_guid: long, the user's guid for calculating permissions
+     *                    - guids: array long, the list of entities to permit
+     *
      * @return Permissions A map of channels, groups and entities with the user's role for each
      */
-    public function getList(array $opts = [])
+    public function getList(array $opts = []): Permissions
     {
         $opts = array_merge([
             'user_guid' => null,
@@ -49,8 +51,10 @@ class Manager
         $entities = $this->entitiesBuilder->get($opts);
         $entities = array_merge($entities, $opts['entities']);
 
+        $roles = new Roles();
+
         /** @var Permissions */
-        $permissions = new Permissions($user, null, $entitiesBuilder);
+        $permissions = new Permissions($user, $roles, $entitiesBuilder);
         if (is_array($entities)) {
             $permissions->calculate($entities);
         }

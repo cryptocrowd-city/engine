@@ -6,6 +6,7 @@ use Minds\Traits\MagicAttributes;
 use Minds\Entities\User;
 use Minds\Core\EntitiesBuilder;
 use Minds\Core\Permissions\Roles\Roles;
+use Minds\Core\Permissions\Roles\Role;
 use Minds\Core\Permissions\Delegates\ChannelRoleCalculator;
 use Minds\Core\Permissions\Delegates\GroupRoleCalculator;
 use Minds\Common\Access;
@@ -33,11 +34,6 @@ class Permissions implements \JsonSerializable
     /** @var EntitiesBuilder */
     private $entitiesBuilder;
 
-    public function setUser(User $user = null)
-    {
-        throw new ImmutableException('User can only be set in the constructor');
-    }
-
     public function __construct(User $user = null, Roles $roles = null, EntitiesBuilder $entitiesBuilder = null)
     {
         $this->groups = [];
@@ -51,8 +47,20 @@ class Permissions implements \JsonSerializable
             $this->channels[$user->getGuid()] = $user;
         }
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
+        $this->channels[$user->getGUID()] = $user;
         $this->channelRoleCalculator = new ChannelRoleCalculator($this->user, $this->roles);
         $this->groupRoleCalculator = new GroupRoleCalculator($this->user, $this->roles, $entitiesBuilder);
+    }
+
+
+    /**
+     * Permissions are user aware. This bomb function is to keep the user from being changed after instantiation.
+     *
+     * @throws ImmutableException
+     */
+    public function setUser(User $user): void
+    {
+        throw new ImmutableException('User can only be set in the constructor');
     }
 
     /**
@@ -64,14 +72,14 @@ class Permissions implements \JsonSerializable
      *
      * @param array entities an array of entities for calculating permissions
      */
-    public function calculate(array $entities = [])
+    public function calculate(array $entities = []): void
     {
         foreach ($entities as $entity) {
             $this->entities[$entity->getGuid()] = $this->getRoleForEntity($entity);
         }
     }
 
-    private function getRoleForEntity($entity)
+    private function getRoleForEntity($entity): Role
     {
         $role = null;
 
@@ -104,7 +112,7 @@ class Permissions implements \JsonSerializable
      *
      * @return array serialized objects
      */
-    public function export()
+    public function export(): array
     {
         $export = [];
         if ($this->user) {
@@ -120,7 +128,7 @@ class Permissions implements \JsonSerializable
     /**
      * @return array channel guids with the user's role
      */
-    public function getChannels()
+    public function getChannels(): array
     {
         return $this->channelRoleCalculator->getChannels();
     }
@@ -128,7 +136,7 @@ class Permissions implements \JsonSerializable
     /**
      * @return array group guids with the user's role
      */
-    public function getGroups()
+    public function getGroups(): array
     {
         return $this->groupRoleCalculator->getGroups();
     }
@@ -136,7 +144,7 @@ class Permissions implements \JsonSerializable
     /**
      * @return array serialized objects
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->export();
     }

@@ -299,28 +299,28 @@ class PermissionsSpec extends ObjectBehavior
         $activity = $prophet->prophesize(Activity::class);
         $activity->getGUID()->willReturn(10);
         $activity->getOwnerGUID()->willReturn(1);
-        $activity->getAccessID()->willReturn(Access::PUBLIC);
+        $activity->getAccessId()->willReturn(Access::PUBLIC);
         $entities[] = $activity;
 
         //Mock subscriber channel activity
         $activity = $prophet->prophesize(Activity::class);
         $activity->getGUID()->willReturn(11);
         $activity->getOwnerGUID()->willReturn(2);
-        $activity->getAccessID()->willReturn(Access::PUBLIC);
+        $activity->getAccessId()->willReturn(Access::PUBLIC);
         $entities[] = $activity;
 
         //Mock non-subscriber channel activity
         $activity = $prophet->prophesize(Activity::class);
         $activity->getGUID()->willReturn(12);
         $activity->getOwnerGUID()->willReturn(3);
-        $activity->getAccessID()->willReturn(Access::PUBLIC);
+        $activity->getAccessId()->willReturn(Access::PUBLIC);
         $entities[] = $activity;
 
         //Mock group activity
         $activity = $prophet->prophesize(Activity::class);
         $activity->getGUID()->willReturn(13);
         $activity->getOwnerGUID()->willReturn(1);
-        $activity->getAccessID()->willReturn(100);
+        $activity->getAccessId()->willReturn(100);
         $entities[] = $activity;
 
         return $entities;

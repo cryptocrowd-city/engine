@@ -31,11 +31,12 @@ class Manager
     }
 
     /**
-    * Save permissions for an entity and propegate it to linked objects
-    * @param mixed $entity a minds entity that implements the save function
-    * @param Permissions $permissions the flag to apply to the entity
-    */
-    public function save($entity, EntityPermissions $permissions)
+     * Save permissions for an entity and propegate it to linked objects.
+     *
+     * @param mixed       $entity      a minds entity that implements the save function
+     * @param Permissions $permissions the flag to apply to the entity
+     */
+    public function save($entity, EntityPermissions $permissions): void
     {
         $entity->setAllowComments($permissions->getAllowComments());
 

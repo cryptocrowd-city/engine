@@ -3,10 +3,11 @@
 namespace Minds\Core\Permissions\Roles;
 
 use Zend\Permissions\Rbac;
+use  Minds\Core\Permissions\Roles\Role;
 
-abstract class BaseRole extends Rbac\Role implements \JsonSerializable
+abstract class BaseRole extends Rbac\Role implements \JsonSerializable, Role
 {
-    public function export()
+    public function export(): array
     {
         $export = [];
         $export['name'] = $this->getName();
@@ -15,7 +16,7 @@ abstract class BaseRole extends Rbac\Role implements \JsonSerializable
         return $export;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->export();
     }

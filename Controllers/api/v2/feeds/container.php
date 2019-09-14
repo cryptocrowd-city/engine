@@ -58,6 +58,9 @@ class container implements Interfaces\Api
             case 'blogs':
                 $type = 'object:blog';
                 break;
+            case 'all':
+                $type = 'all';
+                break;
         }
 
         $hardLimit = 5000;
