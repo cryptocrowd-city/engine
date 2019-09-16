@@ -9,6 +9,7 @@ use Minds\Entities;
 use Minds\Helpers;
 use Minds\Core\Analytics\Metrics\Event;
 use Minds\Core\Events\Dispatcher;
+use Minds\Core\Channels\Delegates\Ban;
 
 class Events
 {
@@ -23,7 +24,7 @@ class Events
                 ->setBody('banned.tpl')
                 ->set('username', $user->username)
                 ->set('email', $user->getEmail())
-                ->set('reason', $user->ban_reason)
+                ->set('reason', getReasonText($user->ban_reason))
                 ->set('user', $user);
             $message = new Core\Email\Message();
             $message->setTo($user)
