@@ -18,7 +18,7 @@ use Minds\Traits\MagicAttributes;
  */
 class SubscriptionRequest
 {
-    use MagicAttibutes;
+    use MagicAttributes;
 
     /** @var string */
     private $publisherGuid;
@@ -27,10 +27,18 @@ class SubscriptionRequest
     private $subscriberGuid;
 
     /** @var bool */
-    private $accepted = false;
+    private $accepted;
 
     /** @var int */
     private $timestampMs;
+
+    /**
+     * @return string
+     */
+    public function getUrn(): string
+    {
+        return "urn:subscription-request:" . implode('-', [ $this->publisherGuid, $this->subscriberGuid ]);
+    }
 
     /**
      * Export
