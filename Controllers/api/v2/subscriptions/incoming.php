@@ -51,7 +51,7 @@ class incoming implements Interfaces\Api
         $urn = "urn:subscription-request:" . implode('-', [ Session::getLoggedInUserGuid(), $subscriberGuid ]);
         
         $request = $manager->get($urn);
-
+        
         if (!$request || $request->getPublisherGuid() != Session::getLoggedInUserGuid()) {
             return Factory::response([
                 'status' => 'error',

@@ -39,7 +39,7 @@ class RepositorySpec extends ObjectBehavior
                     'publisher_guid' => '123',
                     'subscriber_guid' => '456',
                     'timestamp' => new Timestamp(time()),
-                    'accepted' => null,
+                    'declined' => null,
                 ]
                 ], 'next-page-token'));
 
@@ -61,18 +61,19 @@ class RepositorySpec extends ObjectBehavior
                     'publisher_guid' => new Bigint(123),
                     'subscriber_guid' => new Bigint(456),
                     'timestamp' => new Timestamp(time()),
-                    'accepted' => null,
+                    'declined' => null,
                 ],
                 [
                     'publisher_guid' => new Bigint('1789'),
                     'subscriber_guid' => new Bigint('1123'),
                     'timestamp' => new Timestamp(time()),
-                    'accepted' => new Boolean(true),
+                    'declined' => true,
                 ]
                 ], 'next-page-token'));
 
         $response = $this->getList([
             'publisher_guid' => '123',
+            'show_declined' => true,
         ]);
         $response[0]->getPublisherGuid()
             ->shouldBe('123');
@@ -82,7 +83,7 @@ class RepositorySpec extends ObjectBehavior
             ->shouldBe('1789');
         $response[1]->getSubscriberGuid()
             ->shouldBe('1123');
-        $response[1]->isAccepted()
+        $response[1]->isDeclined()
             ->shouldBe(true);
     }
 
@@ -110,7 +111,7 @@ class RepositorySpec extends ObjectBehavior
         $subscriptionRequest = new SubscriptionRequest();
         $subscriptionRequest->setPublisherGuid('123')
             ->setSubscriberGuid('456')
-            ->setAccepted(true);
+            ->setDeclined(true);
 
         $this->db->request(Argument::that(function ($prepared) {
             $values = $prepared->build()['values'];

@@ -11,7 +11,6 @@ use Minds\Common\Repository\Response;
 use Minds\Common\Urn;
 use Cassandra\Timestamp;
 use Cassandra\Bigint;
-use Cassandra\Boolean;
 
 class Repository
 {
@@ -32,6 +31,7 @@ class Repository
     {
         $opts = array_merge([
             'publisher_guid' => null,
+            'show_declined' => false,
             'limit' => 5000,
             'token' => '',
         ], $opts);
@@ -45,7 +45,7 @@ class Repository
             "SELECT * FROM subscription_requests
             WHERE publisher_guid = ?",
             [
-                $opts['publisher_guid'],
+                new Bigint($opts['publisher_guid']),
             ]
         );
         $result = $this->db->request($prepared);
@@ -56,10 +56,11 @@ class Repository
             $subscriptionRequest
                 ->setPublisherGuid((string) $row['publisher_guid'])
                 ->setSubscriberGuid((string) $row['subscriber_guid'])
-                ->setTimestampMs((int) $row['timestamp']->time());
+                ->setTimestampMs((int) $row['timestamp']->time())
+                ->setDeclined((bool) $row['declined']);
 
-            if ($row['accepted']) {
-                $subscriptionRequest->setAccepted((bool) $row['accepted']);
+            if ($subscriptionRequest->isDeclined() && !$opts['show_declined']) {
+                continue;
             }
     
             $response[] = $subscriptionRequest;
@@ -84,8 +85,8 @@ class Repository
             WHERE publisher_guid = ?
             AND subscriber_guid = ?",
             [
-                $publisherGuid,
-                $subscriberGuid,
+                new Bigint($publisherGuid),
+                new Bigint($subscriberGuid),
             ]
         );
         $result = $this->db->request($prepared);
@@ -96,15 +97,16 @@ class Repository
 
         $row = $result[0];
 
+        if (!$row) {
+            return null;
+        }
+
         $subscriptionRequest = new SubscriptionRequest();
         $subscriptionRequest
                 ->setPublisherGuid((string) $row['publisher_guid'])
                 ->setSubscriberGuid((string) $row['subscriber_guid'])
-                ->setTimestampMs((int) $row['timestamp']->time());
-
-        if ($row['accepted']) {
-            $subscriptionRequest->setAccepted((bool) $row['accepted']);
-        }
+                ->setTimestampMs((int) $row['timestamp']->time())
+                ->setDeclined((bool) $row['declined']);
 
         return $subscriptionRequest;
     }
@@ -142,11 +144,11 @@ class Repository
     public function update(SubscriptionRequest $subscriptionRequest, array $field = []): bool
     {
         $statement = "UPDATE subscription_requests
-            SET accepted = ?
+            SET declined = ?
             WHERE publisher_guid = ?
             AND subscriber_guid = ?";
         $values = [
-            new Boolean($subscriptionRequest->getAccepted()),
+            $subscriptionRequest->isDeclined(),
             new Bigint($subscriptionRequest->getPublisherGuid()),
             new Bigint($subscriptionRequest->getSubscriberGuid()),
         ];

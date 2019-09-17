@@ -1452,6 +1452,6 @@ CREATE TABLE minds.subscription_requests (
     publisher_guid bigint,
     subscriber_guid bigint,
     timestamp timestamp,
-    accepted boolean,
+    declined boolean,
     PRIMARY KEY (publisher_guid, subscriber_guid)
 );

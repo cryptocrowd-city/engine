@@ -5,6 +5,7 @@ namespace Minds\Controllers\api\v2\subscriptions;
 use Minds\Api\Factory;
 use Minds\Core\Di\Di;
 use Minds\Core\Session;
+use Minds\Core\Subscriptions\Requests\SubscriptionRequest;
 use Minds\Entities\Factory as EntitiesFactory;
 use Minds\Interfaces;
 
@@ -49,7 +50,7 @@ class outgoing implements Interfaces\Api
 
         $request = new SubscriptionRequest();
         $request->setPublisherGuid($pages[0])
-            ->setSubscriberGuid(Session::getLoggedInGuid());
+            ->setSubscriberGuid(Session::getLoggedInUserGuid());
 
         try {
             $manager->add($request);

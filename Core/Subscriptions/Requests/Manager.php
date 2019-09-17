@@ -40,8 +40,19 @@ class Manager
      */
     public function getIncomingList($user_guid, array $opts = [])
     {
+        $opts = array_merge([
+            'hydrate' => true,
+        ], $opts);
+
         $opts['publisher_guid'] = $user_guid;
         $response = $this->repository->getList($opts);
+
+        if ($opts['hydrate']) {
+            foreach ($response as $i => $request) {
+                $request->setSubscriber($this->entitiesBuilder->single($request->getSubscriberGuid()));
+            }
+        }
+
         return $response;
     }
 
@@ -98,8 +109,7 @@ class Manager
             throw new SubscriptionRequestAlreadyCompletedException();
         }
     
-        $subscriptionRequest->setAccepted(true);
-        $this->repository->update($subscriptionRequest);
+        $this->repository->delete($subscriptionRequest);
 
         $this->notificationsDelegate->onAccept($subscriptionRequest);
         $this->subscriptionsDelegate->onAccept($subscriptionRequest);
@@ -124,7 +134,7 @@ class Manager
             throw new SubscriptionRequestAlreadyCompletedException();
         }
 
-        $subscriptionRequest->setAccepted(false);
+        $subscriptionRequest->setDeclined(true);
         $this->repository->update($subscriptionRequest);
 
         $this->notificationsDelegate->onDecline($subscriptionRequest);

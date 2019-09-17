@@ -17,7 +17,7 @@ class all implements Interfaces\Api
         // Return a list of subscription requests
         $manager = Di::_()->get('Subscriptions\Requests\Manager');
 
-        $requests = $manager->getIncomingRequests(Session::getLoggedInUserGuid(), []);
+        $requests = $manager->getIncomingList(Session::getLoggedInUserGuid(), []);
 
         return Factory::response([
             'requests' => Factory::exportable($requests),
