@@ -18,6 +18,7 @@ class FilterEntitiesDelegate
     /** @var User */
     protected $user;
 
+    /** @var int */
     protected $time;
 
     public function __construct($user, $time, $acl = null)
@@ -37,10 +38,10 @@ class FilterEntitiesDelegate
         return array_values(array_filter($entities, function ($entity) {
             $filterByScheduled = false;
             if ($this->shouldFilterScheduled($entity->getType())) {
-                $filterByScheduled = !ACL::_()->write($entity, $this->user)
-                    && !($entity->getTimeCreated() <= $this->time);
+                $filterByScheduled = $entity->getTimeCreated() > $this->time
+                    && !ACL::_()->write($entity, $this->user);
             }
-            return $this->acl->read($entity, $this->user) && !$filterByScheduled;
+            return !$filterByScheduled && $this->acl->read($entity, $this->user);
         }));
     }
 
