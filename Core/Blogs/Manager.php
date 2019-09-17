@@ -121,7 +121,7 @@ class Manager
         }
 
         $blog
-            ->setTimeCreated(time())
+            ->setTimeCreated($blog->getTimeCreated() ?: time())
             ->setTimeUpdated(time())
             ->setLastUpdated(time())
             ->setLastSave(time());

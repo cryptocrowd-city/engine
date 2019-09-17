@@ -3,40 +3,57 @@
 namespace Minds\Core\Permissions;
 
 use Minds\Core\Di\Di;
-use Minds\Core\Entities\Actions\Save;
-use Minds\Core\Entities\PropagateProperties;
-use Minds\Exceptions\StopEventException;
 
+/*
+* Manager for managing role based permissions
+*/
 class Manager
 {
-    /** @var Save */
-    protected $save;
-    /** @var PropagateProperties */
-    protected $propagateProperties;
+    /** @var EntityBuilder */
+    private $entityBuilder;
 
-    public function __construct(
-        Save $save = null,
-        PropagateProperties $propagateProperties = null
-    ) {
-        $this->save = $save ?: new Save();
-        $this->propagateProperties = $propagateProperties ?? Di::_()->get('PropagateProperties');
+    public function __construct($entityBuilder = null)
+    {
+        $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
     }
 
-
     /**
-     * Save permissions for an entity and propagate it to linked objects
-     * @param mixed $entity a minds entity that implements the save function
-     * @param Permissions $permissions the flag to apply to the entity
-     * @throws StopEventException
+     * Takes a user_guid and list of entity guids
+     * Builds up a permissions object
+     * Permissions contains the user's role per entity, channel and group.
+     *
+     * @param array $opts
+     *                    - user_guid: long, the user's guid for calculating permissions
+     *                    - guids: array long, the list of entities to permit
+     *
+     * @return Permissions A map of channels, groups and entities with the user's role for each
      */
-    public function save($entity, Permissions $permissions)
+    public function getList(array $opts = []): Permissions
     {
-        $entity->setAllowComments($permissions->getAllowComments());
+        $opts = array_merge([
+            'user_guid' => null,
+            'guids' => [],
+        ], $opts);
 
-        $this->save
-            ->setEntity($entity)
-            ->save();
+        if ($opts['user_guid'] === null) {
+            throw new \InvalidArgumentException('user_guid is required');
+        }
 
-        $this->propagateProperties->from($entity);
+        $user = $this->entitiesBuilder->single($opts['user_guid']);
+        $entities = $this->entitiesBuilder->get($opts);
+
+        if ($user->getType() !== 'user') {
+            throw new \InvalidArgumentException('Entity is not a user');
+        }
+
+        $roles = new Roles();
+
+        /** @var Permissions */
+        $permissions = new Permissions($user, null, $entitiesBuilder);
+        if (is_array($entities)) {
+            $permissions->calculate($entities);
+        }
+
+        return $permissions;
     }
 }

@@ -513,6 +513,18 @@ class newsfeed implements Interfaces\Api
 
                     $activity->indexes = ["activity:$activity->owner_guid:edits"]; //don't re-index on edit
                     (new Core\Translation\Storage())->purge($activity->guid);
+
+                    if (isset($_POST['time_created']) && ($_POST['time_created'] != $activity->getTimeCreated())) {
+                        try {
+                            $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
+                            $timeCreatedDelegate->onUpdate($activity, $_POST['time_created'], time());
+                        } catch (\Exception $e) {
+                            return Factory::response([
+                                'status' => 'error',
+                                'message' => $e->getMessage(),
+                            ]);
+                        }
+                    }
                     
                     $save->setEntity($activity)
                         ->save();
@@ -528,6 +540,19 @@ class newsfeed implements Interfaces\Api
                 $activity->setMature(isset($_POST['mature']) && !!$_POST['mature']);
 
                 $user = Core\Session::getLoggedInUser();
+
+                if (isset($_POST['time_created'])) {
+                    try {
+                        $timeCreatedDelegate = new Core\Feeds\Activity\Delegates\TimeCreatedDelegate();
+                        $timeCreatedDelegate->onAdd($activity, $_POST['time_created'], time());
+                    } catch (\Exception $e) {
+                        return Factory::response([
+                            'status' => 'error',
+                            'message' => $e->getMessage(),
+                        ]);
+                    }
+                }
+
                 if ($user->isMature()) {
                     $activity->setMature(true);
                 }
@@ -597,6 +622,8 @@ class newsfeed implements Interfaces\Api
                     }
 
                     $attachment->setNsfw($activity->getNsfw());
+
+                    $attachment->set('time_created', $activity->getTimeCreated());
 
                     $save->setEntity($attachment)->save();
 
