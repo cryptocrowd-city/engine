@@ -141,6 +141,7 @@ class blog implements Interfaces\Api
                         !$blog ||
                         Helpers\Flags::shouldFail($blog) ||
                         !Core\Security\ACL::_()->read($blog)
+                        || ($blog->getTimeCreated() > time() && !$blog->canEdit())
                     ) {
                         break;
                     }
