@@ -6,7 +6,10 @@ namespace Minds\Core\Subscriptions\Requests;
 
 use Minds\Core\Subscriptions\Requests\Delegates\NotificationsDelegate;
 use Minds\Core\Subscriptions\Requests\Delegates\SubscriptionsDelegate;
+use Minds\Core\EntitiesBuilder;
+use Minds\Core\Di\Di;
 use Minds\Common\Repository\Response;
+use Minds\Entities\User;
 
 class Manager
 {
@@ -19,11 +22,15 @@ class Manager
     /** @var SubscriptionsDelegate */
     private $subscriptionsDelegate;
 
-    public function __construct($repository = null, $notificationsDelegate = null, $subscriptionsDelegate = null)
+    /** @var EntitiesBuilder */
+    private $entitiesBuilder;
+
+    public function __construct($repository = null, $notificationsDelegate = null, $subscriptionsDelegate = null, $entitiesBuilder = null)
     {
         $this->repository = $repository ?? new Repository();
         $this->notificationsDelegate = $notificationsDelegate ?? new NotificationsDelegate;
         $this->subscriptionsDelegate = $subscriptionsDelegate ?? new SubscriptionsDelegate;
+        $this->entitiesBuilder = $entitiesBuilder ?? Di::_()->get('EntitiesBuilder');
     }
 
     /**
@@ -31,8 +38,9 @@ class Manager
      * @param array $opts
      * @return Response
      */
-    public function getIncomingList(array $opts = [])
+    public function getIncomingList($user_guid, array $opts = [])
     {
+        $opts['publisher_guid'] = $user_guid;
         $response = $this->repository->getList($opts);
         return $response;
     }
@@ -58,6 +66,12 @@ class Manager
         $existing = $this->get($subscriptionRequest->getUrn());
         if ($existing) {
             throw new SubscriptionRequestExistsException();
+        }
+
+        // Check if the user exists
+        $publisher = $this->entitiesBuilder->single($subscriptionRequest->getPublisherGuid());
+        if (!$publisher || !$publisher instanceof User) {
+            throw new SubscriptionRequestChannelDoesntExist();
         }
 
         $this->repository->add($subscriptionRequest);

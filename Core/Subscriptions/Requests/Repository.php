@@ -6,7 +6,12 @@ namespace Minds\Core\Subscriptions\Requests;
 
 use Minds\Core\Di\Di;
 use Minds\Core\Data\Cassandra\Client;
+use Minds\Core\Data\Cassandra\Prepared;
 use Minds\Common\Repository\Response;
+use Minds\Common\Urn;
+use Cassandra\Timestamp;
+use Cassandra\Bigint;
+use Cassandra\Boolean;
 
 class Repository
 {
@@ -25,6 +30,16 @@ class Repository
      */
     public function getList(array $opts = []): Response
     {
+        $opts = array_merge([
+            'publisher_guid' => null,
+            'limit' => 5000,
+            'token' => '',
+        ], $opts);
+
+        if (!$opts['publisher_guid']) {
+            throw new \Exception('publisher_guid not set');
+        }
+
         $prepared = new Prepared\Custom();
         $prepared->query(
             "SELECT * FROM subscription_requests
@@ -41,9 +56,13 @@ class Repository
             $subscriptionRequest
                 ->setPublisherGuid((string) $row['publisher_guid'])
                 ->setSubscriberGuid((string) $row['subscriber_guid'])
-                ->setAccepted((bool) $row['accepted'])
                 ->setTimestampMs((int) $row['timestamp']->time());
-            $result[] = $subscriptionRequest;
+
+            if ($row['accepted']) {
+                $subscriptionRequest->setAccepted((bool) $row['accepted']);
+            }
+    
+            $response[] = $subscriptionRequest;
         }
 
         return $response;
@@ -81,8 +100,11 @@ class Repository
         $subscriptionRequest
                 ->setPublisherGuid((string) $row['publisher_guid'])
                 ->setSubscriberGuid((string) $row['subscriber_guid'])
-                ->setAccepted((bool) $row['accepted'])
                 ->setTimestampMs((int) $row['timestamp']->time());
+
+        if ($row['accepted']) {
+            $subscriptionRequest->setAccepted((bool) $row['accepted']);
+        }
 
         return $subscriptionRequest;
     }
@@ -94,14 +116,18 @@ class Repository
      */
     public function add(SubscriptionRequest $subscriptionRequest): bool
     {
-        $statement = "INSERT INTO subscription_requests (publisher_guid, subscriber_guid, timestamp) VALUES (?, ?, ?)";
+        $statement = "INSERT INTO subscription_requests
+            (publisher_guid, subscriber_guid, timestamp)
+            VALUES
+            (?, ?, ?)
+            IF NOT EXISTS";
         $values = [
             new Bigint($subscriptionRequest->getPublisherGuid()),
             new Bigint($subscriptionRequest->getSubscriberGuid()),
-            new Timestamp($subscriptionRequest->getTimestamp() ?? round(microtime(true) * 1000)),
+            new Timestamp($subscriptionRequest->getTimestampMs() ?? round(microtime(true) * 1000)),
         ];
 
-        $prepared = new Custom\Prepared();
+        $prepared = new Prepared\Custom();
         $prepared->query($statement, $values);
 
         return (bool) $this->db->request($prepared);
@@ -115,14 +141,17 @@ class Repository
      */
     public function update(SubscriptionRequest $subscriptionRequest, array $field = []): bool
     {
-        $statement = "INSERT INTO subscription_requests (publisher_guid, subscriber_guid, timestamp) VALUES (?, ?, ?)";
+        $statement = "UPDATE subscription_requests
+            SET accepted = ?
+            WHERE publisher_guid = ?
+            AND subscriber_guid = ?";
         $values = [
+            new Boolean($subscriptionRequest->getAccepted()),
             new Bigint($subscriptionRequest->getPublisherGuid()),
             new Bigint($subscriptionRequest->getSubscriberGuid()),
-            new Timestamp($subscriptionRequest->getTimestamp() ?? round(microtime(true) * 1000)),
         ];
 
-        $prepared = new Custom\Prepared();
+        $prepared = new Prepared\Custom();
         $prepared->query($statement, $values);
 
         return (bool) $this->db->request($prepared);
@@ -143,7 +172,7 @@ class Repository
             new Bigint($subscriptionRequest->getSubscriberGuid()),
         ];
 
-        $prepared = new Custom\Prepared();
+        $prepared = new Prepared\Custom();
         $prepared->query($statement, $values);
 
         return (bool) $this->db->request($prepared);

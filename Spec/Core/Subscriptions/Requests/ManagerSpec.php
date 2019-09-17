@@ -6,6 +6,8 @@ use Minds\Core\Subscriptions\Requests\Manager;
 use Minds\Core\Subscriptions\Requests\Repository;
 use Minds\Core\Subscriptions\Requests\SubscriptionRequest;
 use Minds\Core\Subscriptions\Requests\Delegates;
+use Minds\Core\EntitiesBuilder;
+use Minds\Entities\User;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -14,16 +16,19 @@ class ManagerSpec extends ObjectBehavior
     private $repository;
     private $notificationsDelegate;
     private $subscriptionsDelegate;
+    private $entitiesBuilder;
 
     public function let(
         Repository $repository,
         Delegates\NotificationsDelegate $notificationsDelegate,
-        Delegates\SubscriptionsDelegate $subscriptionsDelegate
+        Delegates\SubscriptionsDelegate $subscriptionsDelegate,
+        EntitiesBuilder $entitiesBuilder
     ) {
-        $this->beConstructedWith($repository, $notificationsDelegate, $subscriptionsDelegate);
+        $this->beConstructedWith($repository, $notificationsDelegate, $subscriptionsDelegate, $entitiesBuilder);
         $this->repository = $repository;
         $this->notificationsDelegate = $notificationsDelegate;
         $this->subscriptionsDelegate = $subscriptionsDelegate;
+        $this->entitiesBuilder = $entitiesBuilder;
     }
 
     public function it_is_initializable()
@@ -36,6 +41,9 @@ class ManagerSpec extends ObjectBehavior
         $subscriptionRequest = new SubscriptionRequest();
         $subscriptionRequest->setPublisherGuid(123)
             ->setSubscriberGuid(456);
+
+        $this->entitiesBuilder->single(123)
+            ->willReturn(new User);
         
         $this->repository->get("urn:subscription-request:123-456")
             ->willReturn(null);
