@@ -40,6 +40,7 @@ class newsfeed implements Interfaces\Api
 
         $pinned_guids = null;
         switch ($pages[0]) {
+            /* Refactored to it's own controller
             case 'single':
                 $activity = new Activity($pages[1]);
 
@@ -56,6 +57,7 @@ class newsfeed implements Interfaces\Api
 
                 return Factory::response(['activity' => $activity->export()]);
                 break;
+            */
             default:
             case 'personal':
                 $options = [
