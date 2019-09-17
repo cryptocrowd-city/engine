@@ -370,7 +370,7 @@ class ManagerSpec extends ObjectBehavior
         $this->isBoostLimitExceededBy($boost)->shouldReturn(true);
     }
 
-    public function it_should_allow_a_user_to_boost_onchain(Boost $boost)
+    public function it_should_allow_a_user_to_boost_onchain_when_offchain_limit_reached(Boost $boost)
     {
         $boostArray = [];
         for ($i = 0; $i < 2; $i++) {
@@ -384,7 +384,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
-        Di::_()->get('Config')->set('max_daily_boost_views', 10000);
+        Di::_()->get('Config')->set('max_daily_boost_views', 20000);
         $this->isBoostLimitExceededBy($boost)->shouldReturn(false);
     }
 
