@@ -105,7 +105,7 @@ class Manager
             throw new SubscriptionRequestDoesntExistException();
         }
 
-        if ($existing->getAccepted() !== null) {
+        if ($existing->isDeclined()) {
             throw new SubscriptionRequestAlreadyCompletedException();
         }
     
@@ -130,7 +130,7 @@ class Manager
             throw new SubscriptionRequestDoesntExistException();
         }
 
-        if ($existing->getAccepted() !== null) {
+        if ($existing->isDeclined()) {
             throw new SubscriptionRequestAlreadyCompletedException();
         }
 

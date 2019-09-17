@@ -67,9 +67,7 @@ class ManagerSpec extends ObjectBehavior
         $this->repository->get("urn:subscription-request:123-456")
             ->willReturn($subscriptionRequest);
 
-        $this->repository->update(Argument::that(function ($sr) {
-            return $sr->getAccepted() === true;
-        }))
+        $this->repository->delete(Argument::any())
             ->willReturn(true);
 
         $this->notificationsDelegate->onAccept($subscriptionRequest)
@@ -92,7 +90,7 @@ class ManagerSpec extends ObjectBehavior
             ->willReturn($subscriptionRequest);
 
         $this->repository->update(Argument::that(function ($sr) {
-            return $sr->getAccepted() === false;
+            return $sr->isDeclined() === true;
         }))
             ->willReturn(true);
 

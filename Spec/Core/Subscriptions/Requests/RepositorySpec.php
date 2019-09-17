@@ -31,8 +31,8 @@ class RepositorySpec extends ObjectBehavior
     {
         $this->db->request(Argument::that(function ($prepared) {
             $query = $prepared->build();
-            return $query['values'][0] === '123'
-                && $query['values'][1] === '456';
+            return $query['values'][0]->value() == '123'
+                && $query['values'][1]->value() == '456';
         }))
             ->willReturn(new Rows([
                 [
@@ -54,7 +54,7 @@ class RepositorySpec extends ObjectBehavior
     {
         $this->db->request(Argument::that(function ($prepared) {
             $query = $prepared->build();
-            return $query['values'][0] === '123';
+            return $query['values'][0]->value() == '123';
         }))
             ->willReturn(new Rows([
                 [
@@ -115,7 +115,7 @@ class RepositorySpec extends ObjectBehavior
 
         $this->db->request(Argument::that(function ($prepared) {
             $values = $prepared->build()['values'];
-            return $values[0]->value() == true
+            return $values[0] == true
                 && $values[1]->value() === '123'
                 && $values[2]->value() === '456';
         }))
