@@ -39,10 +39,10 @@ class NotificationsDelegate
     public function onAccept(SubscriptionRequest $subscriptionRequest): void
     {
         $this->eventsDispatcher->trigger('notification', 'all', [
-            'to' => [ $subscription->getSubscriberGuid() ],
-            'entity' => $subscription->getPublisherGuid(),
+            'to' => [ $subscriptionRequest->getSubscriberGuid() ],
+            'entity' => $subscriptionRequest->getPublisherGuid(),
             'notification_view' => 'subscription_request_accepted',
-            'from' => $subscription->getPublisherGuid(),
+            'from' => $subscriptionRequest->getPublisherGuid(),
             'params' => [],
         ]);
     }
@@ -55,10 +55,10 @@ class NotificationsDelegate
     public function onDecline(SubscriptionRequest $subscriptionRequest): void
     {
         $this->eventsDispatcher->trigger('notification', 'all', [
-            'to' => [ $subscription->getSubscriberGuid() ],
-            'entity' => $subscription->getPublisherGuid(),
+            'to' => [ $subscriptionRequest->getSubscriberGuid() ],
+            'entity' => $subscriptionRequest->getPublisherGuid(),
             'notification_view' => 'subscription_request_declined',
-            'from' => $subscription->getPublisherGuid(),
+            'from' => $subscriptionRequest->getPublisherGuid(),
             'params' => [],
         ]);
     }
