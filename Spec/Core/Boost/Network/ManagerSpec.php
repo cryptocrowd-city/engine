@@ -370,7 +370,7 @@ class ManagerSpec extends ObjectBehavior
         $this->isBoostLimitExceededBy($boost)->shouldReturn(true);
     }
 
-    public function runThroughGetList($boost, $existingBoosts)
+    public function runThroughGetList($boost, $existingBoosts, $onchain = false)
     {
         $this->elasticRepository->getList([
             "hydrate" => true,
@@ -392,7 +392,11 @@ class ManagerSpec extends ObjectBehavior
         $boost->getType()
             ->shouldBeCalled()
             ->willReturn('newsfeed');
-
+        
+        $boost->isOnChain()
+            ->shouldBeCalled()
+            ->willReturn($onchain);
+        
         $boost->getOwnerGuid()
             ->shouldBeCalled()
             ->willReturn('123');
@@ -400,5 +404,22 @@ class ManagerSpec extends ObjectBehavior
         $boost->getImpressions()
             ->shouldBeCalled()
             ->willReturn(1000);
+    }
+
+    public function it_should_allow_a_user_to_boost_onchain(Boost $boost)
+    {
+        $boostArray = [];
+        for ($i = 0; $i < 2; $i++) {
+            $newBoost = new Boost();
+            $newBoost->setCreatedTimestamp('9999999999999999');
+            $newBoost->setImpressions(5001);
+            array_push($boostArray, $newBoost);
+        }
+        $boost->isOnChain()
+            ->shouldBeCalled()
+            ->willReturn(true);
+        
+        Di::_()->get('Config')->set('max_daily_boost_views', 10000);
+        $this->isBoostLimitExceededBy($boost)->shouldReturn(false);
     }
 }
