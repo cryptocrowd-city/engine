@@ -23,7 +23,7 @@ class Manager
     /**
      * Takes a user_guid and list of entity guids
      * Builds up a permissions object
-     * Permissions contains the user's role per entity, channel and group
+     * Permissions contains the user's role per entity, channel and group.
      *
      * @param array $opts
      *                    - user_guid: long, the user's guid for calculating permissions
@@ -36,19 +36,18 @@ class Manager
         $opts = array_merge([
             'user_guid' => null,
             'guids' => [],
-            'entities' => [],
         ], $opts);
 
-        //Null user results in logged out permissions
-        $user = null;
-        if ($opts['user_guid'] !== null) {
-            $user = $this->entitiesBuilder->single($opts['user_guid']);
-            if ($user->getType() !== 'user') {
-                throw new \InvalidArgumentException('Entity is not a user');
-            }
+        if ($opts['user_guid'] === null) {
+            throw new \InvalidArgumentException('user_guid is required');
         }
+
+        $user = $this->entitiesBuilder->single($opts['user_guid']);
+        $entities = $this->entitiesBuilder->get($opts) ?: [];
         
-        $entities = $this->entitiesBuilder->get($opts);
+        if ($user->getType() !== 'user') {
+            throw new \InvalidArgumentException('Entity is not a user');
+        }
         $entities = array_merge($entities, $opts['entities']);
 
         $roles = new Roles();
