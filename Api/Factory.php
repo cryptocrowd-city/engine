@@ -6,6 +6,7 @@ use Minds\Interfaces;
 use Minds\Helpers;
 use Minds\Core\Security;
 use Minds\Core\Session;
+use Minds\Core\Di\Di;
 
 /**
  * API Factory
@@ -145,6 +146,9 @@ class Factory
      */
     public static function response($data = [])
     {
+        Di::_()->get('Referrals\Cookie')
+            ->create();
+
         $data = array_merge([
             'status' => 'success', //should success be assumed?
         ], $data);
