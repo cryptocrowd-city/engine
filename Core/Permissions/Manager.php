@@ -36,6 +36,7 @@ class Manager
         $opts = array_merge([
             'user_guid' => null,
             'guids' => [],
+            'entities' => [],
         ], $opts);
 
         if ($opts['user_guid'] === null) {
@@ -45,9 +46,10 @@ class Manager
         $user = $this->entitiesBuilder->single($opts['user_guid']);
         $entities = $this->entitiesBuilder->get($opts) ?: [];
         
-        if ($user->getType() !== 'user') {
+        if ($user && $user->getType() !== 'user') {
             throw new \InvalidArgumentException('Entity is not a user');
         }
+
         $entities = array_merge($entities, $opts['entities']);
 
         $roles = new Roles();

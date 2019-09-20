@@ -2,9 +2,7 @@
 
 namespace Minds\Core\Permissions\Roles;
 
-use Zend\Permissions\Rbac;
-
-class LoggedOutRole extends Rbac\Role
+class LoggedOutRole extends BaseRole
 {
     public function __construct()
     {

@@ -6,19 +6,23 @@ use Zend\Permissions\Rbac\Rbac;
 
 class Roles extends Rbac
 {
-    public const ROLE_LOGGED_OUT = 'logged_out';
-    public const ROLE_BANNED = 'banned';
     public const ROLE_ADMIN = 'admin';
+    public const ROLE_BANNED = 'banned';
     public const ROLE_CHANNEL_ADMIN = 'channel_admin';
     public const ROLE_CHANNEL_MODERATOR = 'channel_moderator';
     public const ROLE_CHANNEL_OWNER = 'channel_owner';
-    public const ROLE_CHANNEL_SUBSCRIBER = 'channel_subscriber';
-    public const ROLE_CHANNEL_NON_SUBSCRIBER = 'channel_nonsubscriber';
+    public const ROLE_CLOSED_CHANNEL_SUBSCRIBER = 'closed_channel_subscriber';
+    public const ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER = 'closed_channel_nonsubscriber';
     public const ROLE_GROUP_ADMIN = 'group_admin';
     public const ROLE_GROUP_MODERATOR = 'group_moderator';
     public const ROLE_GROUP_OWNER = 'group_owner';
     public const ROLE_GROUP_SUBSCRIBER = 'group_subscriber';
     public const ROLE_GROUP_NON_SUBSCRIBER = 'group_nonsubscriber';
+    public const ROLE_LOGGED_OUT = 'logged_out';
+    public const ROLE_MODERATED_CHANNEL_SUBSCRIBER = 'moderated_channel_subscriber';
+    public const ROLE_MODERATED_CHANNEL_NON_SUBSCRIBER = 'moderated_channel_nonsubscriber';
+    public const ROLE_OPEN_CHANNEL_SUBSCRIBER = 'open_channel_subscriber';
+    public const ROLE_OPEN_CHANNEL_NON_SUBSCRIBER = 'open_channel_nonsubscriber';
 
     public const FLAG_APPOINT_ADMIN = 'appoint_admin';
     public const FLAG_APPOINT_MODERATOR = 'appoint_moderator';
@@ -52,14 +56,18 @@ class Roles extends Rbac
         $this->addRole(new BannedRole());
         $this->addRole(new ChannelAdminRole());
         $this->addRole(new ChannelModeratorRole());
-        $this->addRole(new ChannelNonSubscriberRole());
         $this->addRole(new ChannelOwnerRole());
-        $this->addRole(new ChannelSubscriberRole());
+        $this->addRole(new ClosedChannelNonSubscriberRole());
+        $this->addRole(new ClosedChannelSubscriberRole());
         $this->addRole(new GroupAdminRole());
         $this->addRole(new GroupModeratorRole());
         $this->addRole(new GroupNonSubscriberRole());
         $this->addRole(new GroupOwnerRole());
         $this->addRole(new GroupSubscriberRole());
         $this->addRole(new LoggedOutRole());
+        $this->addRole(new ModeratedChannelNonSubscriberRole());
+        $this->addRole(new ModeratedChannelSubscriberRole());
+        $this->addRole(new OpenChannelNonSubscriberRole());
+        $this->addRole(new OpenChannelSubscriberRole());
     }
 }

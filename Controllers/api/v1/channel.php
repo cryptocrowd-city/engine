@@ -14,6 +14,7 @@ use Minds\Entities;
 use Minds\Api\Factory;
 use Minds\Common\ChannelMode;
 use ElggFile;
+use Minds\Core\Di\Di;
 
 class channel implements Interfaces\Api
 {
@@ -86,6 +87,16 @@ class channel implements Interfaces\Api
 
         $block = Core\Security\ACL\Block::_();
         $response['channel']['blocked'] = $block->isBlocked($user);
+       
+        Core\Di\Di::_()->get('Permissions\Manager');
+
+        //Calculate new permissions object with the entities
+        if ($user && Di::_()->get('Features\Manager')->has('permissions')) {
+            $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
+            $permissions = $permissionsManager->getList(['user_guid' => Core\Session::getLoggedInUserGuid(),
+                                                        'entities' => [$user]]);
+            $response['permissions'] = $permissions;
+        }
 
         return Factory::response($response);
     }

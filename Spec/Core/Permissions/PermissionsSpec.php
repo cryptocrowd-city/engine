@@ -12,6 +12,7 @@ use PhpSpec\ObjectBehavior;
 use Prophecy\Prophet;
 use Minds\Common\Access;
 use Minds\Exceptions\ImmutableException;
+use Minds\Common\ChannelMode;
 
 class PermissionsSpec extends ObjectBehavior
 {
@@ -41,15 +42,22 @@ class PermissionsSpec extends ObjectBehavior
         $this->user->isAdmin()->willReturn(false);
         $this->user->isBanned()->willReturn(false);
         $this->user->getGUID()->willReturn(1);
-        $this->subscribedChannel->getGUID()->willReturn(2);
-        $this->unsubscribedChannel->getGUID()->willReturn(3);
-
+        $this->user->getMode()->willReturn(ChannelMode::OPEN);
         $this->user->isSubscribed(1)->willReturn(false);
         $this->user->isSubscribed(2)->willReturn(true);
         $this->user->isSubscribed(3)->willReturn(false);
+        $this->subscribedChannel->getGUID()->willReturn(2);
+        $this->subscribedChannel->getMode()->willReturn(ChannelMode::MODERATED);
+        $this->unsubscribedChannel->getGUID()->willReturn(3);
+        $this->unsubscribedChannel->getMode()->willReturn(ChannelMode::CLOSED);
+
+        
         $this->group->getGUID()->willReturn(100);
         $this->group->isCreator($this->user)->willReturn(true);
         $this->entitiesBuilder->single(100)->willReturn($this->group);
+        $this->entitiesBuilder->single(1)->willReturn($this->user);
+        $this->entitiesBuilder->single(2)->willReturn($this->subscribedChannel);
+        $this->entitiesBuilder->single(3)->willReturn($this->unsubscribedChannel);
         $this->beConstructedWith($this->user, null, $this->entitiesBuilder);
     }
 
@@ -109,12 +117,12 @@ class PermissionsSpec extends ObjectBehavior
         $this->getIsBanned()->shouldEqual(false);
         $channels = $this->getChannels()->getWrappedObject();
         expect($channels[1]->getName())->toEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($channels[2]->getName())->toEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
-        expect($channels[3]->getName())->toEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         $entities = $this->getEntities();
         $role = $entities[10]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(true);
     }
 
     public function it_should_return_subscriber_permissions()
@@ -126,11 +134,11 @@ class PermissionsSpec extends ObjectBehavior
         $this->getIsBanned()->shouldEqual(false);
         $channels = $this->getChannels()->getWrappedObject();
         expect($channels[1]->getName())->toEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($channels[2]->getName())->toEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
-        expect($channels[3]->getName())->toEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         $entities = $this->getEntities();
         $role = $entities[11]->getWrappedObject();
-        expect($role->getName())->shouldEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
+        expect($role->getName())->shouldEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
         expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
@@ -143,11 +151,11 @@ class PermissionsSpec extends ObjectBehavior
         $this->getIsBanned()->shouldEqual(false);
         $channels = $this->getChannels()->getWrappedObject();
         expect($channels[1]->getName())->toEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($channels[2]->getName())->toEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
-        expect($channels[3]->getName())->toEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         $entities = $this->getEntities();
         $role = $entities[12]->getWrappedObject();
-        expect($role->getName())->shouldEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($role->getName())->shouldEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
@@ -160,8 +168,8 @@ class PermissionsSpec extends ObjectBehavior
         $this->getIsBanned()->shouldEqual(false);
         $channels = $this->getChannels()->getWrappedObject();
         expect($channels[1]->getName())->toEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($channels[2]->getName())->toEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
-        expect($channels[3]->getName())->toEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         $groups = $this->getGroups()->getWrappedObject();
         expect($groups[100]->getName())->toEqual(Roles::ROLE_GROUP_OWNER);
         $entities = $this->getEntities();
@@ -181,8 +189,8 @@ class PermissionsSpec extends ObjectBehavior
         $this->getIsBanned()->shouldEqual(false);
         $channels = $this->getChannels()->getWrappedObject();
         expect($channels[1]->getName())->toEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($channels[2]->getName())->toEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
-        expect($channels[3]->getName())->toEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         $groups = $this->getGroups()->getWrappedObject();
         expect($groups[100]->getName())->toEqual(Roles::ROLE_GROUP_ADMIN);
         $entities = $this->getEntities();
@@ -205,8 +213,8 @@ class PermissionsSpec extends ObjectBehavior
         $this->getIsBanned()->shouldEqual(false);
         $channels = $this->getChannels()->getWrappedObject();
         expect($channels[1]->getName())->toEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($channels[2]->getName())->toEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
-        expect($channels[3]->getName())->toEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         $groups = $this->getGroups()->getWrappedObject();
         expect($groups[100]->getName())->toEqual(Roles::ROLE_GROUP_MODERATOR);
         $entities = $this->getEntities();
@@ -229,8 +237,8 @@ class PermissionsSpec extends ObjectBehavior
         $this->getIsBanned()->shouldEqual(false);
         $channels = $this->getChannels()->getWrappedObject();
         expect($channels[1]->getName())->toEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($channels[2]->getName())->toEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
-        expect($channels[3]->getName())->toEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         $groups = $this->getGroups()->getWrappedObject();
         expect($groups[100]->getName())->toEqual(Roles::ROLE_BANNED);
         $entities = $this->getEntities();
@@ -254,8 +262,8 @@ class PermissionsSpec extends ObjectBehavior
         $this->getIsBanned()->shouldEqual(false);
         $channels = $this->getChannels()->getWrappedObject();
         expect($channels[1]->getName())->toEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($channels[2]->getName())->toEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
-        expect($channels[3]->getName())->toEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         $groups = $this->getGroups()->getWrappedObject();
         expect($groups[100]->getName())->toEqual(Roles::ROLE_GROUP_SUBSCRIBER);
         $entities = $this->getEntities();
@@ -279,8 +287,8 @@ class PermissionsSpec extends ObjectBehavior
         $this->getIsBanned()->shouldEqual(false);
         $channels = $this->getChannels()->getWrappedObject();
         expect($channels[1]->getName())->toEqual(Roles::ROLE_CHANNEL_OWNER);
-        expect($channels[2]->getName())->toEqual(Roles::ROLE_CHANNEL_SUBSCRIBER);
-        expect($channels[3]->getName())->toEqual(Roles::ROLE_CHANNEL_NON_SUBSCRIBER);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
         $groups = $this->getGroups()->getWrappedObject();
         expect($groups[100]->getName())->toEqual(Roles::ROLE_GROUP_NON_SUBSCRIBER);
         $entities = $this->getEntities();
@@ -299,6 +307,7 @@ class PermissionsSpec extends ObjectBehavior
         $activity = $prophet->prophesize(Activity::class);
         $activity->getGUID()->willReturn(10);
         $activity->getOwnerGUID()->willReturn(1);
+        $activity->getOwnerObj()->willReturn($this->user->getWrappedObject());
         $activity->getAccessId()->willReturn(Access::PUBLIC);
         $entities[] = $activity;
 
@@ -306,6 +315,7 @@ class PermissionsSpec extends ObjectBehavior
         $activity = $prophet->prophesize(Activity::class);
         $activity->getGUID()->willReturn(11);
         $activity->getOwnerGUID()->willReturn(2);
+        $activity->getOwnerObj()->willReturn($this->subscribedChannel->getWrappedObject());
         $activity->getAccessId()->willReturn(Access::PUBLIC);
         $entities[] = $activity;
 
@@ -313,6 +323,7 @@ class PermissionsSpec extends ObjectBehavior
         $activity = $prophet->prophesize(Activity::class);
         $activity->getGUID()->willReturn(12);
         $activity->getOwnerGUID()->willReturn(3);
+        $activity->getOwnerObj()->willReturn($this->unsubscribedChannel->getWrappedObject());
         $activity->getAccessId()->willReturn(Access::PUBLIC);
         $entities[] = $activity;
 

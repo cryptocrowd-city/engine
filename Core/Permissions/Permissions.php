@@ -39,8 +39,6 @@ class Permissions implements \JsonSerializable
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
         $this->roles = $roles ?: new Roles();
         $this->user = $user;
-        $this->isAdmin = $user->isAdmin();
-        $this->isBanned = $user->isBanned();
         $this->groups = [];
         $this->channels = [];
         $this->entities = [];
@@ -52,8 +50,7 @@ class Permissions implements \JsonSerializable
             $this->channels[$user->getGuid()] = $user;
         }
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
-        $this->channels[$user->getGUID()] = $user;
-        $this->channelRoleCalculator = new ChannelRoleCalculator($this->user, $this->roles);
+        $this->channelRoleCalculator = new ChannelRoleCalculator($this->user, $this->roles, $entitiesBuilder);
         $this->groupRoleCalculator = new GroupRoleCalculator($this->user, $this->roles, $entitiesBuilder);
     }
 
@@ -96,9 +93,11 @@ class Permissions implements \JsonSerializable
             case Access::LOGGED_IN:
             case Access::PUBLIC:
             case Access::UNKNOWN:
+                error_log('Getting channel role');
                 $role = $this->channelRoleCalculator->calculate($entity);
                 break;
             default:
+                error_log('Getting group role');
                 $role = $this->groupRoleCalculator->calculate($entity);
         }
         //Apply global overrides

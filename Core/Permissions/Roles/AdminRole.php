@@ -8,5 +8,6 @@ class AdminRole extends BaseRole
     {
         parent::__construct(Roles::ROLE_ADMIN);
         $this->addPermission(Roles::FLAG_APPOINT_ADMIN);
+        $this->addPermission(Roles::FLAG_CREATE_POST);
     }
 }
