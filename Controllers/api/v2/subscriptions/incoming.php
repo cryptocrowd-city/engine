@@ -12,13 +12,26 @@ use Minds\Interfaces;
  */
 class incoming implements Interfaces\Api
 {
-    public function get($pages)
+    public function get($pages): bool
+    {
+        if (!isset($pages[0])) {
+            return $this->getSingle($pages[0]);
+        } else {
+            return $this->getList($pages[0]);
+        }
+    }
+    
+    /**
+     * Return a single request
+     * @param string $subscriberGuid
+     * @return void
+     */
+    private function getSingle(string $subscriberGuid): bool
     {
         // Return a single request
         $manager = Di::_()->get('Subscriptions\Requests\Manager');
         
         // Construct URN on the fly
-        $subscriberGuid = $pages[0];
         $urn = "urn:subscription-request:" . implode('-', [ Session::getLoggedInUserGuid(), $subscriberGuid ]);
         
         $request = $manager->get($urn);
@@ -32,6 +45,23 @@ class incoming implements Interfaces\Api
 
         return Factory::response([
             'request' => $request->export(),
+        ]);
+    }
+
+    /**
+     * Return a list of subscription requests
+     * @return bool
+     */
+    private function getList(): bool
+    {
+        // Return a list of subscription requests
+        $manager = Di::_()->get('Subscriptions\Requests\Manager');
+
+        $requests = $manager->getIncomingList(Session::getLoggedInUserGuid(), []);
+        
+        return Factory::response([
+            'requests' => Factory::exportable($requests),
+            'next' => $requests->getPagingToken(),
         ]);
     }
 

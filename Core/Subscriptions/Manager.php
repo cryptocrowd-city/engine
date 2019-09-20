@@ -97,14 +97,14 @@ class Manager
      * @param bool $force
      * @return Subscription
      */
-    public function subscribe($publisher, $force = false)
+    public function subscribe($publisher, bool $force = false): ?Subscription
     {
         $subscription = new Subscription();
         $subscription->setSubscriberGuid($this->subscriber->getGuid())
             ->setPublisherGuid($publisher->getGuid());
 
         if ($publisher->getMode() === 2 && !$force) {
-            throw new \Exception("Can not subscribe to closed channel, send a request instead");
+            throw new RequiresSubscriptionRequestException();
         }
 
         if ($this->getSubscriptionsCount() >= static::MAX_SUBSCRIPTIONS) {

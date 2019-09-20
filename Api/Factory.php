@@ -142,8 +142,9 @@ class Factory
     /**
      * Builds an API response
      * @param array $data
+     * @return true
      */
-    public static function response($data = [])
+    public static function response($data = []): bool
     {
         $data = array_merge([
             'status' => 'success', //should success be assumed?
@@ -154,6 +155,8 @@ class Factory
         header('Content-type: application/json');
         header("Access-Control-Allow-Origin: *");
         echo json_encode($data);
+
+        return true;
     }
 
     /**

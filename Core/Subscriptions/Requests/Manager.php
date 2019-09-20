@@ -35,10 +35,11 @@ class Manager
 
     /**
      * Return a list of incoming subscription requests
+     * @param string $userGuid
      * @param array $opts
      * @return Response
      */
-    public function getIncomingList($user_guid, array $opts = [])
+    public function getIncomingList(string $userGuid, array $opts = []): Response
     {
         $opts = array_merge([
             'hydrate' => true,

@@ -14,13 +14,26 @@ use Minds\Interfaces;
  */
 class outgoing implements Interfaces\Api
 {
-    public function get($pages)
+    public function get($pages): bool
+    {
+        if (isset($pages[0])) {
+            return $this->getSingle($pages[0]);
+        } else {
+            return $this->getList();
+        }
+    }
+
+    /**
+     * Return a single request
+     * @param string $publisherGuid
+     * @return void
+     */
+    private function getSingle(string $publisherGuid): bool
     {
         // Return a single request
         $manager = Di::_()->get('Subscriptions\Requests\Manager');
         
         // Construct URN on the fly
-        $publisherGuid = $pages[0];
         $urn = "urn:subscription-request:" . implode('-', [ $publisherGuid, Session::getLoggedInUserGuid() ]);
         
         $request = $manager->get($urn);
@@ -34,6 +47,18 @@ class outgoing implements Interfaces\Api
 
         return Factory::response([
             'request' => $request->export(),
+        ]);
+    }
+
+    /**
+     * Return a list of subscription requests
+     * @return bool
+     */
+    private function getList(): bool
+    {
+        return Factory::response([
+            'requests' => [],
+            'next' => null,
         ]);
     }
 
