@@ -68,4 +68,32 @@ class RolesSpec extends ObjectBehavior
         $role->hasPermission(Roles::FLAG_JOIN)->shouldEqual(false);
         $role->hasPermission(Roles::FLAG_JOIN_GATHERING)->shouldEqual(false);
     }
+
+    public function it_should_have_channel_admin_permissions()
+    {
+        $role = $this->getRole(Roles::ROLE_CHANNEL_ADMIN);
+        $role->hasPermission(Roles::FLAG_APPOINT_ADMIN)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_CREATE_POST)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_EDIT_CHANNEL)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_EDIT_POST)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_DELETE_CHANNEL)->shouldEqual(false);
+        $role->hasPermission(Roles::FLAG_DELETE_POST)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_APPOINT_MODERATOR)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_APPROVE_SUBSCRIBER)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_SUBSCRIBE)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_VIEW)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_VOTE)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_CREATE_COMMENT)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_EDIT_COMMENT)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_DELETE_COMMENT)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_REMIND)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_WIRE)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_MESSAGE)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_INVITE)->shouldEqual(true);
+        $role->hasPermission(Roles::FLAG_CREATE_GROUP)->shouldEqual(false);
+        $role->hasPermission(Roles::FLAG_EDIT_GROUP)->shouldEqual(false);
+        $role->hasPermission(Roles::FLAG_DELETE_GROUP)->shouldEqual(false);
+        $role->hasPermission(Roles::FLAG_JOIN)->shouldEqual(false);
+        $role->hasPermission(Roles::FLAG_JOIN_GATHERING)->shouldEqual(false);
+    }
 }

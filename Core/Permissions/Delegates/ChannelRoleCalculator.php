@@ -9,6 +9,7 @@ use Minds\Entities\User;
 use Minds\Common\ChannelMode;
 use Minds\Core\Di\Di;
 use Minds\Core\EntitiesBuilder;
+use Minds\Entities\Factory as EntitiesFactory;
 
 class ChannelRoleCalculator extends BaseRoleCalculator
 {
@@ -64,7 +65,7 @@ class ChannelRoleCalculator extends BaseRoleCalculator
     protected function getChannelForEntity($entity) : User
     {
         if (method_exists($entity, 'getOwnerObj')) {
-            return $entity->getOwnerObj();
+            return $this->entitiesBuilder->build($entity->getOwnerObj());
         } else {
             return $this->entitiesBuilder->single($entity->getOwnerGuid());
         }
