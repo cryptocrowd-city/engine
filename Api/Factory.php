@@ -146,9 +146,6 @@ class Factory
      */
     public static function response($data = [])
     {
-        Di::_()->get('Referrals\Cookie')
-            ->create();
-
         $data = array_merge([
             'status' => 'success', //should success be assumed?
         ], $data);

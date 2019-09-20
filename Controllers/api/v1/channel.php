@@ -48,7 +48,8 @@ class channel implements Interfaces\Api
         }
 
         Di::_()->get('Referrals\Cookie')
-            ->setEntity($user);
+            ->setEntity($user)
+            ->create();
 
         $user->fullExport = true; //get counts
         $user->exportCounts = true;

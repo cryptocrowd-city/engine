@@ -110,7 +110,8 @@ class Router
             ->withRouterRequest($request);
 
         Di::_()->get('Referrals\Cookie')
-            ->withRouterRequest($request);
+            ->withRouterRequest($request)
+            ->create();
 
         $loop = count($segments);
         while ($loop >= 0) {
