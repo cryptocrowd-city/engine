@@ -42,7 +42,7 @@ class ChannelRoleCalculator extends BaseRoleCalculator
         $role = null;
         $channel = $this->getChannelForEntity($entity);
         if ($this->user === null) {
-            $role = $this->roles->getRole(Roles::ROLE_LOGGED_OUT);
+            $role = $this->getChannelNonSubscriberRole($channel);
         } elseif ($entity->getOwnerGuid() === $this->user->getGuid()) {
             $role = $this->roles->getRole(Roles::ROLE_CHANNEL_OWNER);
         } elseif ($this->user->isSubscribed($entity->getOwnerGuid())) {
@@ -98,10 +98,19 @@ class ChannelRoleCalculator extends BaseRoleCalculator
     {
         switch ($channel->getMode()) {
             case ChannelMode::CLOSED:
+                if ($this->user === null) {
+                    return $this->roles->getRole(Roles::ROLE_LOGGED_OUT_CLOSED);
+                }
                 return $this->roles->getRole(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
             case ChannelMode::MODERATED:
+                if ($this->user === null) {
+                    return $this->roles->getRole(Roles::ROLE_LOGGED_OUT);
+                }
                 return $this->roles->getRole(Roles::ROLE_MODERATED_CHANNEL_NON_SUBSCRIBER);
             case ChannelMode::OPEN:
+                if ($this->user === null) {
+                    return $this->roles->getRole(Roles::ROLE_LOGGED_OUT);
+                }
                 return $this->roles->getRole(Roles::ROLE_OPEN_CHANNEL_NON_SUBSCRIBER);
         }
     }

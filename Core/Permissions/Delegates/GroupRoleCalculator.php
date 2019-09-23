@@ -43,7 +43,7 @@ class GroupRoleCalculator extends BaseRoleCalculator
         $group = $this->entitiesBuilder->single($entity->getAccessId());
         $role = null;
         if ($this->user === null) {
-            $role = $this->roles->getRole(Roles::ROLE_LOGGED_OUT);
+            $role = $this->getGroupNonSubscriberRole($group);
         } elseif ($group->isCreator($this->user)) {
             $role = $this->roles->getRole(Roles::ROLE_GROUP_OWNER);
         } elseif ($group->isOwner($this->user)) {
@@ -86,8 +86,14 @@ class GroupRoleCalculator extends BaseRoleCalculator
     protected function getGroupNonSubscriberRole(Group $group) : Role
     {
         if ($group->isPublic()) {
+            if ($this->user === null) {
+                $this->roles->getRole(Roles::ROLE_LOGGED_OUT);
+            }
             return $this->roles->getRole(Roles::ROLE_OPEN_GROUP_NON_SUBSCRIBER);
         } else {
+            if ($this->user === null) {
+                $this->roles->getRole(Roles::ROLE_LOGGED_OUT_CLOSED);
+            }
             return $this->roles->getRole(Roles::ROLE_CLOSED_GROUP_NON_SUBSCRIBER);
         }
     }

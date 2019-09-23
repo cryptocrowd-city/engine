@@ -19,6 +19,7 @@ class Roles extends Rbac
     public const ROLE_GROUP_MODERATOR = 'group_moderator';
     public const ROLE_GROUP_OWNER = 'group_owner';
     public const ROLE_LOGGED_OUT = 'logged_out';
+    public const ROLE_LOGGED_OUT_CLOSED = 'logged_out_closed';
     public const ROLE_MODERATED_CHANNEL_SUBSCRIBER = 'moderated_channel_subscriber';
     public const ROLE_MODERATED_CHANNEL_NON_SUBSCRIBER = 'moderated_channel_nonsubscriber';
     public const ROLE_OPEN_CHANNEL_SUBSCRIBER = 'open_channel_subscriber';
@@ -67,6 +68,7 @@ class Roles extends Rbac
         $this->addRole(new GroupModeratorRole());
         $this->addRole(new GroupOwnerRole());
         $this->addRole(new LoggedOutRole());
+        $this->addRole(new LoggedOutClosedRole());
         $this->addRole(new ModeratedChannelNonSubscriberRole());
         $this->addRole(new ModeratedChannelSubscriberRole());
         $this->addRole(new OpenChannelNonSubscriberRole());

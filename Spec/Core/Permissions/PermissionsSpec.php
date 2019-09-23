@@ -52,9 +52,9 @@ class PermissionsSpec extends ObjectBehavior
         $this->unsubscribedChannel->getGuid()->willReturn(3);
         $this->unsubscribedChannel->getMode()->willReturn(ChannelMode::CLOSED);
 
-        
         $this->group->getGuid()->willReturn(100);
         $this->group->isCreator($this->user)->willReturn(true);
+        $this->group->isPublic()->willReturn(true);
         $this->entitiesBuilder->single(100)->willReturn($this->group);
         $this->entitiesBuilder->single(1)->willReturn($this->user);
         $this->entitiesBuilder->single(2)->willReturn($this->subscribedChannel);
@@ -355,6 +355,22 @@ class PermissionsSpec extends ObjectBehavior
         $role = $entities[13]->getWrappedObject();
 
         expect($role->getName())->shouldEqual(Roles::ROLE_CLOSED_GROUP_NON_SUBSCRIBER);
+        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+    }
+
+    public function it_should_returned_a_closed_channel_non_subscriber_role_for_logged_out()
+    {
+        $this->beConstructedWith(null, null, $this->entitiesBuilder);
+        $this->calculate($this->mockEntities());
+        $this->getIsAdmin()->shouldEqual(false);
+        $this->getIsBanned()->shouldEqual(false);
+        $channels = $this->getChannels()->getWrappedObject();
+        expect($channels[1]->getName())->toEqual(Roles::ROLE_LOGGED_OUT);
+        expect($channels[2]->getName())->toEqual(Roles::ROLE_LOGGED_OUT);
+        expect($channels[3]->getName())->toEqual(Roles::ROLE_LOGGED_OUT_CLOSED);
+        $entities = $this->getEntities();
+        $role = $entities[12]->getWrappedObject();
+        expect($role->getName())->shouldEqual(Roles::ROLE_LOGGED_OUT_CLOSED);
         expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
