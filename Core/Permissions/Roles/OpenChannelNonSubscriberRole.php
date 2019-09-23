@@ -7,7 +7,6 @@ class OpenChannelNonSubscriberRole extends BaseRole
     public function __construct()
     {
         parent::__construct(Roles::ROLE_OPEN_CHANNEL_NON_SUBSCRIBER);
-        $this->addPermission(Roles::FLAG_CREATE_POST);
         $this->addPermission(Roles::FLAG_SUBSCRIBE);
         $this->addPermission(Roles::FLAG_VIEW);
         $this->addPermission(Roles::FLAG_VOTE);
