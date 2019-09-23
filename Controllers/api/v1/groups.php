@@ -77,6 +77,13 @@ class groups implements Interfaces\Api
 
         $response['groups'] = Factory::exportable($groups);
         $response['entities'] = Factory::exportable($groups);
+        
+        if ($groups && Di::_()->get('Features\Manager')->has('permissions')) {
+            $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
+            $permissions = $permissionsManager->getList(['user_guid' => Core\Session::getLoggedInUserGuid(),
+                                                        'entities' => $groups]);
+            $response['permissions'] = $permissions;
+        }
 
         if (!isset($response['load-next']) && $groups) {
             $response['load-next'] = (string) end($groups)->getGuid();

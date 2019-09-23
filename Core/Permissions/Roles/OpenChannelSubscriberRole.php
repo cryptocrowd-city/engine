@@ -12,8 +12,6 @@ class OpenChannelSubscriberRole extends BaseRole
         $this->addPermission(Roles::FLAG_VIEW);
         $this->addPermission(Roles::FLAG_VOTE);
         $this->addPermission(Roles::FLAG_CREATE_COMMENT);
-        $this->addPermission(Roles::FLAG_EDIT_COMMENT);
-        $this->addPermission(Roles::FLAG_DELETE_COMMENT);
         $this->addPermission(Roles::FLAG_REMIND);
         $this->addPermission(Roles::FLAG_WIRE);
         $this->addPermission(Roles::FLAG_MESSAGE);

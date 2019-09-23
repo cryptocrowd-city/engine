@@ -45,12 +45,12 @@ class ChannelRoleCalculator extends BaseRoleCalculator
             $role = $this->getChannelNonSubscriberRole($channel);
         } elseif ($entity->getOwnerGuid() === $this->user->getGuid()) {
             $role = $this->roles->getRole(Roles::ROLE_CHANNEL_OWNER);
-        } elseif ($this->user->isSubscribed($entity->getOwnerGuid())) {
+        } elseif ($this->user->isSubscribed($channel->getGuid())) {
             $role = $this->getChannelSubscriberRole($channel);
         } else {
             $role = $this->getChannelNonSubscriberRole($channel);
         }
-        $this->channels[$entity->getOwnerGuid()] = $role;
+        $this->channels[$channel->getGuid()] = $role;
 
         return $role;
     }
@@ -64,7 +64,9 @@ class ChannelRoleCalculator extends BaseRoleCalculator
      */
     protected function getChannelForEntity($entity) : User
     {
-        if (method_exists($entity, 'getOwnerObj')) {
+        if ($entity->getType() === 'user') {
+            return $entity;
+        } elseif (method_exists($entity, 'getOwnerObj')) {
             return $this->entitiesBuilder->build($entity->getOwnerObj());
         } else {
             return $this->entitiesBuilder->single($entity->getOwnerGuid());

@@ -48,8 +48,6 @@ class newsfeed implements Interfaces\Api
             'activtiy' =>  $activity->export()
         ];
 
-        Core\Di\Di::_()->get('Permissions\Manager');
-
         //Calculate new permissions object with the entities
         if ($activity && Di::_()->get('Features\Manager')->has('permissions')) {
             $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');

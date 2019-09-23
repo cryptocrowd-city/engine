@@ -151,6 +151,7 @@ class Manager
                 ->setGuid((string) $scoredGuid->getGuid())
                 ->setOwnerGuid((string) $ownerGuid)
                 ->setAccessId($scoredGuid->getAccessId())
+                ->setType($scoredGuid->getType())
                 ->setUrn(new Urn($urn))
                 ->setTimestamp($scoredGuid->getTimestamp());
 
@@ -182,6 +183,7 @@ class Manager
                                 ->setGuid($entity->getGuid())
                                 ->setOwnerGuid($entity->getOwnerGuid())
                                 ->setAccessId($entity->getAccessId())
+                                ->setType($scoredGuid->getType())
                                 ->setUrn($entity->getUrn())
                                 ->setEntity($entity);
             }

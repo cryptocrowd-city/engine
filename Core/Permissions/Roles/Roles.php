@@ -15,6 +15,7 @@ class Roles extends Rbac
     public const ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER = 'closed_channel_nonsubscriber';
     public const ROLE_CLOSED_GROUP_SUBSCRIBER = 'closed_group_subscriber';
     public const ROLE_CLOSED_GROUP_NON_SUBSCRIBER = 'closed_group_nonsubscriber';
+    public const ROLE_ENTITY_OWNER = 'entity_owner';
     public const ROLE_GROUP_ADMIN = 'group_admin';
     public const ROLE_GROUP_MODERATOR = 'group_moderator';
     public const ROLE_GROUP_OWNER = 'group_owner';
@@ -64,6 +65,7 @@ class Roles extends Rbac
         $this->addRole(new ClosedChannelSubscriberRole());
         $this->addRole(new ClosedGroupNonSubscriberRole());
         $this->addRole(new ClosedGroupSubscriberRole());
+        $this->addRole(new EntityOwnerRole());
         $this->addRole(new GroupAdminRole());
         $this->addRole(new GroupModeratorRole());
         $this->addRole(new GroupOwnerRole());

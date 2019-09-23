@@ -40,7 +40,12 @@ class GroupRoleCalculator extends BaseRoleCalculator
         if (isset($this->groups[$entity->getAccessId()])) {
             return $this->groups[$entity->getAccessId()];
         }
-        $group = $this->entitiesBuilder->single($entity->getAccessId());
+        if ($entity->getType() === 'group') {
+            $group = $entity;
+        } else {
+            $group = $this->entitiesBuilder->single($entity->getAccessId());
+        }
+
         $role = null;
         if ($this->user === null) {
             $role = $this->getGroupNonSubscriberRole($group);
@@ -58,7 +63,7 @@ class GroupRoleCalculator extends BaseRoleCalculator
             $role = $this->getGroupNonSubscriberRole($group);
         }
         
-        $this->groups[$entity->getAccessId()] = $role;
+        $this->groups[$group->getGuid()] = $role;
 
         return $role;
     }

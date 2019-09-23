@@ -77,7 +77,9 @@ class Permissions implements \JsonSerializable
     public function calculate(array $entities = []): void
     {
         foreach ($entities as $entity) {
-            $this->entities[$entity->getGuid()] = $this->getRoleForEntity($entity);
+            if ($entity) {
+                $this->entities[$entity->getGuid()] = $this->getRoleForEntity($entity);
+            }
         }
     }
 
@@ -85,19 +87,22 @@ class Permissions implements \JsonSerializable
     {
         $role = null;
 
-        //Access id is the best way to determine what the parent entity is
-        //Any of the access flags are a channel
-        //Anything else is a group guid
+        //Permissions for specific channels and groups
+        if ($entity->getType() === 'user') {
+            return $this->channelRoleCalculator->calculate($entity);
+        } elseif ($entity->getType() === 'group') {
+            return $this->groupRoleCalculator->calculate($entity);
+        }
+
+        //Permissions for entities belonging to groups or channels
         switch ($entity->getAccessId()) {
             case Access::UNLISTED:
             case Access::LOGGED_IN:
             case Access::PUBLIC:
             case Access::UNKNOWN:
-                error_log('Getting channel role');
                 $role = $this->channelRoleCalculator->calculate($entity);
                 break;
             default:
-                error_log('Getting group role');
                 $role = $this->groupRoleCalculator->calculate($entity);
         }
         //Apply global overrides
@@ -106,6 +111,22 @@ class Permissions implements \JsonSerializable
         }
         if ($this->isBanned) {
             $role = $this->roles->getRole(Roles::ROLE_BANNED);
+        }
+
+        //Permissions for any entity a user owns
+        //Filtering out banned users and closed channels and groupos
+        if ($this->user && $entity->getOwnerGuid() === $this->user->getGuid()) {
+            switch ($role->getName()) {
+                //If a user has any of these roles, they can no longer interact with their own content
+                case Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER:
+                case Roles::ROLE_CLOSED_GROUP_NON_SUBSCRIBER:
+                case Roles::ROLE_BANNED:
+                    return $role;
+                default:
+                    //Else they own the entity and can edit/delete, etc
+                    return $this->roles->getRole(Roles::ROLE_ENTITY_OWNER);
+
+            }
         }
 
         return $role;

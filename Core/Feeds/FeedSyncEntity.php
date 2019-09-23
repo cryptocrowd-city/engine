@@ -23,6 +23,8 @@ use Minds\Traits\MagicAttributes;
  * @method FeedSyncEntity setUrn(string $urn)
  * @method int getAccessId()
  * @method FeedSyncEntity setAccessId(int $accessId)
+ * @method string getType()
+ * @method FeedSyncEntity setType(string $type)
  */
 class FeedSyncEntity
 {
@@ -46,6 +48,15 @@ class FeedSyncEntity
     /** @var Entity */
     protected $entity;
 
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+        $this->accessId = $entity->getAccessId();
+        $this->type = $entity->getType();
+    }
+
+    /** @var type */
+    protected $type;
     /**
      * Export to public API
      * @return array
@@ -58,6 +69,7 @@ class FeedSyncEntity
             'access_id' => $this->accessId,
             'timestamp' => $this->timestamp,
             'urn' => $this->urn,
+            'type' => $this->type,
             'entity' => $this->entity ? $this->entity->export() : null,
         ];
     }

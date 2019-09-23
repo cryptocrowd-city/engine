@@ -88,8 +88,6 @@ class channel implements Interfaces\Api
         $block = Core\Security\ACL\Block::_();
         $response['channel']['blocked'] = $block->isBlocked($user);
        
-        Core\Di\Di::_()->get('Permissions\Manager');
-
         //Calculate new permissions object with the entities
         if ($user && Di::_()->get('Features\Manager')->has('permissions')) {
             $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
