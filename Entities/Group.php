@@ -422,6 +422,15 @@ class Group extends NormalizedEntity
         $this->conversationDisabled = $value ? 1 : 0;
         return $this;
     }
+    
+    /**
+     * Return the original `owner_guid` for the group.
+     * @return mixed2
+     */
+    public function getOwnerGuid() {
+        return $this->getOwnerObj()->guid;
+        //return $this->getOwnerGuids()[0] ?? null;
+    }
 
     /**
      * Gets `owner_guids`
