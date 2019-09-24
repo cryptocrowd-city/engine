@@ -44,7 +44,7 @@ class EventsSpec extends ObjectBehavior
             1 => 'is illegal',
             2 => 'Should be marked as explicit',
             3 => 'Encourages or incites violence',
-        ]; 
+        ];
         Di::_()->get('Config')->set('ban_reasons', $reasons);
 
         $this->getBanReasons(1)

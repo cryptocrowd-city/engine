@@ -13,7 +13,7 @@ use Minds\Core\Events\Dispatcher;
 use Minds\Core\Channels\Delegates\Ban;
 
 class Events
-{        
+{
     public function __construct()
     {
         $this->config = Di::_()->get('Config');
