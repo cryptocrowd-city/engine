@@ -7,12 +7,18 @@
 use Minds\Core;
 use Minds\Entities;
 use Minds\Helpers;
+use Minds\Core\Di\Di;
 use Minds\Core\Analytics\Metrics\Event;
 use Minds\Core\Events\Dispatcher;
 use Minds\Core\Channels\Delegates\Ban;
 
 class Events
-{
+{        
+    public function __construct()
+    {
+        $this->config = Di::_()->get('Config');
+    }
+
     public function register()
     {
         Core\Di\Di::_()->get('EventsDispatcher')->register('ban', 'user', function ($event) {
@@ -24,7 +30,7 @@ class Events
                 ->setBody('banned.tpl')
                 ->set('username', $user->username)
                 ->set('email', $user->getEmail())
-                ->set('reason', getReasonText($user->ban_reason))
+                ->set('reason', getBanReasons($user->ban_reason))
                 ->set('user', $user);
             $message = new Core\Email\Message();
             $message->setTo($user)
@@ -44,5 +50,10 @@ class Events
                 ->setBanReason($user->ban_reason)
                 ->push();
         });
+    }
+
+    public function getBanReasons($index)
+    {
+        return $this->config->get('ban_reasons')[$index];
     }
 }

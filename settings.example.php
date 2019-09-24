@@ -572,3 +572,20 @@ $CONFIG->set('gitlab', [
     ],
     'private_key' => ''
 ]);
+
+$CONFIG->set('ban_reasons', [
+    1 => 'is illegal',
+    2 => 'Should be marked as explicit',
+    3 => 'Encourages or incites violence',
+    4 => 'Harassment',
+    5 => 'contains personal and confidential info' ,
+    6 => 'Maliciously targets users (@name, links, images or videos)',
+    7 => 'Impersonates someone in a misleading or deceptive manner',
+    8 => 'is spam',
+    10 => 'is a copyright infringement',
+    11 => 'Another reason',
+    12 => 'Incorrect use of hashtags',
+    13 => 'Malware',
+    15 => 'Trademark infringement',
+    16 => 'Token manipulation'
+]);

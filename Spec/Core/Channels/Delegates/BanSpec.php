@@ -47,9 +47,4 @@ class BanSpec extends ObjectBehavior
             ->shouldReturn(true);
     }
 
-    public function it_should_discern_ban_reason_text()
-    {
-        $this->getReasonText(1)
-            ->shouldReturn("is illegal");
-    }
 }
