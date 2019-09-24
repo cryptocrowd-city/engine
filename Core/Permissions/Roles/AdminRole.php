@@ -7,28 +7,28 @@ class AdminRole extends BaseRole
     public function __construct()
     {
         parent::__construct(Roles::ROLE_ADMIN);
-        $this->addPermission(Roles::FLAG_APPOINT_ADMIN);
-        $this->addPermission(Roles::FLAG_CREATE_POST);
-        $this->addPermission(Roles::FLAG_EDIT_CHANNEL);
-        $this->addPermission(Roles::FLAG_EDIT_POST);
-        $this->addPermission(Roles::FLAG_DELETE_CHANNEL);
-        $this->addPermission(Roles::FLAG_DELETE_POST);
-        $this->addPermission(Roles::FLAG_APPOINT_MODERATOR);
-        $this->addPermission(Roles::FLAG_APPROVE_SUBSCRIBER);
-        $this->addPermission(Roles::FLAG_SUBSCRIBE);
-        $this->addPermission(Roles::FLAG_VIEW);
-        $this->addPermission(Roles::FLAG_VOTE);
-        $this->addPermission(Roles::FLAG_CREATE_COMMENT);
-        $this->addPermission(Roles::FLAG_EDIT_COMMENT);
-        $this->addPermission(Roles::FLAG_DELETE_COMMENT);
-        $this->addPermission(Roles::FLAG_REMIND);
-        $this->addPermission(Roles::FLAG_WIRE);
-        $this->addPermission(Roles::FLAG_MESSAGE);
-        $this->addPermission(Roles::FLAG_INVITE);
-        $this->addPermission(Roles::FLAG_CREATE_GROUP);
-        $this->addPermission(Roles::FLAG_EDIT_GROUP);
-        $this->addPermission(Roles::FLAG_DELETE_GROUP);
-        $this->addPermission(Roles::FLAG_JOIN);
-        $this->addPermission(Roles::FLAG_JOIN_GATHERING);
+        $this->addPermission(Flags::FLAG_APPOINT_ADMIN);
+        $this->addPermission(Flags::FLAG_CREATE_POST);
+        $this->addPermission(Flags::FLAG_EDIT_CHANNEL);
+        $this->addPermission(Flags::FLAG_EDIT_POST);
+        $this->addPermission(Flags::FLAG_DELETE_CHANNEL);
+        $this->addPermission(Flags::FLAG_DELETE_POST);
+        $this->addPermission(Flags::FLAG_APPOINT_MODERATOR);
+        $this->addPermission(Flags::FLAG_APPROVE_SUBSCRIBER);
+        $this->addPermission(Flags::FLAG_SUBSCRIBE);
+        $this->addPermission(Flags::FLAG_VIEW);
+        $this->addPermission(Flags::FLAG_VOTE);
+        $this->addPermission(Flags::FLAG_CREATE_COMMENT);
+        $this->addPermission(Flags::FLAG_EDIT_COMMENT);
+        $this->addPermission(Flags::FLAG_DELETE_COMMENT);
+        $this->addPermission(Flags::FLAG_REMIND);
+        $this->addPermission(Flags::FLAG_WIRE);
+        $this->addPermission(Flags::FLAG_MESSAGE);
+        $this->addPermission(Flags::FLAG_INVITE);
+        $this->addPermission(Flags::FLAG_CREATE_GROUP);
+        $this->addPermission(Flags::FLAG_EDIT_GROUP);
+        $this->addPermission(Flags::FLAG_DELETE_GROUP);
+        $this->addPermission(Flags::FLAG_JOIN);
+        $this->addPermission(Flags::FLAG_JOIN_GATHERING);
     }
 }

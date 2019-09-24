@@ -4,6 +4,7 @@ namespace Spec\Minds\Core\Permissions;
 
 use Minds\Core\Permissions\Permissions;
 use Minds\Core\Permissions\Roles\Roles;
+use Minds\Core\Permissions\Roles\Flags;
 use Minds\Entities\User;
 use Minds\Entities\Activity;
 use Minds\Entities\Group;
@@ -92,13 +93,13 @@ class PermissionsSpec extends ObjectBehavior
         expect(count($entities->getWrappedObject()))->shouldEqual(4);
         $role = $entities[10]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
         $role = $entities[11]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_ADMIN);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(true);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(true);
         $role = $entities[12]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_ADMIN);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(true);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(true);
     }
 
     public function it_should_return_banned_permissions()
@@ -113,7 +114,7 @@ class PermissionsSpec extends ObjectBehavior
         $role = $entities[10]->getWrappedObject();
 
         expect($role->getName())->shouldEqual(Roles::ROLE_BANNED);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
     public function it_should_return_owner_permissions()
@@ -131,17 +132,17 @@ class PermissionsSpec extends ObjectBehavior
         //Owns the activity
         $role = $entities[10]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
         //Subscribed to someone
         $role = $entities[11]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
-        expect($role->hasPermission(Roles::FLAG_VIEW))->shouldEqual(true);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_VIEW))->shouldEqual(true);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
         //Not subscribed to someone
         $role = $entities[12]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
-        expect($role->hasPermission(Roles::FLAG_VIEW))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_VIEW))->shouldEqual(false);
     }
 
     public function it_should_return_subscriber_permissions()
@@ -160,17 +161,17 @@ class PermissionsSpec extends ObjectBehavior
         //Owns the activity
         $role = $entities[10]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
         //Subscribed to someone
         $role = $entities[11]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
-        expect($role->hasPermission(Roles::FLAG_VIEW))->shouldEqual(true);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_VIEW))->shouldEqual(true);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
         //Not subscribed to someone
         $role = $entities[12]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
-        expect($role->hasPermission(Roles::FLAG_VIEW))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_VIEW))->shouldEqual(false);
     }
 
     public function it_should_return_non_subscriber_permissions()
@@ -188,17 +189,17 @@ class PermissionsSpec extends ObjectBehavior
         //Owns the activity
         $role = $entities[10]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
         //Subscribed to someone
         $role = $entities[11]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_MODERATED_CHANNEL_SUBSCRIBER);
-        expect($role->hasPermission(Roles::FLAG_VIEW))->shouldEqual(true);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_VIEW))->shouldEqual(true);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
         //Not subscribed to someone
         $role = $entities[12]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_CLOSED_CHANNEL_NON_SUBSCRIBER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
-        expect($role->hasPermission(Roles::FLAG_VIEW))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_VIEW))->shouldEqual(false);
     }
 
     public function it_should_return_group_owner_permissions()
@@ -217,7 +218,7 @@ class PermissionsSpec extends ObjectBehavior
         $entities = $this->getEntities();
         $role = $entities[13]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
     public function it_should_return_group_admin_permissions()
@@ -238,7 +239,7 @@ class PermissionsSpec extends ObjectBehavior
         $entities = $this->getEntities();
         $role = $entities[13]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
     public function it_should_return_group_moderator_permissions()
@@ -261,7 +262,7 @@ class PermissionsSpec extends ObjectBehavior
         $entities = $this->getEntities();
         $role = $entities[13]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
     public function it_should_return_group_banned_permissions()
@@ -285,7 +286,7 @@ class PermissionsSpec extends ObjectBehavior
         $role = $entities[13]->getWrappedObject();
 
         expect($role->getName())->shouldEqual(Roles::ROLE_BANNED);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
     public function it_should_return_open_group_subscriber_permissions()
@@ -311,7 +312,7 @@ class PermissionsSpec extends ObjectBehavior
         $role = $entities[13]->getWrappedObject();
 
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
     public function it_should_return_open_group_non_subscriber_permissions()
@@ -337,7 +338,7 @@ class PermissionsSpec extends ObjectBehavior
         $role = $entities[13]->getWrappedObject();
 
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
 
@@ -364,7 +365,7 @@ class PermissionsSpec extends ObjectBehavior
         $role = $entities[13];
 
         expect($role->getName())->shouldEqual(Roles::ROLE_ENTITY_OWNER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
     public function it_should_return_non_subscriber_for_owner_when_not_subscribed_to_a_closed_group()
@@ -390,7 +391,7 @@ class PermissionsSpec extends ObjectBehavior
         $role = $entities[13];
 
         expect($role->getName())->shouldEqual(Roles::ROLE_CLOSED_GROUP_NON_SUBSCRIBER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
     public function it_should_return_closed_group_non_subscriber_permissions()
@@ -416,7 +417,7 @@ class PermissionsSpec extends ObjectBehavior
         $role = $entities[13]->getWrappedObject();
 
         expect($role->getName())->shouldEqual(Roles::ROLE_CLOSED_GROUP_NON_SUBSCRIBER);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
     public function it_should_returned_a_closed_channel_non_subscriber_role_for_logged_out()
@@ -432,7 +433,7 @@ class PermissionsSpec extends ObjectBehavior
         $entities = $this->getEntities();
         $role = $entities[12]->getWrappedObject();
         expect($role->getName())->shouldEqual(Roles::ROLE_LOGGED_OUT_CLOSED);
-        expect($role->hasPermission(Roles::FLAG_APPOINT_ADMIN))->shouldEqual(false);
+        expect($role->hasPermission(Flags::FLAG_APPOINT_ADMIN))->shouldEqual(false);
     }
 
 
