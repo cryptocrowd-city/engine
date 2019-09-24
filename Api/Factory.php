@@ -8,7 +8,6 @@ use Minds\Interfaces;
 use Minds\Helpers;
 use Minds\Core\Security;
 use Minds\Core\Session;
-use Minds\Core\Di\Di;
 
 /**
  * API Factory
