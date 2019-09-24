@@ -46,5 +46,4 @@ class BanSpec extends ObjectBehavior
             ->ban($user, 'phpspec', false)
             ->shouldReturn(true);
     }
-
 }
