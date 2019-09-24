@@ -15,7 +15,6 @@ use Minds\Api\Factory;
 use Minds\Common\ChannelMode;
 use Minds\Core\Di\Di;
 use ElggFile;
-use Minds\Core\Di\Di;
 
 class channel implements Interfaces\Api
 {
