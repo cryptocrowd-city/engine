@@ -1461,63 +1461,21 @@ CREATE TABLE minds.moderation_reports (
     uphold boolean,
     user_hashes set<text>,
     PRIMARY KEY (entity_urn, reason_code, sub_reason_code, timestamp)
-) WITH CLUSTERING ORDER BY (reason_code ASC, sub_reason_code ASC, timestamp DESC)
-    AND bloom_filter_fp_chance = 0.01
-    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-    AND comment = ''
-    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
-    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
-    AND crc_check_chance = 1.0
-    AND dclocal_read_repair_chance = 0.1
-    AND default_time_to_live = 0
-    AND gc_grace_seconds = 864000
-    AND max_index_interval = 2048
-    AND memtable_flush_period_in_ms = 0
-    AND min_index_interval = 128
-    AND read_repair_chance = 0.0
-    AND speculative_retry = '99PERCENTILE';
+) WITH CLUSTERING ORDER BY (reason_code ASC, sub_reason_code ASC, timestamp DESC);
 
 CREATE MATERIALIZED VIEW minds.moderation_reports_by_entity_owner_guid AS
     SELECT *
     FROM minds.moderation_reports
     WHERE entity_owner_guid IS NOT NULL AND reason_code IS NOT NULL AND sub_reason_code IS NOT NULL AND timestamp IS NOT NULL
     PRIMARY KEY (entity_owner_guid, timestamp, entity_urn, reason_code, sub_reason_code)
-    WITH CLUSTERING ORDER BY (timestamp DESC, entity_urn ASC, reason_code ASC, sub_reason_code ASC)
-    AND bloom_filter_fp_chance = 0.01
-    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-    AND comment = ''
-    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
-    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
-    AND crc_check_chance = 1.0
-    AND dclocal_read_repair_chance = 0.1
-    AND default_time_to_live = 0
-    AND gc_grace_seconds = 864000
-    AND max_index_interval = 2048
-    AND memtable_flush_period_in_ms = 0
-    AND min_index_interval = 128
-    AND read_repair_chance = 0.0
-    AND speculative_retry = '99PERCENTILE';
+    WITH CLUSTERING ORDER BY (timestamp DESC, entity_urn ASC, reason_code ASC, sub_reason_code ASC);
 
 CREATE MATERIALIZED VIEW minds.moderation_reports_by_state AS
     SELECT *
     FROM minds.moderation_reports
     WHERE state IS NOT NULL AND reason_code IS NOT NULL AND sub_reason_code IS NOT NULL AND timestamp IS NOT NULL
     PRIMARY KEY (state, timestamp, entity_urn, reason_code, sub_reason_code)
-    WITH CLUSTERING ORDER BY (timestamp DESC, entity_urn ASC, reason_code ASC, sub_reason_code ASC)
-    AND bloom_filter_fp_chance = 0.01
-    AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-    AND comment = ''
-    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
-    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
-    AND crc_check_chance = 1.0
-    AND dclocal_read_repair_chance = 0.1
-    AND default_time_to_live = 0
-    AND gc_grace_seconds = 864000
-    AND max_index_interval = 2048
-    AND memtable_flush_period_in_ms = 0
-    AND min_index_interval = 128
-    AND read_repair_chance = 0.0
-    AND speculative_retry = '99PERCENTILE';
+    WITH CLUSTERING ORDER BY (timestamp DESC, entity_urn ASC, reason_code ASC, sub_reason_code ASC);
 
 CREATE TABLE minds.moderation_strikes (
     user_guid bigint,
@@ -1526,21 +1484,7 @@ CREATE TABLE minds.moderation_strikes (
     timestamp timestamp,
     report_urn text,
     PRIMARY KEY (user_guid, reason_code, sub_reason_code, timestamp)
-) WITH CLUSTERING ORDER BY (reason_code ASC, sub_reason_code ASC, timestamp ASC)
-    AND bloom_filter_fp_chance = 0.01
-    AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
-    AND comment = ''
-    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
-    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
-    AND crc_check_chance = 1.0
-    AND dclocal_read_repair_chance = 0.1
-    AND default_time_to_live = 0
-    AND gc_grace_seconds = 864000
-    AND max_index_interval = 2048
-    AND memtable_flush_period_in_ms = 0
-    AND min_index_interval = 128
-    AND read_repair_chance = 0.0
-    AND speculative_retry = '99PERCENTILE';
+) WITH CLUSTERING ORDER BY (reason_code ASC, sub_reason_code ASC, timestamp ASC);
 
 CREATE TABLE minds.moderation_summons (
     report_urn text,
@@ -1550,17 +1494,4 @@ CREATE TABLE minds.moderation_summons (
     status text,
     PRIMARY KEY (report_urn, jury_type, juror_guid)
 ) WITH CLUSTERING ORDER BY (jury_type ASC, juror_guid ASC)
-    AND bloom_filter_fp_chance = 0.01
-    AND caching = {'keys': 'ALL', 'rows_per_partition': 'ALL'}
-    AND comment = ''
-    AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
-    AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
-    AND crc_check_chance = 1.0
-    AND dclocal_read_repair_chance = 0.1
-    AND default_time_to_live = 0
-    AND gc_grace_seconds = 864000
-    AND max_index_interval = 2048
-    AND memtable_flush_period_in_ms = 0
-    AND min_index_interval = 128
-    AND read_repair_chance = 0.0
-    AND speculative_retry = '99PERCENTILE';
+    AND bloom_filter_fp_chance = 0.01;
