@@ -53,6 +53,7 @@ class FeedSyncEntity
         $this->entity = $entity;
         $this->accessId = $entity->getAccessId();
         $this->type = $entity->getType();
+        return $this;
     }
 
     /** @var type */

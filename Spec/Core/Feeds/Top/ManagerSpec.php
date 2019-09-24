@@ -75,6 +75,10 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(5000);
 
+        $entity1->getType()
+            ->shouldBeCalled()
+            ->willReturn('object:image');
+
         $entity1->getAccessId()
             ->shouldBeCalled()
             ->willReturn(Access::PUBLIC);
@@ -114,6 +118,10 @@ class ManagerSpec extends ObjectBehavior
         $entity2->getGUID()
             ->shouldBeCalled()
             ->willReturn(5001);
+
+        $entity2->getType()
+            ->shouldBeCalled()
+            ->willReturn('activity');
 
         $entity2->getAccessId()
             ->shouldBeCalled()
@@ -183,6 +191,10 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(Access::PUBLIC);
 
+        $entity1->getType()
+            ->shouldBeCalled()
+            ->willReturn('activity');
+
         $entity1->getOwnerGUID()
             ->shouldBeCalled()
             ->willReturn(1000);
@@ -220,6 +232,9 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(5001);
 
+        $entity2->getType()
+            ->shouldBeCalled()
+            ->willReturn('activity');
         
         $entity2->getAccessId()
             ->shouldBeCalled()
