@@ -57,7 +57,8 @@ class FeedSyncEntity
     }
 
     /** @var type */
-    protected $type;
+    public $type;
+
     /**
      * Export to public API
      * @return array
