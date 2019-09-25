@@ -427,7 +427,8 @@ class Group extends NormalizedEntity
      * Return the original `owner_guid` for the group.
      * @return mixed2
      */
-    public function getOwnerGuid() {
+    public function getOwnerGuid()
+    {
         return $this->getOwnerObj()->guid;
         //return $this->getOwnerGuids()[0] ?? null;
     }
