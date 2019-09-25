@@ -3,11 +3,17 @@
 namespace Minds\Core;
 
 use Minds\Core\I18n\I18n;
+use Minds\Core\Router\Manager;
+use Minds\Core\Router\Middleware\LegacyRouterMiddleware;
 use Minds\Helpers;
 use Minds\Core\Di\Di;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\ServerRequestFactory;
-use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\JsonResponse;
+use Zend\Diactoros\Uri;
 
 /**
  * Minds Core Router.
@@ -37,15 +43,52 @@ class Router
     ];
 
     /**
-     * Route the pages
+     * @param null $uri
+     * @param null $method
+     */
+    public function route($uri = null, $method = null)
+    {
+        if (!$uri) {
+            $uri = strtok($_SERVER['REDIRECT_ORIG_URI'] ?? $_SERVER['REQUEST_URI'], '?');
+        }
+
+        if (!$method) {
+            $method = $_SERVER['REQUEST_METHOD'];
+        }
+
+        /** @var Manager $manager */
+        $manager = Di::_()->get('Router');
+
+        $manager
+            ->pipe(new LegacyRouterMiddleware());
+
+        $request = ServerRequestFactory::fromGlobals()
+            ->withMethod($method)
+            ->withUri(new Uri($uri)); // TODO: Apply scheme+host+port to Uri, ensure it works with reverse proxy
+
+        $response = $manager->handle($request);
+
+        foreach ($response->getHeaders() as $header => $values) {
+            foreach ($values as $value) {
+                header(sprintf('%s: %s', $header, $value), false);
+            }
+        }
+
+        http_response_code($response->getStatusCode());
+        echo $response->getBody();
+    }
+
+    /**
+     * Legacy Route the pages
      * (fallback to elgg page handler if we fail).
      *
      * @param string $uri
      * @param string $method
      *
      * @return null|mixed
+     * @deprecated
      */
-    public function route($uri = null, $method = null)
+    public function legacyHandler($uri = null, $method = null)
     {
         if ((!$uri) && (isset($_SERVER['REDIRECT_ORIG_URI']))) {
             $uri = strtok($_SERVER['REDIRECT_ORIG_URI'], '?');
@@ -66,6 +109,7 @@ class Router
         if ($method == 'post') {
             $this->postDataFix();
         }
+
 
         $request = ServerRequestFactory::fromGlobals();
         $response = new JsonResponse([]);
