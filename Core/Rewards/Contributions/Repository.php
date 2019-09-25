@@ -118,7 +118,7 @@ class Repository
 
             $contributions[] = $contribution;
         }
-        $pagingStateToken = $rows->pagingStateToken() ?: null;
+        $pagingStateToken = $rows ? $rows->pagingStateToken() : null;
         return [
             'contributions' => $contributions,
             'token' => $pagingStateToken
