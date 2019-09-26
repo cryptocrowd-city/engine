@@ -43,7 +43,7 @@ class Repository
         }
 
         $response = new Response;
-        if ($opts['type'] === 'subscibers') {
+        if ($opts['type'] === 'subscribers') {
             $statement = "SELECT * FROM friends";
         } else {
             $statement = "SELECT * FROM friendsof";
@@ -77,7 +77,7 @@ class Repository
             $response->setPagingToken(base64_encode($rows->pagingStateToken()));
             $response->setLastPage($rows->isLastPage());
         } catch (\Exception $e) {
-            return $response;
+            // do nothing.
         }
 
         return $response;

@@ -37,4 +37,9 @@ class Custom implements Interfaces\PreparedInterface
     {
         return $this->opts;
     }
+
+    public function getTemplate()
+    {
+        return $this->template;
+    }
 }

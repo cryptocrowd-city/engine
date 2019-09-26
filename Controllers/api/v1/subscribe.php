@@ -49,9 +49,14 @@ class subscribe implements Interfaces\Api
                 'message' => 'Unable to find '.$type,
             ]);
         }
+        $pagingToken = (string) $users->getPagingToken();
+        
+        $users = array_filter(Factory::exportable($users->toArray()), function ($user) {
+            return ($user->enabled != 'no' && $user->banned != 'yes');
+        });
 
-        $response['users'] = Factory::exportable(array_values($users->toArray()));
-        $response['load-next'] = (string) $users->getPagingToken();
+        $response['users'] = $users;
+        $response['load-next'] = $pagingToken;
 
         return Factory::response($response);
     }

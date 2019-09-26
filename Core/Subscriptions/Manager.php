@@ -73,6 +73,10 @@ class Manager
      */
     public function getList($opts)
     {
+        if (!$opts['guid']) {
+            return [];
+        }
+        
         $opts = array_merge([
             'limit' => 12,
             'offset' => '',
@@ -80,9 +84,6 @@ class Manager
             'type' => 'subscribers',
         ], $opts);
         
-        if (!$opts['guid']) {
-            return [];
-        }
         return $this->repository->getList($opts);
     }
 
