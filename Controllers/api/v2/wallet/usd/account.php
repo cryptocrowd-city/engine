@@ -103,7 +103,7 @@ class account implements Interfaces\Api
         Factory::isLoggedIn();
         $response = [];
 
-        $vars = Core\Router::getPutVars();
+        $vars = Core\Router\PrePsr7\Router::getPutVars();
 
         $account = (new Payments\Stripe\Connect\Account())
             ->setUserGuid(Core\Session::getLoggedInUser()->guid)

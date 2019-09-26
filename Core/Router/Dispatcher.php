@@ -1,17 +1,18 @@
 <?php declare(strict_types=1);
 /**
- * Manager
+ * Dispatcher
  * @author edgebal
  */
 
 namespace Minds\Core\Router;
 
+use Minds\Core\Router\Middleware\EmptyResponseMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class Manager implements RequestHandlerInterface
+class Dispatcher implements RequestHandlerInterface
 {
     /** @var MiddlewareInterface[] */
     protected $middleware = [];
@@ -30,11 +31,13 @@ class Manager implements RequestHandlerInterface
      * Handles a request and produces a response.
      *
      * May call other collaborating code to generate the response.
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         if (count($this->middleware) === 0) {
-            die('TBD: Fallback');
+            return (new EmptyResponseMiddleware())->process($request, $this);
         }
 
         $middleware = array_shift($this->middleware);

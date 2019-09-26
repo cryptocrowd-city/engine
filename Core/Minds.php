@@ -2,6 +2,7 @@
 
 namespace Minds\Core;
 
+use Minds\Core\Channels\ChannelsRouter;
 use Minds\Core\Di\Di;
 
 /**
@@ -35,6 +36,7 @@ class Minds extends base
     {
         $this->initModules();
         $this->initProviders();
+        $this->initRouter();
     }
 
     /**
@@ -111,6 +113,11 @@ class Minds extends base
         (new Feeds\FeedsProvider())->register();
         (new Analytics\AnalyticsProvider())->register();
         (new Channels\ChannelsProvider())->register();
+    }
+
+    public function initRouter()
+    {
+        (new ChannelsRouter())->register();
     }
 
     /**
