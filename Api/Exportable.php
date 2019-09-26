@@ -8,6 +8,9 @@
 
 namespace Minds\Api;
 
+use Minds\Core\Di\Di;
+use Minds\Core\Session;
+
 class Exportable implements \JsonSerializable
 {
     /** @var array */
@@ -100,6 +103,14 @@ class Exportable implements \JsonSerializable
 
             $exported = $item->export(...$this->exportArgs);
 
+            if ($item && Di::_()->get('Features\Manager')->has('permissions')) {
+                $userGuid = $user ? $user->getGuid() : null;
+                $permissionsManager = Di::_()->get('Permissions\Manager');
+                $permissions = $permissionsManager->getList(['user_guid' => Session::getLoggedinUser(),
+                                                            'entities' => [$item]]);
+                $exported['permissions'] = $permissions->export();
+            }
+
             // Shims
             // TODO: Maybe allow customization via classes? i.e. JavascriptGuidShim, ExceptionShim, etc
 
@@ -125,8 +136,6 @@ class Exportable implements \JsonSerializable
             foreach ($this->exceptions as $exception) {
                 $exported[$exception] = $item->{$exception};
             }
-
-            //
 
             $output[$key] = $exported;
         }
