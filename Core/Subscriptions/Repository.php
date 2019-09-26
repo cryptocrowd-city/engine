@@ -5,9 +5,9 @@ namespace Minds\Core\Subscriptions;
 use Cassandra;
 use Minds\Common\Repository\Response;
 use Minds\Core\Data\Cassandra\Client;
-use Minds\Core\Data\Cassandra\Prepared\Custom;
 use Minds\Core\Di\Di;
-use Minds\Core\Util\UUIDGenerator;
+use Minds\Core\Data\Cassandra\Prepared;
+use Minds\Entities\User;
 
 class Repository
 {
@@ -20,17 +20,67 @@ class Repository
     }
 
     /**
-     * @param array $opts
-     * @return Response
+     * Gets a subscription or subscribers list from cassandra.
+     *
+     * @param array $opts -
+     *  guid - required!
+     *  type - either 'subscribers' or 'subscriptions'.
+     *  limit - limit.
+     *  offset - offset.
+     * @return Response response object.
      */
     public function getList(array $opts = [])
     {
         $opts = array_merge([
-            'limit' => 10,
-            'offset' => 0,
-            'uuid' => '',
-            'recursive' => false,
+            'limit' => 12,
+            'offset' => '',
+            'guid' => null,
+            'type' => null,
         ], $opts);
+
+        if (!$opts['guid']) {
+            throw new \Exception('GUID is required');
+        }
+
+        $response = new Response;
+        if ($opts['type'] === 'subscibers') {
+            $statement = "SELECT * FROM friends";
+        } else {
+            $statement = "SELECT * FROM friendsof";
+        }
+
+        $where = ["column1 = ?"];
+        $values = [$opts['guid']];
+
+        $statement .= " WHERE " . implode(' AND ', $where);
+        $statement .= " ALLOW FILTERING";
+        $cqlOpts = [];
+        if ($opts['limit']) {
+            $cqlOpts['page_size'] = (int) $opts['limit'];
+        }
+
+        if ($opts['offset']) {
+            $cqlOpts['paging_state_token'] = base64_decode($opts['offset'], true);
+        }
+        
+        $query = new Prepared\Custom();
+        $query->query($statement, $values);
+        $query->setOpts($cqlOpts);
+
+        try {
+            $rows = $this->client->request($query);
+            foreach ($rows as $row) {
+                $user = new User($row['key']);
+                $response[] = $user;
+            }
+
+            $response->setPagingToken(base64_encode($rows->pagingStateToken()));
+            $response->setLastPage($rows->isLastPage());
+        } catch (\Exception $e) {
+            return $response;
+        }
+
+        return $response;
     }
 
     /**

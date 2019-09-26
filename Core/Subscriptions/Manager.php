@@ -61,6 +61,31 @@ class Manager
         $this->checkRateLimitDelegate = $checkRateLimitDelegate ?: new CheckRateLimit();
     }
 
+    /**
+     * Gets a subscription or subscribers list from the repository.
+     *
+     * @param array $opts -
+     *  guid - required!
+     *  type - either 'subscribers' or 'subscriptions'.
+     *  limit - limit.
+     *  offset - offset.
+     * @return Response response objet
+     */
+    public function getList($opts)
+    {
+        $opts = array_merge([
+            'limit' => 12,
+            'offset' => '',
+            'guid' => '',
+            'type' => 'subscribers',
+        ], $opts);
+        
+        if (!$opts['guid']) {
+            return [];
+        }
+        return $this->repository->getList($opts);
+    }
+
     public function setSubscriber($user)
     {
         $this->subscriber = $user;
