@@ -12,10 +12,10 @@ use Minds\Core\Permissions\Roles\Roles;
 */
 class Manager
 {
-    /** @var EntityBuilder */
-    private $entityBuilder;
+    /** @var EntitiesBuilder */
+    private $entitiesBuilder;
 
-    public function __construct($entityBuilder = null)
+    public function __construct($entitiesBuilder = null)
     {
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
     }
@@ -55,7 +55,7 @@ class Manager
         $roles = new Roles();
 
         /** @var Permissions */
-        $permissions = new Permissions($user, $roles, $entitiesBuilder);
+        $permissions = new Permissions($user, $roles, $this->entitiesBuilder);
         if (is_array($entities)) {
             $permissions->calculate($entities);
         }
