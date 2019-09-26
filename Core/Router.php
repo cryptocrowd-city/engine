@@ -2,18 +2,12 @@
 
 namespace Minds\Core;
 
+use Minds\Core\Di\Di;
 use Minds\Core\I18n\I18n;
 use Minds\Core\Router\Manager;
-use Minds\Core\Router\Middleware\LegacyRouterMiddleware;
 use Minds\Helpers;
-use Minds\Core\Di\Di;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\Uri;
+use Zend\Diactoros\ServerRequestFactory;
 
 /**
  * Minds Core Router.
@@ -42,53 +36,30 @@ class Router
       '/checkout' => '\\Minds\\Controllers\\checkout',
     ];
 
+    /** @var Manager */
+    protected $manager;
+
     /**
-     * @param null $uri
-     * @param null $method
+     * Router constructor.
+     * @param Manager $manager
      */
-    public function route($uri = null, $method = null)
-    {
-        if (!$uri) {
-            $uri = strtok($_SERVER['REDIRECT_ORIG_URI'] ?? $_SERVER['REQUEST_URI'], '?');
-        }
-
-        if (!$method) {
-            $method = $_SERVER['REQUEST_METHOD'];
-        }
-
-        /** @var Manager $manager */
-        $manager = Di::_()->get('Router');
-
-        $manager
-            ->pipe(new LegacyRouterMiddleware());
-
-        $request = ServerRequestFactory::fromGlobals()
-            ->withMethod($method)
-            ->withUri(new Uri($uri)); // TODO: Apply scheme+host+port to Uri, ensure it works with reverse proxy
-
-        $response = $manager->handle($request);
-
-        foreach ($response->getHeaders() as $header => $values) {
-            foreach ($values as $value) {
-                header(sprintf('%s: %s', $header, $value), false);
-            }
-        }
-
-        http_response_code($response->getStatusCode());
-        echo $response->getBody();
+    public function __construct(
+        $manager = null
+    ) {
+        /** @var Router\Manager $manager */
+        $this->manager = $manager ?: Di::_()->get('Router\Manager');
     }
 
     /**
-     * Legacy Route the pages
+     * Route the pages
      * (fallback to elgg page handler if we fail).
      *
      * @param string $uri
      * @param string $method
      *
      * @return null|mixed
-     * @deprecated
      */
-    public function legacyHandler($uri = null, $method = null)
+    public function route($uri = null, $method = null)
     {
         if ((!$uri) && (isset($_SERVER['REDIRECT_ORIG_URI']))) {
             $uri = strtok($_SERVER['REDIRECT_ORIG_URI'], '?');
@@ -110,9 +81,15 @@ class Router
             $this->postDataFix();
         }
 
-
         $request = ServerRequestFactory::fromGlobals();
         $response = new JsonResponse([]);
+
+        $result = $this->manager
+            ->handle($request, $response);
+
+        if ($result === false) {
+            return null;
+        }
 
         if ($request->getMethod() === 'OPTIONS') {
             header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
@@ -138,8 +115,6 @@ class Router
 
         // XSRF Cookie - may be able to remove now with OAuth flow
         Security\XSRF::setCookie();
-
-        new SEO\Defaults(Di::_()->get('Config'));
 
         if (Session::isLoggedin()) {
             Helpers\Analytics::increment('active');
