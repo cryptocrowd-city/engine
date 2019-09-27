@@ -9,12 +9,14 @@ use Minds\Entities;
 use Minds\Helpers;
 use Minds\Core\Analytics\Metrics\Event;
 use Minds\Core\Events\Dispatcher;
+use Minds\Core\Di\Di;
 
 class Events
 {
     public function register()
     {
-        Core\Di\Di::_()->get('EventsDispatcher')->register('ban', 'user', function ($event) {
+        Di::_()->get('EventsDispatcher')->register('ban', 'user', function ($event) {
+            $config = Di::_()->get('Config');
             $user = $event->getParameters();
             //send ban email
             $template = new Core\Email\Template();
@@ -29,9 +31,9 @@ class Events
             $message->setTo($user)
                 ->setMessageId(implode('-', [$user->guid, sha1($user->getEmail()), sha1('register-' . time())]))
                 ->setSubject("You are banned from Minds.")
-                ->setFrom('info@minds.com')
+                ->setFrom($config->get('contact_email'))
                 ->setHtml($template);
-            Core\Di\Di::_()->get('Mailer')->queue($message);
+            Di::_()->get('Mailer')->queue($message);
 
             // Record metric
 
