@@ -430,8 +430,8 @@ class Group extends NormalizedEntity
     public function getOwnerGuid()
     {
         $guids = $this->getOwnerGuids();
-        return $guids 
-            ? guids[0] 
+        return $guids
+            ? guids[0]
             : $this->getOwnerObj()->guid;
     }
 
