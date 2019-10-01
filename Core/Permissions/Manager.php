@@ -44,7 +44,9 @@ class Manager
             throw new \InvalidArgumentException('user_guid is required');
         }
 
-        $guids = $opts['guids'] ?: array_map(function ($item) { return $item['guid']; }, $opts['entities']);
+        $guids = $opts['guids'] ?: array_map(function ($item) {
+            return $item['guid'];
+        }, $opts['entities']);
 
         $user = $this->entitiesBuilder->single($opts['user_guid']);
         $entities = $this->entitiesBuilder->get(['guids' => $guids]);
