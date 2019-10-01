@@ -10,6 +10,7 @@ use Minds\Core\Permissions\Roles\Roles;
 /*
 * Manager for managing role based permissions
 */
+
 class Manager
 {
     /** @var EntitiesBuilder */
@@ -43,9 +44,15 @@ class Manager
             throw new \InvalidArgumentException('user_guid is required');
         }
 
+        $guids = $opts['guids'] ?: array_map(function ($item) { return $item['guid']; }, $opts['entities']);
+
         $user = $this->entitiesBuilder->single($opts['user_guid']);
-        $entities = $this->entitiesBuilder->get($opts) ?: [];
-        
+        $entities = $this->entitiesBuilder->get(['guids' => $guids]);
+
+        if (!$user) {
+            throw new \InvalidArgumentException('User does not exist');
+        }
+
         if ($user && $user->getType() !== 'user') {
             throw new \InvalidArgumentException('Entity is not a user');
         }
