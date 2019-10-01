@@ -13,15 +13,12 @@ use Minds\Common\Urn;
 use Minds\Core\Entities\Resolver;
 use Minds\Core\Session;
 use Minds\Interfaces;
-use Minds\Core\Di\Di;
 
 class entities implements Interfaces\Api
 {
     /**
-     * Equivalent to HTTP GET method.
-     *
-     * @param array $pages
-     *
+     * Equivalent to HTTP GET method
+     * @param  array $pages
      * @return mixed|null
      */
     public function get($pages)
@@ -34,7 +31,7 @@ class entities implements Interfaces\Api
             ->setUser(Session::getLoggedinUser() ?: null)
             ->setUrns($urns)
             ->setOpts([
-                'asActivities' => $asActivities,
+                'asActivities' => $asActivities
             ]);
 
         $entities = $resolver->fetch();
@@ -42,15 +39,12 @@ class entities implements Interfaces\Api
         // Return
         return Factory::response([
             'entities' => Exportable::_(array_values($entities)),
-            'permissions' => $permissions,
         ]);
     }
 
     /**
-     * Equivalent to HTTP POST method.
-     *
-     * @param array $pages
-     *
+     * Equivalent to HTTP POST method
+     * @param  array $pages
      * @return mixed|null
      */
     public function post($pages)
@@ -59,10 +53,8 @@ class entities implements Interfaces\Api
     }
 
     /**
-     * Equivalent to HTTP PUT method.
-     *
-     * @param array $pages
-     *
+     * Equivalent to HTTP PUT method
+     * @param  array $pages
      * @return mixed|null
      */
     public function put($pages)
@@ -71,10 +63,8 @@ class entities implements Interfaces\Api
     }
 
     /**
-     * Equivalent to HTTP DELETE method.
-     *
-     * @param array $pages
-     *
+     * Equivalent to HTTP DELETE method
+     * @param  array $pages
      * @return mixed|null
      */
     public function delete($pages)

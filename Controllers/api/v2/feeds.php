@@ -13,10 +13,8 @@ use Minds\Interfaces;
 class feeds implements Interfaces\Api
 {
     /**
-     * Gets a list of suggested hashtags, including the ones the user has opted in.
-     *
+     * Gets a list of suggested hashtags, including the ones the user has opted in
      * @param array $pages
-     *
      * @throws \Exception
      */
     public function get($pages)
@@ -31,7 +29,7 @@ class feeds implements Interfaces\Api
         if (!$filter) {
             return Factory::response([
                 'status' => 'error',
-                'message' => 'Invalid filter',
+                'message' => 'Invalid filter'
             ]);
         }
 
@@ -40,7 +38,7 @@ class feeds implements Interfaces\Api
         if (!$algorithm) {
             return Factory::response([
                 'status' => 'error',
-                'message' => 'Invalid algorithm',
+                'message' => 'Invalid algorithm'
             ]);
         }
 
@@ -74,6 +72,8 @@ class feeds implements Interfaces\Api
             $period = '1y';
         }
 
+        //
+
         $hardLimit = 600;
 
         if ($currentUser && $currentUser->isAdmin()) {
@@ -105,6 +105,8 @@ class feeds implements Interfaces\Api
             ]);
         }
 
+        //
+
         $hashtag = null;
         if (isset($_GET['hashtag'])) {
             $hashtag = strtolower($_GET['hashtag']);
@@ -130,7 +132,7 @@ class feeds implements Interfaces\Api
             if (!$container || !Core\Security\ACL::_()->read($container)) {
                 return Factory::response([
                     'status' => 'error',
-                    'message' => 'Forbidden',
+                    'message' => 'Forbidden'
                 ]);
             }
         }
@@ -200,11 +202,9 @@ class feeds implements Interfaces\Api
                 'status' => 'success',
                 'entities' => Exportable::_($result),
                 'load-next' => $limit + $offset,
-                'permissions' => $permissions,
             ]);
         } catch (\Exception $e) {
             error_log($e);
-
             return Factory::response(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }

@@ -112,19 +112,9 @@ class recommended implements Interfaces\Api
 
         // Trim to correct length
         $entities = array_slice($entities, 0, $limit);
-        $permissions = null;
-        $currentUser = Core\Session::getLoggedinUser();
-        //Calculate new permissions object with the entities
-        if (Di::_()->get('Features\Manager')->has('permissions')) {
-            $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
-            $permissions = $permissionsManager->getList(['user_guid' => $currentUser,
-                                                        'entities' => $entities]);
-        }
-
 
         return Factory::response([
-            'entities' => Factory::exportable($entities),
-            'permissions' => $permissions,
+            'entities' => Factory::exportable($entities)
         ]);
     }
 

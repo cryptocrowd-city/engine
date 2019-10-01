@@ -40,7 +40,6 @@ class newsfeed implements Interfaces\Api
 
         $pinned_guids = null;
         switch ($pages[0]) {
-            /* Refactored to it's own controller
             case 'single':
                 $activity = new Activity($pages[1]);
 
@@ -57,7 +56,6 @@ class newsfeed implements Interfaces\Api
 
                 return Factory::response(['activity' => $activity->export()]);
                 break;
-            */
             default:
             case 'personal':
                 $options = [
@@ -170,8 +168,6 @@ class newsfeed implements Interfaces\Api
             array_shift($activity);
         }
 
-      
-
         $loadPrevious = $activity ? (string) current($activity)->guid : '';
 
         //   \Minds\Helpers\Counters::incrementBatch($activity, 'impression');
@@ -215,7 +211,7 @@ class newsfeed implements Interfaces\Api
                 }
             }
         }
-        
+
         if ($activity) {
             if (!$loadNext) {
                 $loadNext = (string) end($activity)->guid;

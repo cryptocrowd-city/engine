@@ -153,7 +153,6 @@ class feed implements Interfaces\Api
 
         return Factory::response([
             'entities' => Exportable::_($boosts),
-            'permissions' => $permissions,
             'load-next' => $next ?: null,
         ]);
     }
