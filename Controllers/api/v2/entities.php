@@ -39,14 +39,6 @@ class entities implements Interfaces\Api
 
         $entities = $resolver->fetch();
 
-        $permissions = null;
-        //Calculate new permissions object with the entities
-        if (Di::_()->get('Features\Manager')->has('permissions')) {
-            $permissionsManager = Di::_()->get('Permissions\Manager');
-            $permissions = $permissionsManager->getList(['user_guid' => Session::getLoggedInUserGuid(),
-                                                        'entities' => $entities]);
-        }
-
         // Return
         return Factory::response([
             'entities' => Exportable::_(array_values($entities)),

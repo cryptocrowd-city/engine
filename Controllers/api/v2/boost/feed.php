@@ -151,15 +151,6 @@ class feed implements Interfaces\Api
                 ]);
         }
 
-        $permissions = null;
-        //Calculate new permissions object with the entities
-        if ($boosts && Di::_()->get('Features\Manager')->has('permissions')) {
-            $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
-            $permissions = $permissionsManager->getList(['user_guid' => Core\Session::getLoggedInUserGuid(),
-                                                        'entities' => $boosts]);
-        }
-
-
         return Factory::response([
             'entities' => Exportable::_($boosts),
             'permissions' => $permissions,

@@ -68,6 +68,9 @@ class ManagerSpec extends ObjectBehavior
             "guids" => [10, 11, 12, 13],
             "entities" => [],
         ])->willReturn($this->mockEntities());
+        $this->entitiesBuilder->get([
+            "guids" => [10, 11, 12, 13]
+        ])->willReturn($this->mockEntities());
         $this->beConstructedWith($this->entitiesBuilder);
     }
 

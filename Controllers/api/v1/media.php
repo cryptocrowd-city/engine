@@ -73,7 +73,7 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
                         Security\ACL::$ignore = $ignore;
                     }
 
-                    /* No break */
+                    /* no break */
                 default:
                     $entity->fullExport = true;
                     $response['entity'] = $entity->export();
@@ -97,15 +97,6 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
                 }
         }
 
-        $currentUser = Core\Session::getLoggedinUser();
-        //Calculate new permissions object with the entities
-        if (Di::_()->get('Features\Manager')->has('permissions')) {
-            $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
-            $permissions = $permissionsManager->getList(['user_guid' => $currentUser,
-                                                        'entities' => [$entity]]);
-            $response['permissions'] = $permissions->export();
-        }
-        
         return Factory::response($response);
     }
 

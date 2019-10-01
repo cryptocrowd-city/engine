@@ -91,14 +91,6 @@ class channel implements Interfaces\Api
 
         $block = Core\Security\ACL\Block::_();
         $response['channel']['blocked'] = $block->isBlocked($user);
-       
-        //Calculate new permissions object with the entities
-        if ($user && Di::_()->get('Features\Manager')->has('permissions')) {
-            $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
-            $permissions = $permissionsManager->getList(['user_guid' => Core\Session::getLoggedInUserGuid(),
-                                                        'entities' => [$user]]);
-            $response['permissions'] = $permissions;
-        }
 
         if ($user->isPro()) {
             /** @var Core\Pro\Manager $manager */

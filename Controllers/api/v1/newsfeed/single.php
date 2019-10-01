@@ -45,16 +45,8 @@ class newsfeed implements Interfaces\Api
         }
 
         $response = [
-            'activtiy' =>  $activity->export()
+            'activity' =>  $activity->export()
         ];
-
-        //Calculate new permissions object with the entities
-        if ($activity && Di::_()->get('Features\Manager')->has('permissions')) {
-            $permissionsManager = Core\Di\Di::_()->get('Permissions\Manager');
-            $permissions = $permissionsManager->getList(['user_guid' => Core\Session::getLoggedInUserGuid(),
-                                                        'entities' => [$activity]]);
-            $response['permissions'] = $permissions;
-        }
 
         return Factory::response($response);
     }

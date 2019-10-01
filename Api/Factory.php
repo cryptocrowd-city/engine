@@ -224,8 +224,6 @@ class Factory
             $entities[$k] = $entity->export();
             //Calculate new permissions object with the entities
             if ($entity && Di::_()->get('Features\Manager')->has('permissions')) {
-                $userGuid = $user ? $user->getGuid() : null;
-                
                 $permissions = $permissionsManager->getList(['user_guid' => Session::getLoggedinUser(),
                                                             'entities' => [$entity]]);
                 $entities[$k]['permissions'] = $permissions->export();

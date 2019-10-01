@@ -104,7 +104,6 @@ class Exportable implements \JsonSerializable
             $exported = $item->export(...$this->exportArgs);
 
             if ($item && Di::_()->get('Features\Manager')->has('permissions')) {
-                $userGuid = $user ? $user->getGuid() : null;
                 $permissionsManager = Di::_()->get('Permissions\Manager');
                 $permissions = $permissionsManager->getList(['user_guid' => Session::getLoggedinUser(),
                                                             'entities' => [$item]]);
