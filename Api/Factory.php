@@ -209,7 +209,7 @@ class Factory
      * @return array - an array of the entities
      * @deprecated
      */
-    public static function exportable($entities, $exceptions = [], $exportContext = false, $includePermissions = true) : array
+    public static function exportable($entities = [], $exceptions = [], $exportContext = false, $includePermissions = true)
     {
         foreach ($entities as $k => $entity) {
             $entities[$k] = Factory::export($entity, $exceptions, $exportContext, $includePermissions);
@@ -220,7 +220,7 @@ class Factory
     /**
      * Exports a single entity, called by exportable for arrays
      */
-    public static function export($entity, $exceptions = false, $exportContext=false, $includePermissions = true) : array
+    public static function export($entity, $exceptions = false, $exportContext=false, $includePermissions = true)
     {
         if ($exportContext && method_exists($entity, 'setExportContext')) {
             $entity->setExportContext($exportContext);
@@ -229,6 +229,8 @@ class Factory
         $export = $entity->export();
         //Calculate new permissions object with the entities
         if ($includePermissions && $entity && Di::_()->get('Features\Manager')->has('permissions')) {
+            /** @var Manager $permissionsManager */
+            $permissionsManager = Di::_()->get('Permissions\Manager');
             $permissions = $permissionsManager->getList([
                 'user_guid' => Session::getLoggedinUser(),
                 'entities' => [$entity],
