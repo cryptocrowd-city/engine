@@ -42,6 +42,7 @@ class newsfeed implements Interfaces\Api
         switch ($pages[0]) {
             case 'single':
                 $activity = new Activity($pages[1]);
+
                 if (!Security\ACL::_()->read($activity)) {
                     return Factory::response([
                         'status' => 'error',
@@ -53,7 +54,7 @@ class newsfeed implements Interfaces\Api
                     return Factory::response(['status' => 'error']);
                 }
 
-                return Factory::response(['activity' => factory::exportable([$activity])]);
+                return Factory::response(['activity' => Factory::export($activity)]);
                 break;
             default:
             case 'personal':
