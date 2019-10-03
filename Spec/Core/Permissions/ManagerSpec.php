@@ -32,8 +32,7 @@ class ManagerSpec extends ObjectBehavior
         User $unsubscribedChannel,
         Group $group,
         EntitiesBuilder $entitiesBuilder
-    )
-    {
+    ) {
         $this->user = $user;
         $this->group = $group;
         $this->subscribedChannel = $subscribedChannel;
