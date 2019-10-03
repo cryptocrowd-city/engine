@@ -1070,7 +1070,7 @@ abstract class ElggEntity extends ElggData implements
             $url = "_graphics/icons/default/$size.png";
         }
 
-        return $url;
+        return elgg_normalize_url($url);
     }
 
     /**
