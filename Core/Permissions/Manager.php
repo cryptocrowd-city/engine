@@ -50,7 +50,7 @@ class Manager
             throw new \InvalidArgumentException('User does not exist');
         }
 
-        $entities = $opts['entities'] ?? $this->entitiesBuilder->get(['guids' => $opts['guids']]);
+        $entities = empty($opts['entities']) ? $this->entitiesBuilder->get(['guids' => $opts['guids']]) : $opts['entities'];
 
         if ($user && $user->getType() !== 'user') {
             throw new \InvalidArgumentException('Entity is not a user');
