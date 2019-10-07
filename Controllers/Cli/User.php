@@ -54,11 +54,12 @@ class User extends Cli\Controller implements Interfaces\CliControllerInterface
     /**
      * Resets a users passwords.
      * Requires username and password.
-     * 
+     *
      * Example call: php ./cli.php User password_reset --username=nemofin --password=password123
      * @return void
      */
-    public function password_reset() {
+    public function password_reset()
+    {
         try {
             if (!$this->getOpt('username') || !$this->getOpt('password')) {
                 throw new Exceptions\CliException('Missing username / password');
@@ -75,7 +76,7 @@ class User extends Cli\Controller implements Interfaces\CliControllerInterface
             $user->save();
 
             $this->out("Password changed successfuly for user ".$username);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->out("An error has occured");
             $this->out($e);
         }
