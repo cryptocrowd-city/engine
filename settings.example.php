@@ -579,3 +579,5 @@ $CONFIG->set('pro', [
     'subdomain_suffix' => 'minds.com',
     'dynamodb_table_name' => 'traefik',
 ]);
+
+$CONFIG->set('contact_email', 'info@minds.com');
