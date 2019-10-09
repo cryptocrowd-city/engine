@@ -52,8 +52,23 @@ class Events
         });
     }
 
-    public function getBanReasons($index)
+    /**
+     * Returns a readable format for a given ban reason, converting
+     * tree indicies to their text counterparts, discarding sub-reason.
+     *
+     * e.g. with the default config, an index of 1 returns "is illegal"
+     * an index of 1.1 also returns "is illegal"
+     *
+     * @param string $index - the given ban reason index
+     * @return string the first reason in the ban reason tree, or
+     *  if text is in the reason field, it will return that.
+     */
+    public function getBanReasons($reason)
     {
-        return $this->config->get('ban_reasons')[$index];
+        $reason = preg_split("/\./", $reason)[0];
+        if (is_numeric($reason)) {
+            return $this->config->get('ban_reasons')[$reason];
+        }
+        return $reason;
     }
 }
