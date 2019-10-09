@@ -21,8 +21,6 @@ use Minds\Traits\MagicAttributes;
  * @method int getTimestampMs()
  * @method EntityCentricRecord setTimestamp(int $timestamp)
  * @method int getTimestamp()
- * @method EntityCentricRecord setViews(int $views)
- * @method int getViews()
  * @method EntityCentricRecord setSums(array $sums)
  * @method int getSums()
  */
