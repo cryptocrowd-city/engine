@@ -45,9 +45,9 @@ class Manager
 
     /**
      * Synchronise views from cassandra to elastic
-     * @return void
+     * @return iterable
      */
-    public function sync()
+    public function sync(): iterable
     {
         foreach (Manager::SYNCHRONISERS as $synchroniserClass) {
             $synchroniser = new $synchroniserClass;
