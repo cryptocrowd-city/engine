@@ -30,7 +30,7 @@ class Events
                 ->setBody('banned.tpl')
                 ->set('username', $user->username)
                 ->set('email', $user->getEmail())
-                ->set('reason', getBanReasons($user->ban_reason))
+                ->set('reason', $this->getBanReasons($user->ban_reason))
                 ->set('user', $user);
             $message = new Core\Email\Message();
             $message->setTo($user)
