@@ -29,10 +29,10 @@ class transactions implements Interfaces\Api
             ]);
         }
 
-        if(!$account) {
+        if (!$account) {
             return Factory::response([
                 'status' => 'error',
-                'message' => 'Stripe account not found'
+                'message' => 'Stripe account not found',
             ]);
         }
 
