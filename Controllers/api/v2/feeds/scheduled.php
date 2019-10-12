@@ -66,7 +66,7 @@ class scheduled implements Interfaces\Api
                 return Factory::response([
                     'status' => 'success',
                     'count' => $manager->getScheduledCount([
-                        'container_guid' => $container_guid, 
+                        'container_guid' => $container_guid,
                         'type' => $type,
                         'owner_guid' => $currentUser->guid,
                     ])
