@@ -29,7 +29,7 @@ class Repository
      *  offset - offset.
      * @return Response response object.
      */
-    public function getList(array $opts = [])
+    public function getList(array $opts = []): Response
     {
         $opts = array_merge([
             'limit' => 12,
@@ -44,16 +44,16 @@ class Repository
 
         $response = new Response;
         if ($opts['type'] === 'subscribers') {
-            $statement = "SELECT * FROM friends";
-        } else {
             $statement = "SELECT * FROM friendsof";
+        } else {
+            $statement = "SELECT * FROM friends";
         }
 
-        $where = ["column1 = ?"];
+        $where = ["key = ?"];
         $values = [$opts['guid']];
 
         $statement .= " WHERE " . implode(' AND ', $where);
-        $statement .= " ALLOW FILTERING";
+
         $cqlOpts = [];
         if ($opts['limit']) {
             $cqlOpts['page_size'] = (int) $opts['limit'];
@@ -70,7 +70,7 @@ class Repository
         try {
             $rows = $this->client->request($query);
             foreach ($rows as $row) {
-                $user = new User($row['key']);
+                $user = new User($row['column1']);
                 $response[] = $user;
             }
 

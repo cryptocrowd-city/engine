@@ -38,7 +38,13 @@ class Custom implements Interfaces\PreparedInterface
         return $this->opts;
     }
 
-    public function getTemplate()
+    /**
+     * Gets the template of the custom query
+     * e.g. "SELECT * FROM friendsof WHERE column1 = ?"
+     *
+     * @return string the template.
+     */
+    public function getTemplate(): string
     {
         return $this->template;
     }
