@@ -68,7 +68,9 @@ class RepositorySpec extends ObjectBehavior
     public function it_should_get_subscribers()
     {
         $this->client->request(Argument::that(function ($prepared) {
-            return $prepared->getTemplate() === "SELECT * FROM friends WHERE column1 = ? ALLOW FILTERING";
+            var_dump($prepared->getTemplate());
+
+            return $prepared->getTemplate() === "SELECT * FROM friendsof WHERE key = ?";
         }))
             ->shouldBeCalled()
             ->willReturn(new Rows([
@@ -85,7 +87,7 @@ class RepositorySpec extends ObjectBehavior
     public function it_should_get_subscriptions()
     {
         $this->client->request(Argument::that(function ($prepared) {
-            return $prepared->getTemplate() === "SELECT * FROM friendsof WHERE column1 = ? ALLOW FILTERING";
+            return $prepared->getTemplate() === "SELECT * FROM friends WHERE key = ?";
         }))
             ->shouldBeCalled()
             ->willReturn(new Rows([
