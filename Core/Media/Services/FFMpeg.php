@@ -38,6 +38,11 @@ class FFMpeg implements ServiceInterface
     /** @var string $dir */
     private $dir = 'cinemr_data';
 
+    /**
+     * @var bool
+     */
+    private $full_hd = false;
+
     public function __construct(
         $queue = null,
         $ffmpeg = null,
@@ -71,10 +76,23 @@ class FFMpeg implements ServiceInterface
         $this->dir = $this->config->get('transcoder')['dir'];
     }
 
+    /**
+     * @param $key
+     * @return FFMpeg
+     */
     public function setKey($key)
     {
         $this->key = $key;
 
+        return $this;
+    }
+
+    /**
+     * @param bool $value
+     * @return FFMpeg
+     */
+    public function setFullHD(bool $value) {
+        $this->full_hd = $value;
         return $this;
     }
 
@@ -206,6 +224,10 @@ class FFMpeg implements ServiceInterface
                 'height' => '480',
                 'formats' => ['mp4', 'webm'],
             ], $opts);
+
+            if ($opts['charge'] && !$this->full_hd) {
+                continue;
+            }
 
             if ($rotated) {
                 $ratio = $videostream->get('width') / $videostream->get('height');
