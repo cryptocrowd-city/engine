@@ -43,7 +43,7 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
                     if (isset($pages[1]) && $pages[1] == 'play') {
                         http_response_code(302);
 
-                        $res = !is_empty($_GET['res']) && in_array($_GET['res'], ['360', '720', '1080']) ?? '360';
+                        $res = !empty($_GET['res']) && in_array($_GET['res'], ['360', '720', '1080']) ?$_GET['res'] : '360';
 
                         if ($entity->subtype == 'audio') {
                             \forward($entity->getSourceUrl('128.mp3'));
@@ -60,8 +60,11 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
                         $response = $entities[0];
                         $response['transcodes'] = [
                             '360.mp4' => $entity->getSourceUrl('360.mp4'),
-                            '720.mp4' =>  $entity->getSourceUrl('720.mp4')
+                            '720.mp4' => $entity->getSourceUrl('720.mp4'),
                         ];
+                        if ($entity->getFlag('full_hd')) {
+                            $response['transcodes']['1080.mp4'] = $entity->getSourceUrl('1080.mp4');
+                        }
                     }
 
                     if (method_exists($entity, 'getWireThreshold')) {
