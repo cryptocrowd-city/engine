@@ -118,7 +118,6 @@ class Video extends Object
             'license',
             'monetized',
             'mature',
-            'full_hd',
             'boost_rejection_reason',
             'time_sent',
         ]);
