@@ -27,9 +27,6 @@ class Manager
     /** @var User */
     protected $actor;
 
-    /** @var string[] */
-    const TYPES = ['logo', 'background'];
-
     /**
      * Manager constructor.
      * @param ImageManager $imageManager
@@ -79,7 +76,7 @@ class Manager
     {
         if (!$this->user) {
             throw new Exception('Invalid user');
-        } elseif (!$this->type || !in_array($this->type, static::TYPES, true)) {
+        } elseif (!$this->type || !in_array($this->type, Asset::TYPES, true)) {
             throw new Exception('Invalid asset type');
         }
 
@@ -91,18 +88,23 @@ class Manager
                 $file->getClientFilename()
             );
 
+        // Setup asset
+
+        $asset = new Asset();
+        $asset
+            ->setType($this->type)
+            ->setUserGuid($this->user->guid);
+
         // Handle asset type
 
         switch ($this->type) {
             case 'logo':
-                $ext = 'png';
                 $blob = $this->imageManager
                     ->resize(1920, 1080, false, false) // Max: 2K
                     ->getPng();
                 break;
 
             case 'background':
-                $ext = 'jpg';
                 $blob = $this->imageManager
                     ->autorotate()
                     ->resize(3840, 2160, false, false) // Max: 4K
@@ -113,9 +115,7 @@ class Manager
                 throw new Exception('Invalid asset type handler');
         }
 
-        $file = new ElggFile();
-        $file->owner_guid = $this->user->guid;
-        $file->setFilename("pro/{$this->type}.{$ext}");
+        $file = $asset->getFile();
         $file->open('write');
         $file->write($blob);
         $file->close();
