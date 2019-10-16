@@ -10,6 +10,7 @@ namespace Minds\Controllers\api\v2\media;
 
 use Minds\Api\Factory;
 use Minds\Core\Di\Di;
+use Minds\Core\Session;
 use Minds\Interfaces;
 use Minds\Core\Media\ClientUpload\ClientUploadLease;
 
@@ -55,7 +56,9 @@ class upload implements Interfaces\Api
                 $lease->setGuid($guid)
                     ->setMediaType($mediaType);
 
-                $manager->complete($lease);
+                $manager
+                    ->setFullHD(Session::getLoggedinUser()->isPro())
+                    ->complete($lease);
             break;
         }
         return Factory::response([]);

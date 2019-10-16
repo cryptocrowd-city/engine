@@ -163,6 +163,7 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
                 $body = $req['body'];
                 fwrite($fp, $body);
                 $video->access_id = 0;
+                $video->patch(['full_hd', Core\Session::getLoggedinUser()->isPro()]);
                 $video->upload($tmpFilename);
                 $guid = $video->save();
                 fclose($fp);

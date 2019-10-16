@@ -154,6 +154,7 @@ class FFMpeg implements ServiceInterface
             ->setQueue('Transcode')
             ->send([
                 'key' => $this->key,
+                'full_hd' => $this->full_hd,
             ]);
 
         return $this;
