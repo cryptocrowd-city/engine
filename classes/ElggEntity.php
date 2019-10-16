@@ -1202,11 +1202,10 @@ abstract class ElggEntity extends ElggData implements
 	/**
 	 * Delete this entity.
 	 *
-	 * @param bool $recursive Whether to delete all the entities contained by this entity
-	 *
 	 * @return bool
 	 */
-	public function delete($recursive = true) {
+    public function delete()
+    {
 		global $CONFIG, $ENTITY_CACHE;
 
 		//some plugins may want to halt the delete...
