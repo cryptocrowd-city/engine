@@ -10,11 +10,12 @@ use Minds\Entities\Activity;
 use Minds\Entities\Group;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-
 use Spec\Minds\Mocks;
+use Core\Groups\Delegates\PropagateRejection;
 
 class FeedsSpec extends ObjectBehavior
 {
+    protected $_propagateRejection;
     protected $_adminQueue;
     protected $_entities;
     protected $_entitiesFactory;
@@ -24,7 +25,8 @@ class FeedsSpec extends ObjectBehavior
         AdminQueue $adminQueue,
         Mocks\Minds\Core\Entities $entities,
         Mocks\Minds\Core\Entities\Factory $entitiesFactory,
-        Core\EntitiesBuilder $entitiesBuilder
+        Core\EntitiesBuilder $entitiesBuilder,
+        PropagateRejection $propagateRejection
     ) {
         // AdminQueue
 
@@ -52,7 +54,9 @@ class FeedsSpec extends ObjectBehavior
 
         $this->_entitiesBuilder = $entitiesBuilder;
 
-        $this->beConstructedWith($entitiesBuilder);
+        $this->_propagateRejection = $propagateRejection;
+
+        $this->beConstructedWith($entitiesBuilder, $propagateRejection);
     }
 
     public function it_is_initializable()
@@ -325,7 +329,11 @@ class FeedsSpec extends ObjectBehavior
         $group->getGuid()->willReturn(1000);
         $activity->get('guid')->willReturn(5000);
         $activity->get('container_guid')->willReturn(1000);
-
+        
+        $this->_propagateRejection->deleteActivity(5000)
+            ->shouldBeCalled()
+            ->willReturn(true);
+        
         $this->_adminQueue->delete($group, $activity)
             ->shouldBeCalled()
             ->willReturn(true);

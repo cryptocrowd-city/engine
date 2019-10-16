@@ -11,6 +11,7 @@ namespace Minds\Core\Groups;
 use Minds\Core;
 use Minds\Core\Di\Di;
 use Minds\Entities;
+use Minds\Core\Groups\Delegates\PropagateRejection;
 
 // TODO: Migrate to new Feeds CQL (approveAll)
 class Feeds
@@ -21,13 +22,17 @@ class Feeds
     /** @var Core\EntitiesBuilder */
     protected $entitiesBuilder;
 
+    /** @var Delegates\PropagateRejection */
+    protected $propagateRejection;
+
     /**
      * Feeds constructor.
      * @param null $entitiesBuilder
      */
-    public function __construct($entitiesBuilder = null)
+    public function __construct($entitiesBuilder = null, $propagateRejection = null)
     {
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
+        $this->propagateRejection = $propagateRejection ?: new PropagateRejection();
     }
 
     /**
@@ -216,6 +221,8 @@ class Feeds
         if ($success && $options['notification']) {
             $this->sendNotification('reject', $activity);
         }
+
+        $this->propagateRejection->deleteActivity($activity->guid);
 
         return $success;
     }
