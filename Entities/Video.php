@@ -218,7 +218,7 @@ class Video extends Object
 
             if ($field == 'access_id') {
                 $data[$field] = (int) $data[$field];
-            } elseif (in_array($field, ['mature', 'full_hd'])) {
+            } elseif (in_array($field, ['mature', 'full_hd'], true)) {
                 $this->setFlag($field, !!$data[$field]);
                 continue;
             }

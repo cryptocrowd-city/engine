@@ -91,7 +91,8 @@ class FFMpeg implements ServiceInterface
      * @param bool $value
      * @return FFMpeg
      */
-    public function setFullHD(bool $value) {
+    public function setFullHD(bool $value)
+    {
         $this->full_hd = $value;
         return $this;
     }

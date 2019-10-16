@@ -43,7 +43,7 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
                     if (isset($pages[1]) && $pages[1] == 'play') {
                         http_response_code(302);
 
-                        $res = !empty($_GET['res']) && in_array($_GET['res'], ['360', '720', '1080']) ?$_GET['res'] : '360';
+                        $res = !empty($_GET['res']) && in_array($_GET['res'], ['360', '720', '1080'], true) ?$_GET['res'] : '360';
 
                         if ($entity->subtype == 'audio') {
                             \forward($entity->getSourceUrl('128.mp3'));

@@ -29,7 +29,8 @@ class Manager
      * @param bool $value
      * @return Manager
      */
-    public function setFullHD(bool $value): Manager {
+    public function setFullHD(bool $value): Manager
+    {
         $this->full_hd = $value;
         return $this;
     }
