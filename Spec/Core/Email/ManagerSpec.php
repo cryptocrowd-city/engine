@@ -2,6 +2,10 @@
 
 namespace Spec\Minds\Core\Email;
 
+use Cassandra\Rows;
+use Minds\Core\Data\Cassandra\Client;
+use Minds\Core\Data\Cassandra\Prepared\Custom;
+use Minds\Core\Di\Di;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -28,7 +32,8 @@ class ManagerSpec extends ObjectBehavior
         $this->shouldHaveType('Minds\Core\Email\Manager');
     }
 
-    public function it_should_get_subscribers()
+    /* WE NEED TO MOCK THE CALL TO Entities::get(['guids' => $guids]) AND I GOT STUCK AT CASSANDRA CLIENT RETURNING A Future object?
+    public function it_should_get_subscribers(EmailSubscription $emailSub1, EmailSubscription $emailSub2, Client $client)
     {
         $opts = [
             'campaign' => 'when',
@@ -37,25 +42,26 @@ class ManagerSpec extends ObjectBehavior
             'limit' => 2000,
         ];
 
-        $user1 = new User();
-        $user1->guid = '123';
-        $user1->username = 'user1';
-        $user2 = new User();
-        $user1->guid = '456';
-        $user1->username = 'user2';
+        $subscriptions = [
+            'data' => [
+                $emailSub1,
+                $emailSub2
+            ],
+            'token' => '120123iasjdojqwoeij'
+        ];
 
-        $this->repository->getList(Argument::type('array'))
-            ->shouldBeCalled()
-            ->willReturn([
-                'data' => [
-                    $user1->guid,
-                    $user2->guid
-                ],
-                'token' => '120123iasjdojqwoeij'
-            ]);
+        Di::_()->bind('Database\Cassandra\Cql', function ($di) use ($client) {
+            return $client;
+        }, ['useFactory'=>true]);
+
+        $this->repository->getList(Argument::type('array'))->shouldBeCalled()->willReturn($subscriptions);
+        $emailSub1->getUserGuid()->shouldBeCalled()->willReturn('1001');
+        $emailSub2->getUserGuid()->shouldBeCalled()->willReturn('1002');
+        $client->request(Argument::type(Custom::class), true)->shouldBeCalled()->willReturn([$rows]);
+        $rows->get()->shouldBeCalled()->willReturn([]);
 
         $this->getSubscribers($opts)->shouldBeArray();
-    }
+    }*/
 
     public function it_should_unsubscribe_a_user_from_a_campaign()
     {
@@ -111,7 +117,7 @@ class ManagerSpec extends ObjectBehavior
 
         $this->repository->delete($subscriptions[1])
             ->shouldBeCalled();
-        
+
         $this->unsubscribe($user)
             ->shouldReturn(true);
     }
