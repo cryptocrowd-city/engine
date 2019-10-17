@@ -2,7 +2,6 @@
 
 namespace Spec\Minds\Core\Email;
 
-use Cassandra\Rows;
 use Minds\Core\Data\Cassandra\Client;
 use Minds\Core\Data\Cassandra\Prepared\Custom;
 use Minds\Core\Di\Di;
@@ -14,6 +13,7 @@ use Minds\Core\Email\CampaignLogs\Repository as CampaignLogsRepository;
 use Minds\Entities\User;
 use Minds\Core\Email\EmailSubscription;
 use Minds\Core\Email\CampaignLogs\CampaignLog;
+use Spec\Minds\Mocks\Cassandra\FutureRow;
 
 class ManagerSpec extends ObjectBehavior
 {
@@ -32,7 +32,6 @@ class ManagerSpec extends ObjectBehavior
         $this->shouldHaveType('Minds\Core\Email\Manager');
     }
 
-    /* WE NEED TO MOCK THE CALL TO Entities::get(['guids' => $guids]) AND I GOT STUCK AT CASSANDRA CLIENT RETURNING A Future object?
     public function it_should_get_subscribers(EmailSubscription $emailSub1, EmailSubscription $emailSub2, Client $client)
     {
         $opts = [
@@ -50,18 +49,21 @@ class ManagerSpec extends ObjectBehavior
             'token' => '120123iasjdojqwoeij'
         ];
 
+
         Di::_()->bind('Database\Cassandra\Cql', function ($di) use ($client) {
             return $client;
-        }, ['useFactory'=>true]);
+        });
+
+        $futureRow = new FutureRow('something');
 
         $this->repository->getList(Argument::type('array'))->shouldBeCalled()->willReturn($subscriptions);
         $emailSub1->getUserGuid()->shouldBeCalled()->willReturn('1001');
         $emailSub2->getUserGuid()->shouldBeCalled()->willReturn('1002');
-        $client->request(Argument::type(Custom::class), true)->shouldBeCalled()->willReturn([$rows]);
-        $rows->get()->shouldBeCalled()->willReturn([]);
+        //$client->request(Argument::type(Custom::class), true)->shouldBeCalled()->willReturn($futureRow);
 
-        $this->getSubscribers($opts)->shouldBeArray();
-    }*/
+        /* TODO: We can't mock Call because it's called directly via Entities::get() call */
+        $this->shouldThrow()->during('getSubscribers', [$opts]);
+    }
 
     public function it_should_unsubscribe_a_user_from_a_campaign()
     {
