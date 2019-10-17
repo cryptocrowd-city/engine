@@ -38,9 +38,7 @@ class FFMpeg implements ServiceInterface
     /** @var string $dir */
     private $dir = 'cinemr_data';
 
-    /**
-     * @var bool
-     */
+    /** @var bool $full_hd */
     private $full_hd = false;
 
     public function __construct(
