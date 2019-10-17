@@ -69,10 +69,11 @@ class Manager
 
     /**
      * @param UploadedFile $file
+     * @param Asset|null $asset
      * @return bool
      * @throws Exception
      */
-    public function set(UploadedFile $file)
+    public function set(UploadedFile $file, Asset $asset = null)
     {
         if (!$this->user) {
             throw new Exception('Invalid user');
@@ -90,7 +91,10 @@ class Manager
 
         // Setup asset
 
-        $asset = new Asset();
+        if (!$asset) {
+            $asset = new Asset();
+        }
+
         $asset
             ->setType($this->type)
             ->setUserGuid($this->user->guid);
