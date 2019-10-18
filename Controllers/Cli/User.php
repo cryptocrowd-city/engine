@@ -96,13 +96,12 @@ class User extends Cli\Controller implements Interfaces\CliControllerInterface
         if (!$this->getOpt('username')) {
             throw new Exceptions\CliException('Missing username');
         }
-        $ban = new Ban(); 
+        $ban = new Ban();
         $user = new Entities\User($this->getOpt('username'));
         $ban->setUser($user);
         $this->out("Banning ".$username."...");
-        $ban->ban($this->getOpt('reason') ?? 1);   
+        $ban->ban($this->getOpt('reason') ?? 1);
         $this->out("Success if there are no errors above. Banned ".$username.".");
-     
     }
 
     /**
@@ -117,7 +116,7 @@ class User extends Cli\Controller implements Interfaces\CliControllerInterface
         if (!$this->getOpt('username')) {
             throw new Exceptions\CliException('Missing username');
         }
-        $ban = new Ban(); 
+        $ban = new Ban();
         $user = new Entities\User($this->getOpt('username'));
         $ban->setUser($user);
         $this->out("Unbanning ".$username);

@@ -26,10 +26,10 @@ class Email implements Interfaces\QueueRunner
                    $data = $data->getData();
 
                    $message = unserialize($data['message']);
-
+                   error_log(var_export($message->from));
                    $mailer->send($message);
-
-                   echo "[email]: delivered to {$message->to[0]['name']} ($message->subject) \n";
+                   echo $message->from[0]['email'];
+                   echo "[priority email]: delivered to {$message->to[0]['name']} ($message->subject) {$message->from[0]['email']}\n";
                });
         $this->run();
     }
