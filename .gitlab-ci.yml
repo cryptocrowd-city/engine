@@ -34,7 +34,7 @@ test:
   stage: test
   image: minds/php:7.3
   script:
-    - php -n bin/phpspec run
+    - php -n -c Spec/php-test.ini bin/phpspec run
 
 lint:
   stage: test
