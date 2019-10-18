@@ -27,7 +27,7 @@ class Email implements Interfaces\QueueRunner
 
                    $message = unserialize($data['message']);
                    $mailer->send($message);
-                   echo "[priority email]: delivered to {$message->to[0]['name']} ($message->subject) \n";
+                   echo "[email]: delivered to {$message->to[0]['name']} ($message->subject) \n";
                });
         $this->run();
     }

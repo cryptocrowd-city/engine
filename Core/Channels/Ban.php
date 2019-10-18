@@ -81,11 +81,11 @@ class Ban
      */
     public function ban($banReason = '')
     {
+
+        error_log("ban called");
         if (!$this->user) {
             throw new \Exception('Missing User');
         }
-
-        $banned = $this->banDelegate->ban($this->user, $banReason);
 
         if ($banned) {
             $this->logoutDelegate->logout($this->user);
