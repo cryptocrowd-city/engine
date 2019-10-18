@@ -50,9 +50,8 @@ class Mailer
     {
         $this->mailer->ClearAllRecipients();
         $this->mailer->ClearAttachments();
-
+        $this->mailer->setFrom($message->from['email'], $message->from['name']);
         $this->mailer->From = $message->from['email'];
-        $this->mailer->FromName = $message->from['name'];
 
         foreach ($message->to as $to) {
             if ($this->filter->isSpam($to['email'])) {
