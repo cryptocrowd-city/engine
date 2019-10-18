@@ -32,7 +32,7 @@ class Events
             $message->setTo($user)
                 ->setMessageId(implode('-', [$user->guid, sha1($user->getEmail()), sha1('register-' . time())]))
                 ->setSubject("You are banned from Minds.")
-                ->setFrom($config->get('contact_details')['email'], $config->get('contact_details')['name'])
+                ->setReplyTo($config->get('contact_details')['email'], $config->get('contact_details')['name'])
                 ->setHtml($template);
             Di::_()->get('Mailer')->queue($message);
 

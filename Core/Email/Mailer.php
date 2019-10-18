@@ -53,9 +53,12 @@ class Mailer
         $this->mailer->ClearAllRecipients();
         $this->mailer->ClearAttachments();
 
-        if (isset($message->from['email'])) {
+        if (isset($message->getReplyTo()['email'])) {
             $this->mailer->ClearReplyTos();
-            $this->mailer->addReplyTo($message->from['email'], $fromName);    
+            $this->mailer->addReplyTo(
+                $message->getReplyTo()['email'],
+                $message->getReplyTo()['name']
+            );
         }
         
         $this->mailer->setFrom($message->from['email'], $fromName);
