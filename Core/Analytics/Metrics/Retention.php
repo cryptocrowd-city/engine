@@ -49,7 +49,7 @@ class Retention implements AnalyticsMetric
             $startTs = $timestamps[$x+1];
             $signups = [];
             $offset = "";
-            echo "\n Gathering signups \n";
+            error_log("Gathering signups");
             while (true) {
                 $data = $this->db->getRow("analytics:signup:day:$startTs", ['limit'=>200, 'offset' => $offset]);
                 if (count($data) <= 1) {
@@ -61,13 +61,13 @@ class Retention implements AnalyticsMetric
                     $offset = $k;
                 }
             }
-            echo " (done)";
+            error_log("(done)");
 
             //now get active users from each interval after this date
             $endTs =  $timestamps[$x-$x+1];
             //echo "[$x]:: actives: " . date('d-m-Y', $endTs) . " signups: " . date('d-m-Y', $startTs) . "\n";
             $offset = "";
-            echo "\n Gathering actives \n";
+            error_log("Gathering actives");
             foreach ($signups as $signup => $ts) {
                 if ($this->wasActive($signup, $now)) {
                     $this->db->insert("{$this->namespace}:$x:$now", [$signup=>time()]);
@@ -76,7 +76,7 @@ class Retention implements AnalyticsMetric
                     echo "\r $x: $signup (not active) $offset";
                 }
             }
-            echo "(done)";
+            error_log("(done)");
         }
 
         return true;
