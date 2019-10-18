@@ -1,4 +1,4 @@
-image: minds/php:latest
+image: minds/php:7.3
 
 services:
   - docker:dind
@@ -22,7 +22,7 @@ cache:
 build:
   stage: build
   script:
-    - apk update && apk add --no-cache git
+    - apk add --no-cache git
     - sh tools/setup.sh production
   cache:
     paths:
@@ -32,13 +32,13 @@ build:
 
 test:
   stage: test
-  image: minds/php-tests:latest
+  image: minds/php:7.3
   script:
     - bin/phpspec run
 
 lint:
   stage: test
-  image: minds/php-tests:latest
+  image: minds/php:7.3
   script:
     - bin/php-cs-fixer fix --allow-risky=yes --verbose --dry-run
 
