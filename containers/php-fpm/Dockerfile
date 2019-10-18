@@ -1,4 +1,4 @@
-FROM minds/php:latest
+FROM minds/php:7.3
 
 # Install opcache (move to php image)
 RUN docker-php-ext-install -j$(nproc) opcache
