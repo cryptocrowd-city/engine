@@ -582,7 +582,10 @@ $CONFIG->set('pro', [
     'dynamodb_table_name' => 'traefik',
 ]);
 
-$CONFIG->set('contact_email', 'info@minds.com');
+$CONFIG->set('contact_details', [
+    'name' => 'Minds',
+    'email' => 'info@minds.com',
+]);
 
 $CONFIG->set('upgrades', [
     'pro' => [

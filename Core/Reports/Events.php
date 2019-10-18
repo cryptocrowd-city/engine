@@ -27,11 +27,12 @@ class Events
                 ->set('email', $user->getEmail())
                 ->set('reason', $user->ban_reason)
                 ->set('user', $user);
+
             $message = new Core\Email\Message();
             $message->setTo($user)
                 ->setMessageId(implode('-', [$user->guid, sha1($user->getEmail()), sha1('register-' . time())]))
                 ->setSubject("You are banned from Minds.")
-                ->setFrom($config->get('contact_email'))
+                ->setFrom($config->get('contact_details')['email'], $config->get('contact_details')['name'])
                 ->setHtml($template);
             Di::_()->get('Mailer')->queue($message);
 
