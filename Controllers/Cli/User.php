@@ -7,7 +7,6 @@ use Minds\Cli;
 use Minds\Interfaces;
 use Minds\Exceptions;
 use Minds\Entities;
-use Minds\Core\Di\Di;
 use Minds\Core\Channels\Ban;
 
 class User extends Cli\Controller implements Interfaces\CliControllerInterface

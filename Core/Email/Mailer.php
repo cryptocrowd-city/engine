@@ -48,20 +48,21 @@ class Mailer
      */
     public function send($message)
     {
-        $fromName = $message->from['name'] ?? 'Minds';
-
         $this->mailer->ClearAllRecipients();
         $this->mailer->ClearAttachments();
 
-        if (isset($message->getReplyTo()['email'])) {
+        if ($message->getReplyTo()) {
             $this->mailer->ClearReplyTos();
             $this->mailer->addReplyTo(
                 $message->getReplyTo()['email'],
-                $message->getReplyTo()['name']
+                $message->getReplyTo()['name'] ?? 'Minds'
             );
         }
         
-        $this->mailer->setFrom($message->from['email'], $fromName);
+        $this->mailer->setFrom(
+            $message->from['email'],
+            $message->from['name'] ?? 'Minds'
+        );
 
         foreach ($message->to as $to) {
             if ($this->filter->isSpam($to['email'])) {

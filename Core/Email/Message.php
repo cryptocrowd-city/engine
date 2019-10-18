@@ -117,11 +117,11 @@ class Message
     /**
      * Get reply-to.
      *
-     * @return Message returns array containing email and username.
+     * @return array array containing email and username.
      */
-    public function getReplyTo(): array
+    public function getReplyTo()
     {
-        return $this->replyTo;
+        return $this->replyTo ?? [];
     }
     /**
      * Set reply-to.
@@ -134,7 +134,7 @@ class Message
     public function setReplyTo($email, $name = 'Minds'): Message
     {
         $this->replyTo['email'] = $email;
-        $this->replyTo['username'] = $name;
+        $this->replyTo['name'] = $name;
         return $this;
     }
 }
