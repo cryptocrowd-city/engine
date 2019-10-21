@@ -54,10 +54,10 @@ class Events
 
     /**
      * Returns a readable format for a given ban reason, converting
-     * tree indicies to their text counterparts, discarding sub-reason.
+     * tree indices to their text counterparts.
      *
-     * e.g. with the default config, an index of 1 returns "is illegal"
-     * an index of 1.1 also returns "is illegal"
+     * e.g. with the default config, an index of 3 returns "Illegal"
+     * an index of 1.3 returns "Illegal (Extortion)"
      *
      * @param string $index - the given ban reason index
      * @return string the first reason in the ban reason tree, or
@@ -65,9 +65,16 @@ class Events
      */
     public function getBanReasons($reason)
     {
-        $reason = preg_split("/\./", $reason)[0];
-        if (is_numeric($reason)) {
-            return $this->config->get('ban_reasons')[$reason];
+        $banReasons = $this->config->get('ban_reasons');
+        $splitReason = preg_split("/\./", $reason);
+        if (is_numeric($reason) && isset($splitReason[1])) {
+            $index = $splitReason[0];
+            $subIndex = $splitReason[1];
+            return $banReasons[$index]['label']
+                .$banReasons[$index]['reasons'][$subIndex];
+        }
+        if (is_numeric($reason) && isset($splitReason[0])) {
+            return $banReasons[$splitReason[0]]['label'];
         }
         return $reason;
     }
