@@ -5,6 +5,7 @@
 
 namespace Minds\Core\Channels;
 
+use Minds\Core\Channels\Delegates\MetricsDelegate;
 use Minds\Core\Di\Di;
 use Minds\Core\Queue\Interfaces\QueueClient;
 use Minds\Entities\User;
@@ -30,6 +31,9 @@ class Manager
     /** @var Delegates\Artifacts\Factory */
     protected $artifactsDelegatesFactory;
 
+    /** @var MetricsDelegate */
+    protected $metricsDelegate;
+
     /** @var Delegates\Logout */
     protected $logoutDelegate;
 
@@ -44,10 +48,12 @@ class Manager
      */
     public function __construct(
         $artifactsDelegatesFactory = null,
+        $metricsDelegate = null,
         $logoutDelegate = null,
         $queueClient = null
     ) {
         $this->artifactsDelegatesFactory = $artifactsDelegatesFactory ?: new Delegates\Artifacts\Factory();
+        $this->metricsDelegate = $metricsDelegate ?: new MetricsDelegate();
         $this->logoutDelegate = $logoutDelegate ?: new Delegates\Logout();
         $this->queueClient = $queueClient ?: Di::_()->get('Queue');
     }
@@ -132,6 +138,8 @@ class Manager
                 if (!$done) {
                     throw new \Exception("{$delegateClassName} deletion failed for {$userGuid}");
                 }
+
+                $this->metricsDelegate->onDelete($this->user);
             } catch (\Exception $e) {
                 // TODO: Fail?
                 error_log((string) $e);
