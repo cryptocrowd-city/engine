@@ -220,6 +220,11 @@ class blog implements Interfaces\Api
             $blog->setMature(!!$_POST['mature']);
         }
 
+        if (isset($_POST['nsfw'])) {
+            $nsfw = !is_array($_POST['nsfw']) ? json_decode($_POST['nsfw']) : $_POST['nsfw'];
+            $blog->setNsfw($nsfw);
+        }
+
         if (isset($_POST['wire_threshold'])) {
             $threshold = is_string($_POST['wire_threshold']) ? json_decode($_POST['wire_threshold']) : $_POST['wire_threshold'];
             $blog->setWireThreshold($threshold);
