@@ -1519,13 +1519,9 @@ CREATE TABLE minds.subscription_requests (
     PRIMARY KEY (publisher_guid, subscriber_guid)
 );
 
-CREATE TABLE notification_batches (
+CREATE TABLE minds.notification_batches (
     user_guid varint,
     batch_id  text,
     primary key (user_guid, batch_id)
-)
-WITH CACHING = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
-    AND compaction = {'max_threshold': '32', 'min_threshold': '4', 'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-    AND compression = {'class': 'org.apache.cassandra.io.compress.LZ4Compressor', 'chunk_length_in_kb': '64'}
-    AND dclocal_read_repair_chance = 0.1;
+);
 
