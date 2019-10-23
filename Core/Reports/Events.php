@@ -8,16 +8,13 @@ use Minds\Core;
 use Minds\Entities;
 use Minds\Helpers;
 use Minds\Core\Di\Di;
+use Minds\Core\Config;
 use Minds\Core\Analytics\Metrics\Event;
 use Minds\Core\Events\Dispatcher;
 use Minds\Core\Channels\Delegates\Ban;
 
 class Events
 {
-    public function __construct()
-    {
-        $this->config = Di::_()->get('Config');
-    }
 
     public function register()
     {
@@ -65,7 +62,7 @@ class Events
      */
     public function getBanReasons($reason)
     {
-        $banReasons = $this->config->get('ban_reasons');
+        $banReasons = Di::_()->get('Config')->get('ban_reasons');
         $splitReason = preg_split("/\./", $reason);
         if (is_numeric($reason) && isset($splitReason[1])) {
             $index = $splitReason[0];
