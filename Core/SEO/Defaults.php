@@ -328,6 +328,23 @@ class Defaults
             return $meta;
         });
 
+        Manager::add('/analytics', function ($slugs = []) {
+            $meta = [
+                'title' => 'Analytics',
+                'description' => 'Track your traffic, earnings, engagement and trending analytics',
+                'og:title' => 'Analytics',
+                'og:description' => 'Track your traffic, earnings, engagement and trending analytics',
+                'og:url' => sprintf("%sanalytics/%s", $this->config->site_url, implode('/', $slugs)),
+                'og:image' => $this->config->cdn_assets_url . 'assets/photos/network.jpg',
+                'og:image:width' => 2000,
+                'og:image:height' => 1000,
+                'twitter:site' => '@minds',
+                'twitter:card' => 'summary',
+            ];
+
+            return $meta;
+        });
+
         Manager::add('/wallet/tokens/referrals', function ($slugs = []) {
             $meta = [
                 'title' => 'Referrals',
