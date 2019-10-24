@@ -271,7 +271,7 @@ class blog implements Interfaces\Api
         }
 
         if ($blog->isMonetized()) {
-            if ($blog->isMature()) {
+            if ($blog->isNsfw()) {
                 return Factory::response([
                     'status' => 'error',
                     'message' => 'Cannot monetize an explicit blog'
@@ -288,7 +288,7 @@ class blog implements Interfaces\Api
             }
         }
 
-        if (isset($_POST['mature']) && $_POST['mature']) {
+        if (isset($_POST['nsfw']) && $_POST['nsfw']) {
             $user = Core\Session::getLoggedInUser();
 
             if (!$user->getMatureContent()) {

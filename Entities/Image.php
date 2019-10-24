@@ -188,7 +188,7 @@ class Image extends File
             'thumbnail',
             'cinemr_guid',
             'license',
-            'mature',
+            'nsfw',
             'boost_rejection_reason',
             'rating',
             'width',
@@ -220,7 +220,7 @@ class Image extends File
         $export['thumbs:up:count'] = Helpers\Counters::get($this->guid, 'thumbs:up');
         $export['thumbs:down:count'] = Helpers\Counters::get($this->guid, 'thumbs:down');
         $export['description'] = $this->description; //videos need to be able to export html.. sanitize soon!
-        $export['mature'] = $this->mature ?: $this->getFlag('mature');
+        $export['nsfw'] = $this->nsfw ?: $this->getFlag('nsfw');
         $export['rating'] = $this->getRating();
         $export['width'] = $this->width ?: 0;
         $export['height'] = $this->height ?: 0;
@@ -263,7 +263,7 @@ class Image extends File
             'title' => null,
             'description' => null,
             'license' => null,
-            'mature' => null,
+            'nsfw' => null,
             'boost_rejection_reason' => null,
             'hidden' => null,
             'batch_guid' => null,
@@ -281,7 +281,7 @@ class Image extends File
             'batch_guid',
             'access_id',
             'container_guid',
-            'mature',
+            'nsfw',
             'boost_rejection_reason',
             'rating',
             'time_sent',
@@ -294,8 +294,8 @@ class Image extends File
 
             if ($field == 'access_id') {
                 $data[$field] = (int) $data[$field];
-            } elseif ($field == 'mature') {
-                $this->setFlag('mature', !!$data['mature']);
+            } elseif ($field == 'nsfw') {
+                $this->setFlag('nsfw', !is_array($data['nsfw']) ? json_decode($data['nsfw']) : $data['nsfw']);
                 continue;
             }
 
@@ -342,7 +342,7 @@ class Image extends File
             [[
                 'src' => \elgg_get_site_url() . 'fs/v1/thumbnail/' . $this->guid,
                 'href' => \elgg_get_site_url() . 'media/' . ($this->container_guid ? $this->container_guid . '/' : '') . $this->guid,
-                'mature' => $this->getFlag('mature'),
+                'nsfw' => $this->getFlag('nsfw'),
                 'width' => $this->width ?? 0,
                 'height' => $this->height ?? 0,
                 'gif' => (bool) ($this->gif ?? false),
