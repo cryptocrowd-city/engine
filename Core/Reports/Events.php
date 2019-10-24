@@ -15,7 +15,6 @@ use Minds\Core\Channels\Delegates\Ban;
 
 class Events
 {
-
     public function register()
     {
         Core\Di\Di::_()->get('EventsDispatcher')->register('ban', 'user', function ($event) {
