@@ -9,25 +9,20 @@ stages:
   - prepare
   - review
   - deploy:staging
+  - qa
   - deploy:canary
   - deploy:production
-
-cache:
-  paths:
-    - vendor
-    - bin
-  policy: pull
 
 build:
   stage: build
   script:
     - apk update && apk add --no-cache git
-    - sh tools/setup.sh
-  cache:
+    - sh tools/setup.sh production
+  artifacts:
+    name: '$CI_COMMIT_REF_SLUG'
     paths:
       - vendor
       - bin
-    policy: push
 
 test:
   stage: test
@@ -126,6 +121,17 @@ review:stop:
     refs:
       - master
       - test/gitlab-ci
+
+qa:manual:
+  stage: qa
+  script:
+    - echo "Manually approved"
+  when: manual
+  only:
+    refs:
+      - master
+      - test/gitlab-ci
+  allow_failure: false
 
 staging:fpm:
   stage: deploy:staging
