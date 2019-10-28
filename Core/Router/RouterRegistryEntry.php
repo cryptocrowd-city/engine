@@ -6,6 +6,7 @@
 
 namespace Minds\Core\Router;
 
+use Exception;
 use Minds\Traits\MagicAttributes;
 
 /**
@@ -14,6 +15,8 @@ use Minds\Traits\MagicAttributes;
  * @method string getRoute()
  * @method mixed getBinding()
  * @method RouterRegistryEntry setBinding(mixed $binding)
+ * @method string[] getMiddleware[]
+ * @method RouterRegistryEntry setMiddleware(string[] $middleware)
  */
 class RouterRegistryEntry
 {
@@ -24,6 +27,9 @@ class RouterRegistryEntry
 
     /** @var mixed */
     protected $binding;
+
+    /** @var string[] */
+    protected $middleware;
 
     /**
      * @param string $route
@@ -39,7 +45,7 @@ class RouterRegistryEntry
      */
     public function getWildcardRoute(): string
     {
-        return preg_replace('/\/:[^\/]+/g', '*', $this->route, '/');
+        return preg_replace('#/:[^/]+#', '/*', $this->route);
     }
 
     /**
@@ -76,8 +82,57 @@ class RouterRegistryEntry
         return $specificity;
     }
 
-    public function matches($route): bool
+    /**
+     * @param string $route
+     * @return bool
+     */
+    public function matches(string $route): bool
     {
+        $pattern = sprintf("#^%s$#i", strtr(preg_quote($this->getWildcardRoute(), '#'), ['\*' => '[^/]+']));
+        return preg_match($pattern, $route);
+    }
 
+    /**
+     * @param string $route
+     * @return array
+     */
+    public function extract(string $route): array
+    {
+        $route = trim($route, '/');
+        $pattern = sprintf(
+            '#^%s$#i',
+            preg_replace_callback('#/\\\:([^/]+)#', [$this, '_regexNamedCapture'], preg_quote($this->route, '#'))
+        );
+
+        $matches = [];
+        preg_match($pattern, $route, $matches);
+
+        $parameters = [];
+
+        foreach ($matches as $key => $value) {
+            if (is_numeric($key)) {
+                continue;
+            }
+
+            $parameters[$key] = $value;
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * @param array $matches
+     * @return string
+     * @throws Exception
+     */
+    protected function _regexNamedCapture(array $matches): string
+    {
+        $name = $matches[1] ?? '_';
+
+        if (is_numeric($name) || !ctype_alnum($name)) {
+            throw new Exception('Invalid route parameter name');
+        }
+
+        return sprintf('/(?<%s>[^/]+)', $name);
     }
 }

@@ -15,5 +15,9 @@ class RouterProvider extends Provider
         $this->di->bind('Router', function ($di) {
             return new Dispatcher();
         }, ['useFactory' => true]);
+
+        $this->di->bind('Router\Registry', function ($di) {
+            return RouterRegistry::_();
+        }, ['useFactory' => true]);
     }
 }

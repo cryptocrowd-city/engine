@@ -30,9 +30,10 @@ class RouterRegistry
      * @param string $method
      * @param string $route
      * @param mixed $binding
+     * @param string[] $middleware
      * @return RouterRegistry
      */
-    public function register(string $method, string $route, $binding): RouterRegistry
+    public function register(string $method, string $route, $binding, array $middleware): RouterRegistry
     {
         $method = strtolower($method);
 
@@ -43,7 +44,8 @@ class RouterRegistry
         $routerRegistryEntry = new RouterRegistryEntry();
         $routerRegistryEntry
             ->setRoute($route)
-            ->setBinding($binding);
+            ->setBinding($binding)
+            ->setMiddleware($middleware);
 
         $this->registry[$method][] = $routerRegistryEntry;
 
@@ -81,7 +83,7 @@ class RouterRegistry
      * @param RouterRegistryEntry $b
      * @return int
      */
-    protected function _routerRegistryEntrySort(RouterRegistryEntry $a, RouterRegistryEntry $b)
+    protected function _routerRegistryEntrySort(RouterRegistryEntry $a, RouterRegistryEntry $b): int
     {
         if ($a->getDepth() !== $b->getDepth()) {
             return $b->getDepth() - $a->getDepth();

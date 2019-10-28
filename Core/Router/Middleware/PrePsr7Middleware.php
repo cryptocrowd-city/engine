@@ -26,11 +26,45 @@ class PrePsr7Middleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        header('X-Router-Mode: legacy');
+        $allowed = [
+            '/api/v1/',
+            '/api/v2/',
+            '/emails/',
+            '/fs/v1',
+            '/oauth2/',
+            '/checkout',
+            '/deeplinks',
+            '/icon',
+            '/sitemap',
+            '/sitemaps',
+            '/thumbProxy',
+            '/archive',
+            '/wall',
+            '/not-supported',
+            '/apple-app-site-association'
+        ];
 
-        $result = (new PrePsr7\Router())
-            ->route($request->getUri()->getPath(), strtolower($request->getMethod()));
+        $route = sprintf("/%s", ltrim($request->getUri()->getPath(), '/'));
 
-        exit; // NOTE: This is awful, but needed
+        $prePsr7 = false;
+
+        foreach ($allowed as $allowedRoute) {
+            if (stripos($route, $allowedRoute) === 0) {
+                $prePsr7 = true;
+                break;
+            }
+        }
+
+        if ($route === '/' || $prePsr7) {
+            header('X-Router-Mode: legacy');
+
+            (new PrePsr7\Router())
+                ->route($route, strtolower($request->getMethod()));
+
+            exit; // NOTE: This is awful, but needed
+        }
+
+        return $handler
+            ->handle($request);
     }
 }

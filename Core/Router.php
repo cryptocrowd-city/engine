@@ -8,6 +8,7 @@ namespace Minds\Core;
 
 use Minds\Core\Di\Di;
 use Minds\Core\Router\Dispatcher;
+use Minds\Core\Router\Middleware\ExceptionHandlingMiddleware;
 use Minds\Core\Router\Middleware\FrameDenyMiddleware;
 use Minds\Core\Router\Middleware\PostFixMiddleware;
 use Minds\Core\Router\Middleware\PrePsr7Middleware;
@@ -35,6 +36,7 @@ class Router
         $dispatcher = Di::_()->get('Router');
 
         $dispatcher
+            ->pipe(new ExceptionHandlingMiddleware())
             ->pipe(new PostFixMiddleware())
             ->pipe(new FrameDenyMiddleware())
             ->pipe(new ModuleRoutingMiddleware())
@@ -47,7 +49,8 @@ class Router
                     ->withHost($host)
             ); // TODO: Ensure it works with reverse proxy
 
-        $response = $dispatcher->handle($request);
+        $response = $dispatcher
+            ->handle($request);
 
         foreach ($response->getHeaders() as $header => $values) {
             foreach ($values as $value) {

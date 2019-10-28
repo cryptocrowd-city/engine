@@ -69,6 +69,16 @@ class Route
     }
 
     /**
+     * @param callable $fn
+     * @return Route
+     */
+    public function do(callable $fn): Route
+    {
+        call_user_func($fn, $this);
+        return $this;
+    }
+
+    /**
      * @param string[] $methods
      * @param string $route
      * @param $binding
@@ -88,7 +98,7 @@ class Route
         $route = sprintf("/%s/%s", trim($this->getPrefix(), '/'), trim($route, '/'));
 
         foreach ($methods as $method) {
-            $this->routerRegistry->register($method, $route, $binding);
+            $this->routerRegistry->register($method, $route, $binding, $this->middleware);
         }
 
         return true;
