@@ -137,8 +137,11 @@ class Resize
                     $params['xoffset'],
                     $params['yoffset']
                 );
-                $frame->setImagePage(0, 0, 0, 0);
 
+                 // Resize canvas to new image
+                $frame->setImagePage(0, 0, 0, 0);
+                
+                // If selected with / height differ from selection width/height, then we need to resize
                 if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
                     $frame->thumbnailImage($params['newwidth'], $params['newheight']);
                 }
@@ -151,30 +154,18 @@ class Resize
                 $params['xoffset'],
                 $params['yoffset']
             );
+
+            // If selected with / height differ from selection width/height, then we need to resize
             if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
                 $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
             }
         }
-
-        // If selected with / height differ from selection width/height, then we need to resize
-        // if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
-        //     $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
-        // }
 
         $this->output = $this->image;
 
         return $this;
     }
 
-    public function cropGIF($image) {
-        $image->cropImage(
-            $params['selectionwidth'],
-            $params['selectionheight'],
-            $params['xoffset'],
-            $params['yoffset']
-        );
-        $image->setImagePage(0, 0, 0, 0);
-    }
     /**
      * @param int $quality
      * @return string
