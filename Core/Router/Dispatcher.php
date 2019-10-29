@@ -6,7 +6,7 @@
 
 namespace Minds\Core\Router;
 
-use Minds\Core\Router\Middleware\EmptyResponseMiddleware;
+use Minds\Core\Router\Middleware\Kernel\EmptyResponseMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;

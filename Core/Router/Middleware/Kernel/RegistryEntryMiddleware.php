@@ -1,22 +1,35 @@
 <?php
 /**
- * RouterRegistryEntryMiddleware
+ * RegistryEntryMiddleware
  * @author edgebal
  */
 
-namespace Minds\Core\Router\Middleware;
+namespace Minds\Core\Router\Middleware\Kernel;
 
 use Exception;
 use Minds\Core\Di\Di;
-use Minds\Core\Router\DiRef;
-use Minds\Core\Router\RouterRegistryEntry;
+use Minds\Core\Di\Ref as DiRef;
+use Minds\Core\Router\RegistryEntry;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class RouterRegistryEntryMiddleware implements MiddlewareInterface
+class RegistryEntryMiddleware implements MiddlewareInterface
 {
+    /** @var string */
+    protected $attributeName = '_router-registry-entry';
+
+    /**
+     * @param string $attributeName
+     * @return RegistryEntryMiddleware
+     */
+    public function setAttributeName(string $attributeName): RegistryEntryMiddleware
+    {
+        $this->attributeName = $attributeName;
+        return $this;
+    }
+
     /**
      * Process an incoming server request.
      *
@@ -26,12 +39,12 @@ class RouterRegistryEntryMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        /** @var RouterRegistryEntry $routerRegistryEntry */
-        $routerRegistryEntry = $request->getAttribute('router_registry_entry');
+        /** @var RegistryEntry $registryEntry */
+        $registryEntry = $request->getAttribute($this->attributeName);
 
-        if ($routerRegistryEntry) {
-            $binding = $routerRegistryEntry->getBinding();
-            $parameters = $routerRegistryEntry->extract($request->getUri()->getPath());
+        if ($registryEntry) {
+            $binding = $registryEntry->getBinding();
+            $parameters = $registryEntry->extract($request->getUri()->getPath());
 
             if ($binding instanceof DiRef) {
                 return call_user_func(

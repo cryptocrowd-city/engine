@@ -1,23 +1,23 @@
 <?php
 /**
- * RouterRegistry
+ * Registry
  * @author edgebal
  */
 
 namespace Minds\Core\Router;
 
-class RouterRegistry
+class Registry
 {
-    /** @var RouterRegistry */
+    /** @var Registry */
     protected static $instance;
 
     /** @var array */
     protected $registry = [];
 
     /**
-     * @return RouterRegistry
+     * @return Registry
      */
-    public static function _(): RouterRegistry
+    public static function _(): Registry
     {
         if (!static::$instance) {
             static::$instance = new static();
@@ -31,9 +31,9 @@ class RouterRegistry
      * @param string $route
      * @param mixed $binding
      * @param string[] $middleware
-     * @return RouterRegistry
+     * @return Registry
      */
-    public function register(string $method, string $route, $binding, array $middleware): RouterRegistry
+    public function register(string $method, string $route, $binding, array $middleware): Registry
     {
         $method = strtolower($method);
 
@@ -41,13 +41,13 @@ class RouterRegistry
             $this->registry[$method] = [];
         }
 
-        $routerRegistryEntry = new RouterRegistryEntry();
-        $routerRegistryEntry
+        $registryEntry = new RegistryEntry();
+        $registryEntry
             ->setRoute($route)
             ->setBinding($binding)
             ->setMiddleware($middleware);
 
-        $this->registry[$method][] = $routerRegistryEntry;
+        $this->registry[$method][] = $registryEntry;
 
         return $this;
     }
@@ -55,9 +55,9 @@ class RouterRegistry
     /**
      * @param string $method
      * @param string $route
-     * @return RouterRegistryEntry|null
+     * @return RegistryEntry|null
      */
-    public function getBestMatch(string $method, string $route):? RouterRegistryEntry
+    public function getBestMatch(string $method, string $route):? RegistryEntry
     {
         if (!isset($this->registry[$method]) || !$this->registry[$method]) {
             return null;
@@ -65,13 +65,13 @@ class RouterRegistry
 
         $route = trim($route, '/');
 
-        /** @var RouterRegistryEntry[] $sortedRouterRegistryEntries */
-        $sortedRouterRegistryEntries = $this->registry[$method];
-        usort($sortedRouterRegistryEntries, [$this, '_routerRegistryEntrySort']);
+        /** @var RegistryEntry[] $sortedRegistryEntries */
+        $sortedRegistryEntries = $this->registry[$method];
+        usort($sortedRegistryEntries, [$this, '_registryEntrySort']);
 
-        foreach ($sortedRouterRegistryEntries as $routerRegistryEntry) {
-            if ($routerRegistryEntry->matches($route)) {
-                return $routerRegistryEntry;
+        foreach ($sortedRegistryEntries as $registryEntry) {
+            if ($registryEntry->matches($route)) {
+                return $registryEntry;
             }
         }
 
@@ -79,11 +79,11 @@ class RouterRegistry
     }
 
     /**
-     * @param RouterRegistryEntry $a
-     * @param RouterRegistryEntry $b
+     * @param RegistryEntry $a
+     * @param RegistryEntry $b
      * @return int
      */
-    protected function _routerRegistryEntrySort(RouterRegistryEntry $a, RouterRegistryEntry $b): int
+    protected function _registryEntrySort(RegistryEntry $a, RegistryEntry $b): int
     {
         if ($a->getDepth() !== $b->getDepth()) {
             return $b->getDepth() - $a->getDepth();

@@ -1,6 +1,6 @@
 <?php
 /**
- * RouterRegistryEntry
+ * RegistryEntry
  * @author edgebal
  */
 
@@ -10,15 +10,15 @@ use Exception;
 use Minds\Traits\MagicAttributes;
 
 /**
- * Class RouterRegistryEntry
+ * Class RegistryEntry
  * @package Minds\Core\Router
  * @method string getRoute()
  * @method mixed getBinding()
- * @method RouterRegistryEntry setBinding(mixed $binding)
+ * @method RegistryEntry setBinding(mixed $binding)
  * @method string[] getMiddleware[]
- * @method RouterRegistryEntry setMiddleware(string[] $middleware)
+ * @method RegistryEntry setMiddleware(string[] $middleware)
  */
-class RouterRegistryEntry
+class RegistryEntry
 {
     use MagicAttributes;
 
@@ -33,9 +33,9 @@ class RouterRegistryEntry
 
     /**
      * @param string $route
-     * @return RouterRegistryEntry
+     * @return RegistryEntry
      */
-    public function setRoute(string $route): RouterRegistryEntry {
+    public function setRoute(string $route): RegistryEntry {
         $this->route = trim($route, '/');
         return $this;
     }

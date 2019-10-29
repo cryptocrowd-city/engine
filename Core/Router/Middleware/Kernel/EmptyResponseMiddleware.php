@@ -4,12 +4,13 @@
  * @author edgebal
  */
 
-namespace Minds\Core\Router\Middleware;
+namespace Minds\Core\Router\Middleware\Kernel;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
 
 class EmptyResponseMiddleware implements MiddlewareInterface
@@ -26,9 +27,19 @@ class EmptyResponseMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return (new JsonResponse([
-            'status' => 'error',
-            'message' => 'Endpoint not found'
-        ]))->withStatus(404);
+        $message = 'Endpoint Not Found';
+        $status = 404;
+
+        switch ($request->getAttribute('accept')) {
+            case 'html':
+                return new HtmlResponse(sprintf('<h1>%s</h1>', $message), $status);
+
+            case 'json':
+            default:
+                return new JsonResponse([
+                    'status' => 'error',
+                    'message' => $message,
+                ], $status);
+        }
     }
 }

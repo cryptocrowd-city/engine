@@ -27,21 +27,21 @@ class Route
     /** @var string[] */
     protected $middleware = [];
 
-    /** @var RouterRegistry */
-    protected $routerRegistry;
+    /** @var Registry */
+    protected $registry;
 
     /** @var string[] */
     const ALLOWED_METHODS = ['get','post','put','delete'];
 
     /**
      * Route constructor.
-     * @param RouterRegistry|null $routerRegistry
+     * @param Registry|null $registry
      */
     public function __construct(
-        RouterRegistry $routerRegistry = null
+        Registry $registry = null
     )
     {
-        $this->routerRegistry = $routerRegistry ?: RouterRegistry::_();
+        $this->registry = $registry ?: Registry::_();
     }
 
     /**
@@ -91,14 +91,10 @@ class Route
             throw new Exception('Invalid method');
         }
 
-        if (!is_callable($binding) && !($binding instanceof DiRef)) {
-            throw new Exception('Invalid binding');
-        }
-
         $route = sprintf("/%s/%s", trim($this->getPrefix(), '/'), trim($route, '/'));
 
         foreach ($methods as $method) {
-            $this->routerRegistry->register($method, $route, $binding, $this->middleware);
+            $this->registry->register($method, $route, $binding, $this->middleware);
         }
 
         return true;

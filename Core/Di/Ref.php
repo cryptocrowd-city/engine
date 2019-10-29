@@ -1,22 +1,22 @@
 <?php
 /**
- * DiRef
+ * Ref
  * @author edgebal
  */
 
-namespace Minds\Core\Router;
+namespace Minds\Core\Di;
 
 use Minds\Traits\MagicAttributes;
 
 /**
- * Class DiRef
- * @package Minds\Core\Router
+ * Class Ref
+ * @package Minds\Core\Di
  * @method string getProvider()
- * @method DiRef setProvider(string $provider)
+ * @method Ref setProvider(string $provider)
  * @method string getMethod()
- * @method DiRef setMethod(string $method)
+ * @method Ref setMethod(string $method)
  */
-class DiRef
+class Ref
 {
     use MagicAttributes;
 
@@ -27,7 +27,7 @@ class DiRef
     protected $method;
 
     /**
-     * DiRef constructor.
+     * Ref constructor.
      * @param string $provider
      * @param string $method
      */
@@ -40,9 +40,9 @@ class DiRef
     /**
      * @param string $provider
      * @param string $method
-     * @return DiRef
+     * @return Ref
      */
-    public static function _(string $provider, string $method): DiRef
+    public static function _(string $provider, string $method): Ref
     {
         return new static($provider, $method);
     }

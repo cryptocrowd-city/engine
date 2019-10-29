@@ -8,11 +8,7 @@ namespace Minds\Core;
 
 use Minds\Core\Di\Di;
 use Minds\Core\Router\Dispatcher;
-use Minds\Core\Router\Middleware\ExceptionHandlingMiddleware;
-use Minds\Core\Router\Middleware\FrameDenyMiddleware;
-use Minds\Core\Router\Middleware\PostFixMiddleware;
-use Minds\Core\Router\Middleware\PrePsr7Middleware;
-use Minds\Core\Router\Middleware\ModuleRoutingMiddleware;
+use Minds\Core\Router\Middleware\Kernel;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Uri;
 
@@ -35,13 +31,6 @@ class Router
         /** @var Dispatcher $dispatcher */
         $dispatcher = Di::_()->get('Router');
 
-        $dispatcher
-            ->pipe(new ExceptionHandlingMiddleware())
-            ->pipe(new PostFixMiddleware())
-            ->pipe(new FrameDenyMiddleware())
-            ->pipe(new ModuleRoutingMiddleware())
-            ->pipe(new PrePsr7Middleware() /* !!! WARNING !!! This one _exits PHP_ when path matches */);
-
         $request = ServerRequestFactory::fromGlobals()
             ->withMethod($method)
             ->withUri(
@@ -50,6 +39,19 @@ class Router
             ); // TODO: Ensure it works with reverse proxy
 
         $response = $dispatcher
+            ->pipe(new Kernel\CorsMiddleware())
+            ->pipe(new Kernel\ContentNegotiationMiddleware())
+            ->pipe(new Kernel\ErrorHandlerMiddleware())
+            ->pipe(
+                (new Kernel\RouteResolverMiddleware())
+                    ->setAttributeName('_request-handler')
+            )
+            ->pipe(new Kernel\JsonPayloadMiddleware())
+            ->pipe(new Kernel\FrameSecurityMiddleware())
+            ->pipe(
+                (new Kernel\RequestHandlerMiddleware())
+                    ->setAttributeName('_request-handler')
+            )
             ->handle($request);
 
         foreach ($response->getHeaders() as $header => $values) {
