@@ -6446,8 +6446,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "~7.1",
-        "ext-redis": "~4.3"
+        "php": "~7.1"
     },
     "platform-dev": []
 }
