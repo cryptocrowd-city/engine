@@ -1,44 +1,30 @@
 <?php
-/**
- * Braintree webhooks
- */
-
 namespace Minds\Core\Payments\Braintree;
 
 use Minds\Core;
 use Minds\Core\Guid;
 use Minds\Core\Payments;
 use Minds\Entities;
-use Minds\Helpers\Wallet as WalletHelper;
 use Minds\Core\Di\Di;
 use Minds\Core\Blockchain\Transactions\Transaction;
-
-use Braintree_ClientToken;
-use Braintree_Configuration;
-use Braintree_MerchantAccount;
-use Braintree_Transaction;
-use Braintree_TransactionSearch;
-use Braintree_Customer;
-use Braintree_CustomerSearch;
-use Braintree_PaymentMethod;
-use Braintree_Subscription;
-use Braintree_Test_MerchantAccount;
-use Braintree_WebhookNotification;
 use Minds\Core\Payments\Subscriptions\Subscription;
+use Braintree as BT;
 
 class Webhooks
 {
     protected $payload;
     protected $signature;
+    /** @var BT\WebhookNotification */
     protected $notification;
+    /** @var array */
     protected $aliases = [
-        Braintree_WebhookNotification::SUB_MERCHANT_ACCOUNT_APPROVED => 'subMerchantApproved',
-        Braintree_WebhookNotification::SUB_MERCHANT_ACCOUNT_DECLINED => 'subMerchantDeclined',
+        BT\WebhookNotification::SUB_MERCHANT_ACCOUNT_APPROVED => 'subMerchantApproved',
+        BT\WebhookNotification::SUB_MERCHANT_ACCOUNT_DECLINED => 'subMerchantDeclined',
         'subscription_charged_successfully' => 'subscriptionCharged',
         'subscription_went_active' => 'subscriptionActive',
-        Braintree_WebhookNotification::SUBSCRIPTION_EXPIRED => 'subscriptionExpired',
-        Braintree_WebhookNotification::SUBSCRIPTION_WENT_PAST_DUE => 'subscriptionOverdue',
-        Braintree_WebhookNotification::SUBSCRIPTION_CANCELED => 'subscriptionCanceled',
+        BT\WebhookNotification::SUBSCRIPTION_EXPIRED => 'subscriptionExpired',
+        BT\WebhookNotification::SUBSCRIPTION_WENT_PAST_DUE => 'subscriptionOverdue',
+        BT\WebhookNotification::SUBSCRIPTION_CANCELED => 'subscriptionCanceled',
         'check' => 'check'
     ];
     protected $hooks;
@@ -84,7 +70,7 @@ class Webhooks
 
     protected function buildNotification()
     {
-        $this->notification = Braintree_WebhookNotification::parse($this->signature, $this->payload);
+        $this->notification = BT\WebhookNotification::parse($this->signature, $this->payload);
     }
 
     protected function routeAlias()
@@ -102,7 +88,7 @@ class Webhooks
     {
         $message = "Congrats, you are now a Minds Merchant";
         Core\Events\Dispatcher::trigger('notification', 'elgg/hook/activity', [
-          'to'=>[$notification->merchantAccount->id],
+          'to'=>[$this->notification->merchantAccount->id],
           'from' => 100000000000000519,
           'notification_view' => 'custom_message',
           'params' => ['message'=>$message],
@@ -115,10 +101,10 @@ class Webhooks
      */
     protected function subMerchantDeclined()
     {
-        $reason = $notification->message;
+        $reason = $this->notification->message;
         $message = "Sorry, we could not approve your Merchant Account: $reason";
         Core\Events\Dispatcher::trigger('notification', 'elgg/hook/activity', [
-          'to'=>[$notification->merchantAccount->id],
+          'to'=>[$this->notification->merchantAccount->id],
           'from' => 100000000000000519,
           'notification_view' => 'custom_message',
           'params' => ['message'=>$message],

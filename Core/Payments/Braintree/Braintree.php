@@ -17,21 +17,18 @@ use Minds\Core\Payments\PaymentMethod;
 use Minds\Core\Payments\Subscriptions\Subscription;
 use Minds\Entities;
 
-use Braintree_Gateway;
-use Braintree_Configuration;
-use Braintree_Merchant;
-use Braintree_MerchantAccount;
-use Braintree_Transaction;
-use Braintree_TransactionSearch;
-use Braintree_Test_MerchantAccount;
+use Braintree as BT;
 
 class Braintree implements PaymentServiceInterface, SubscriptionPaymentServiceInterface
 {
+    /** @var Config */
     private $config;
+    /** @var BT\Configuration */
     private $btConfig;
+    /** @var BT\Gateway */
     private $gateway;
 
-    public function __construct(Braintree_Configuration $btConfig, Config $config)
+    public function __construct(BT\Configuration $btConfig, Config $config)
     {
         $this->btConfig = $btConfig;
         $this->config = $config;
@@ -59,9 +56,9 @@ class Braintree implements PaymentServiceInterface, SubscriptionPaymentServiceIn
         $this->btConfig->setMerchantId($config['merchant_id']);
         $this->btConfig->setPublicKey($config['public_key']);
         $this->btConfig->setPrivateKey($config['private_key']);
-        $this->gateway = new Braintree_Gateway($this->btConfig);
+        $this->gateway = new BT\Gateway($this->btConfig);
         //this is a hack for webhooks
-        Braintree_Configuration::$global = $this->btConfig;
+        BT\Configuration::$global = $this->btConfig;
         //call_user_func([$this->btConfig, 'gateway']);
         return $this;
     }
@@ -159,11 +156,11 @@ class Braintree implements PaymentServiceInterface, SubscriptionPaymentServiceIn
     public function getSales(Merchant $merchant, array $options = [])
     {
         $results = $this->gateway->transaction()->search([
-          Braintree_TransactionSearch::merchantAccountId()->is($merchant->getGuid()),
-          Braintree_TransactionSearch::status()->in([
-            Braintree_Transaction::SUBMITTED_FOR_SETTLEMENT,
-            Braintree_Transaction::SETTLED,
-            Braintree_Transaction::VOIDED
+          BT\TransactionSearch::merchantAccountId()->is($merchant->getGuid()),
+          BT\TransactionSearch::status()->in([
+            BT\Transaction::SUBMITTED_FOR_SETTLEMENT,
+            BT\Transaction::SETTLED,
+            BT\Transaction::VOIDED
           ])
         ]);
 
@@ -206,7 +203,7 @@ class Braintree implements PaymentServiceInterface, SubscriptionPaymentServiceIn
           ],
           'funding' => [
             'descriptor' => $merchant->getName(),
-            'destination' => $merchant->getDestination() == 'bank' ? Braintree_MerchantAccount::FUNDING_DESTINATION_BANK : Braintree_MerchantAccount::FUNDING_DESTINATION_EMAIL,
+            'destination' => $merchant->getDestination() == 'bank' ? BT\MerchantAccount::FUNDING_DESTINATION_BANK : BT\MerchantAccount::FUNDING_DESTINATION_EMAIL,
             'email' => $merchant->getEmail(),
             'accountNumber' => $merchant->getDestination() == 'bank' ? $merchant->getAccountNumber() : null,
             'routingNumber' => $merchant->getDestination() == 'bank' ? $merchant->getRoutingNumber() : null
@@ -244,7 +241,7 @@ class Braintree implements PaymentServiceInterface, SubscriptionPaymentServiceIn
           ],
           'funding' => [
             'descriptor' => $merchant->getName(),
-            'destination' => $merchant->getDestination() == 'bank' ? Braintree_MerchantAccount::FUNDING_DESTINATION_BANK : Braintree_MerchantAccount::FUNDING_DESTINATION_EMAIL,
+            'destination' => $merchant->getDestination() == 'bank' ? BT\MerchantAccount::FUNDING_DESTINATION_BANK : BT\MerchantAccount::FUNDING_DESTINATION_EMAIL,
             'email' => $merchant->getEmail(),
             'accountNumber' => $merchant->getDestination() == 'bank' ? $merchant->getAccountNumber() : null,
             'routingNumber' => $merchant->getDestination() == 'bank' ? $merchant->getRoutingNumber() : null
@@ -288,7 +285,7 @@ class Braintree implements PaymentServiceInterface, SubscriptionPaymentServiceIn
 
             return $merchant;
         } catch (\Exception $e) {
-            if ($e instanceof \Braintree_Exception_NotFound) {
+            if ($e instanceof BT\Exception\NotFound) {
                 return false;
             }
             throw new \Exception($e->getMessage());
@@ -307,7 +304,7 @@ class Braintree implements PaymentServiceInterface, SubscriptionPaymentServiceIn
 
         try {
             $braintree_customer = $this->gateway->customer()->find($id);
-        } catch (\Braintree_Exception_NotFound $e) {
+        } catch (BT\Exception\NotFound $e) {
             $braintree_customer = null;
         }
 
@@ -392,7 +389,7 @@ class Braintree implements PaymentServiceInterface, SubscriptionPaymentServiceIn
               ->setPlanId($result->planId)
               ->setTrialPeriod($result->trialPeriod)
               ->setAddOns($addOns);
-        } catch (\Braintree_Exception_NotFound $e) {
+        } catch (BT\Exception\NotFound $e) {
             return null;
         }
     }

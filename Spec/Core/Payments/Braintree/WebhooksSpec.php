@@ -5,8 +5,8 @@ namespace Spec\Minds\Core\Payments\Braintree;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-use Braintree_WebhookTesting;
-use Braintree_WebhookNotification;
+use Braintree\WebhookTesting;
+use Braintree\WebhookNotification;
 
 use Minds\Core\Payments\Subscriptions;
 use Minds\Core\Payments\Hooks;
