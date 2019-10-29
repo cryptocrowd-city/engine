@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Route
  * @author edgebal
@@ -39,8 +39,7 @@ class Route
      */
     public function __construct(
         Registry $registry = null
-    )
-    {
+    ) {
         $this->registry = $registry ?: Registry::_();
     }
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * RouteResolverMiddleware
  * @author edgebal
@@ -28,8 +28,7 @@ class RouteResolverMiddleware implements MiddlewareInterface
      */
     public function __construct(
         $registry = null
-    )
-    {
+    ) {
         $this->registry = $registry ?: Di::_()->get('Router\Registry');
     }
 
@@ -49,6 +48,9 @@ class RouteResolverMiddleware implements MiddlewareInterface
      * Processes an incoming server request in order to produce a response.
      * If unable to produce the response itself, it may delegate to the provided
      * request handler to do so.
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

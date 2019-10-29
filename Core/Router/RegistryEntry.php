@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * RegistryEntry
  * @author edgebal
@@ -35,7 +35,8 @@ class RegistryEntry
      * @param string $route
      * @return RegistryEntry
      */
-    public function setRoute(string $route): RegistryEntry {
+    public function setRoute(string $route): RegistryEntry
+    {
         $this->route = trim($route, '/');
         return $this;
     }

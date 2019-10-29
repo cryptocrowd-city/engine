@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * ContentNegotiationMiddleware
  * @author edgebal
@@ -6,13 +6,10 @@
 
 namespace Minds\Core\Router\Middleware\Kernel;
 
-use Minds\Core\Router\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response\HtmlResponse;
-use Zend\Diactoros\Response\JsonResponse;
 
 class ContentNegotiationMiddleware implements MiddlewareInterface
 {
@@ -28,6 +25,9 @@ class ContentNegotiationMiddleware implements MiddlewareInterface
      * Processes an incoming server request in order to produce a response.
      * If unable to produce the response itself, it may delegate to the provided
      * request handler to do so.
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

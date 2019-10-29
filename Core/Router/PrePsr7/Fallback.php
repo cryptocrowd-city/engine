@@ -26,8 +26,7 @@ class Fallback
      */
     public function __construct(
         $config = null
-    )
-    {
+    ) {
         $this->config = $config ?: Di::_()->get('Config');
     }
 
@@ -82,7 +81,7 @@ class Fallback
         $response = ob_get_contents();
         ob_end_clean();
 
-        $stream = fopen('php://memory','r+');
+        $stream = fopen('php://memory', 'r+');
         fwrite($stream, $response);
         rewind($stream);
 

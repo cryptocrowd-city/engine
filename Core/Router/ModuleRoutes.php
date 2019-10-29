@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * ModuleRoutes
  * @author edgebal
@@ -17,8 +17,7 @@ abstract class ModuleRoutes
      */
     public function __construct(
         $route = null
-    )
-    {
+    ) {
         $this->route = $route ?: new Route();
     }
 

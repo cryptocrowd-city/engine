@@ -179,7 +179,7 @@ class Factory
         ], $data);
 
         if (ob_get_level() > 1) {
-            // New PSR-7 Router has an OB open all the times
+            // New PSR-7 Router has an OB started all the time
             ob_end_clean();
         }
 
