@@ -127,7 +127,15 @@ class Resize
 
         $params = $this->getResizeParameters();
 
-        // First crop the image
+        // If is animated, and square is set, handle seperately.
+        if ($this->image->getNumberImages() > 1 && $this->square) {
+            foreach ($this->image as $frame) {
+                // Crop into square from the center of image.
+                $frame->cropThumbnailImage($params['selectionheight'], $params['selectionwidth']);
+            }
+        }
+
+        // Crop the image to selection dimensions
         $this->image->cropImage($params['selectionwidth'], $params['selectionheight'], $params['xoffset'],
             $params['yoffset']);
 
@@ -135,6 +143,8 @@ class Resize
         if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
             $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
         }
+        
+        $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
 
         $this->output = $this->image;
 
