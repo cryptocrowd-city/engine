@@ -7,6 +7,8 @@
 namespace Minds\Core\Router\Middleware\Kernel;
 
 use Exception;
+use Minds\Core\Router\Exceptions\ForbiddenException;
+use Minds\Core\Router\Exceptions\UnauthorizedException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -28,29 +30,35 @@ class ErrorHandlerMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $message = 'Internal Server Error';
+        $status = 500;
+
         try {
             return $handler
                 ->handle($request);
+        } catch (UnauthorizedException $e) {
+            $message = 'Unauthorized';
+            $status = 401;
+        } catch (ForbiddenException $e) {
+            $message = 'Forbidden';
+            $status = 403;
         } catch (Exception $e) {
             // TODO: Handle Sentry
 
             error_log($e);
             // TODO: Nicer logging
+        }
 
-            $message = 'Internal Server Error';
-            $status = 500;
+        switch ($request->getAttribute('accept')) {
+            case 'html':
+                return new HtmlResponse(sprintf('<h1>%s</h1>', $message), $status);
 
-            switch ($request->getAttribute('accept')) {
-                case 'html':
-                    return new HtmlResponse(sprintf('<h1>%s</h1>', $message), $status);
-
-                case 'json':
-                default:
-                    return new JsonResponse([
-                        'status' => 'error',
-                        'message' => $message,
-                    ], $status);
-            }
+            case 'json':
+            default:
+                return new JsonResponse([
+                    'status' => 'error',
+                    'message' => $message,
+                ], $status);
         }
     }
 }
