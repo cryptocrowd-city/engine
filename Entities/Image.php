@@ -153,6 +153,7 @@ class Image extends File
                     $w = 1024;
                     $s = false;
                     $u = true;
+                    // no break
                 default:
                     continue 2;
             }
