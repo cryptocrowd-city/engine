@@ -127,30 +127,54 @@ class Resize
 
         $params = $this->getResizeParameters();
 
-        // If is animated, and square is set, handle seperately.
-        if ($this->image->getNumberImages() > 1 && $this->square) {
+        // If is animated, 
+        if ($this->image->getNumberImages() > 1) {
             foreach ($this->image as $frame) {
-                // Crop into square from the center of image.
-                $frame->cropThumbnailImage($params['selectionheight'], $params['selectionwidth']);
+                // Crop into square.
+                $frame->cropImage(
+                    $params['selectionwidth'],
+                    $params['selectionheight'],
+                    $params['xoffset'],
+                    $params['yoffset']
+                );
+                $frame->setImagePage(0, 0, 0, 0);
+
+                if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
+                    $frame->thumbnailImage($params['newwidth'], $params['newheight']);
+                }
+            }
+        } else { 
+            // Crop the image to selection dimensions
+            $this->image->cropImage(
+                $params['selectionwidth'],
+                $params['selectionheight'],
+                $params['xoffset'],
+                $params['yoffset']
+            );
+            if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
+                $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
             }
         }
 
-        // Crop the image to selection dimensions
-        $this->image->cropImage($params['selectionwidth'], $params['selectionheight'], $params['xoffset'],
-            $params['yoffset']);
-
         // If selected with / height differ from selection width/height, then we need to resize
-        if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
-            $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
-        }
-        
-        $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
+        // if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
+        //     $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
+        // }
 
         $this->output = $this->image;
 
         return $this;
     }
 
+    public function cropGIF($image) {
+        $image->cropImage(
+            $params['selectionwidth'],
+            $params['selectionheight'],
+            $params['xoffset'],
+            $params['yoffset']
+        );
+        $image->setImagePage(0, 0, 0, 0);
+    }
     /**
      * @param int $quality
      * @return string
