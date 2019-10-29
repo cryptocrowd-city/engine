@@ -1,20 +1,34 @@
 <?php
 /**
- * ExceptionHandlingMiddleware
+ * SEOMiddleware
  * @author edgebal
  */
 
 namespace Minds\Core\Router\Middleware;
 
-use Exception;
+use Minds\Core\Config;
+use Minds\Core\Di\Di;
+use Minds\Core\SEO;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response\JsonResponse;
 
-class ExceptionHandlingMiddleware implements MiddlewareInterface
+class SEOMiddleware implements MiddlewareInterface
 {
+    /** @var Config */
+    protected $config;
+
+    /**
+     * SEOMiddleware constructor.
+     * @param Config $config
+     */
+    public function __construct(
+        $config = null
+    ) {
+        $this->config = $config ?: Di::_()->get('Config');
+    }
+
     /**
      * Process an incoming server request.
      *
@@ -24,18 +38,9 @@ class ExceptionHandlingMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        try {
-            return $handler
-                ->handle($request);
-        } catch (Exception $e) {
-            // TODO: Handle Sentry
+        new SEO\Defaults($this->config);
 
-            error_log($e);
-
-            return new JsonResponse([
-                'status' => 'error',
-                'message' => 'Internal error'
-            ], 500);
-        }
+        return $handler
+            ->handle($request);
     }
 }

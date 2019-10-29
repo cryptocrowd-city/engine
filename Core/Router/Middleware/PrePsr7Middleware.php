@@ -55,8 +55,8 @@ class PrePsr7Middleware implements MiddlewareInterface
             }
         }
 
-        if ($route === '/' || $prePsr7) {
-            header('X-Router-Mode: legacy');
+        if ($prePsr7) {
+            header('X-Router: pre-psr7');
 
             (new PrePsr7\Router())
                 ->route($route, strtolower($request->getMethod()));

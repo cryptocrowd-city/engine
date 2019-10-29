@@ -79,7 +79,7 @@ class ModuleRoutingMiddleware implements MiddlewareInterface
                     $request
                         ->withAttribute('router_registry_entry', $routerRegistryEntry)
                 )
-                ->withHeader('X-Router-Mode', 'module-routing');
+                ->withHeader('X-Router', 'module-routing');
 
         }
 
