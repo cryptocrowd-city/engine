@@ -82,14 +82,6 @@ RUN apk add --no-cache --virtual build-deps \
     && apk del build-deps \
     && rm -rf $INSTALL_DIR
 
-# Install awscli
-RUN apk add --no-cache \
-    python \
-    py-pip \
-    groff \
-    && pip install awscli --upgrade \
-    && apk del py-pip
-
 # PHP INI
 COPY php.ini /usr/local/etc/php/
 COPY opcache.ini /usr/local/etc/php/conf.d/opcache-recommended.ini
