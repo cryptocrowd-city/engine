@@ -127,7 +127,7 @@ class Resize
 
         $params = $this->getResizeParameters();
 
-        // If is animated, 
+        // If is animated,
         if ($this->image->getNumberImages() > 1) {
             foreach ($this->image as $frame) {
                 // Crop into square.
@@ -138,7 +138,7 @@ class Resize
                     $params['yoffset']
                 );
 
-                 // Resize canvas to new image
+                // Resize canvas to new image
                 $frame->setImagePage(0, 0, 0, 0);
                 
                 // If selected with / height differ from selection width/height, then we need to resize
@@ -146,7 +146,7 @@ class Resize
                     $frame->thumbnailImage($params['newwidth'], $params['newheight']);
                 }
             }
-        } else { 
+        } else {
             // Crop the image to selection dimensions
             $this->image->cropImage(
                 $params['selectionwidth'],
