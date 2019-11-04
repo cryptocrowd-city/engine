@@ -15,9 +15,16 @@ class Thumbnails
         $this->config = $config ?: Di::_()->get('Config');
     }
 
-    public function get($guid, $size)
+    /**
+     * @param $entity Entities\Entity|string
+     * @param $size
+     * @return bool|\ElggFile|mixed|string
+     */
+    public function get($entity, $size)
     {
-        $entity = Entities\Factory::build($guid);
+        if (is_string($entity)) {
+            $entity = Entities\Factory::build($entity);
+        }
         if (!$entity || !Core\Security\ACL::_()->read($entity)) {
             return false;
         }
