@@ -12,6 +12,10 @@ class FeedsProvider extends Provider
             return new Top\Manager();
         });
 
+        $this->di->bind('Feeds\Activity\Manager', function ($di) {
+            return new Activity\Manager();
+        });
+
         $this->di->bind('Feeds\Firehose\Manager', function ($di) {
             return new Firehose\Manager();
         });

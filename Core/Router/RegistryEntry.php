@@ -90,7 +90,7 @@ class RegistryEntry
     public function matches(string $route): bool
     {
         $pattern = sprintf("#^%s$#i", strtr(preg_quote($this->getWildcardRoute(), '#'), ['\*' => '[^/]+']));
-        return preg_match($pattern, $route);
+        return (bool) preg_match($pattern, $route);
     }
 
     /**

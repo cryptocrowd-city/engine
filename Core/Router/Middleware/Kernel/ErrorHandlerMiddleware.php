@@ -45,7 +45,7 @@ class ErrorHandlerMiddleware implements MiddlewareInterface
         } catch (Exception $e) {
             // TODO: Handle Sentry
 
-            error_log($e);
+            error_log((string) $e);
             // TODO: Nicer logging
         }
 
