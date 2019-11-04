@@ -64,7 +64,12 @@ class Manager
         if (!$cmd) {
             return null;
         }
+        if ($entity->access_id !== ACCESS_PUBLIC) {
+            $url = (string)$this->s3->createPresignedRequest($cmd, '+48 hours')->getUri();
+        } else {
+            $url = $this->config->get('cinemr_url') . $entity->cinemr_guid . '/' . $size;
+        }
 
-        return (string) $this->s3->createPresignedRequest($cmd, '+48 hours')->getUri();
+        return $url;
     }
 }
