@@ -225,7 +225,7 @@ class FFMpeg implements ServiceInterface
                 'formats' => ['mp4', 'webm'],
             ], $opts);
 
-            if ($opts['charge'] && !$this->full_hd) {
+            if ($opts['pro'] && !$this->full_hd) {
                 continue;
             }
 
