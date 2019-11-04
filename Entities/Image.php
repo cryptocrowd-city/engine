@@ -214,9 +214,8 @@ class Image extends File
      */
     public function export()
     {
-
-        error_log(var_export($this->nsfw,true));
-        error_log(var_export($this->getFlag('nsfw'),true));
+        error_log(var_export($this->nsfw, true));
+        error_log(var_export($this->getFlag('nsfw'), true));
         error_log("^^^^^^^^^^^^^^^^^");
         
         $export = parent::export();
