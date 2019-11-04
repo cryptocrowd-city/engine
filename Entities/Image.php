@@ -214,13 +214,18 @@ class Image extends File
      */
     public function export()
     {
+
+        error_log(var_export($this->nsfw,true));
+        error_log(var_export($this->getFlag('nsfw'),true));
+        error_log("^^^^^^^^^^^^^^^^^");
+        
         $export = parent::export();
         $export['thumbnail_src'] = $this->getIconUrl('xlarge');
         $export['thumbnail'] = $export['thumbnail_src'];
         $export['thumbs:up:count'] = Helpers\Counters::get($this->guid, 'thumbs:up');
         $export['thumbs:down:count'] = Helpers\Counters::get($this->guid, 'thumbs:down');
         $export['description'] = $this->description; //videos need to be able to export html.. sanitize soon!
-        $export['nsfw'] = $this->nsfw ?: $this->getFlag('nsfw');
+        $export['nsfw'] = $this->nsfw ?: [];
         $export['rating'] = $this->getRating();
         $export['width'] = $this->width ?: 0;
         $export['height'] = $this->height ?: 0;
