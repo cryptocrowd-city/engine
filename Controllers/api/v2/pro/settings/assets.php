@@ -1,22 +1,26 @@
 <?php
 /**
- * settings
+ * settings assets
  * @author edgebal
  */
 
-namespace Minds\Controllers\api\v2\pro;
+namespace Minds\Controllers\api\v2\pro\settings;
 
 use Exception;
 use Minds\Core\Di\Di;
-use Minds\Core\Pro\Domain as ProDomain;
 use Minds\Core\Pro\Manager;
+use Minds\Core\Pro\Assets\Manager as AssetsManager;
 use Minds\Core\Session;
 use Minds\Entities\User;
 use Minds\Interfaces;
 use Minds\Api\Factory;
+use Zend\Diactoros\ServerRequest;
 
-class settings implements Interfaces\Api
+class assets implements Interfaces\Api
 {
+    /** @var ServerRequest */
+    public $request;
+    
     /**
      * Equivalent to HTTP GET method
      * @param array $pages
@@ -24,41 +28,24 @@ class settings implements Interfaces\Api
      */
     public function get($pages)
     {
-        $user = Session::getLoggedinUser();
-
-        if (isset($pages[0]) && $pages[0]) {
-            if (!Session::isAdmin()) {
-                return Factory::response([
-                    'status' => 'error',
-                    'message' => 'You are not authorized',
-                ]);
-            }
-
-            $user = new User($pages[0]);
-        }
-
-        /** @var Manager $manager */
-        $manager = Di::_()->get('Pro\Manager');
-        $manager
-            ->setUser($user)
-            ->setActor(Session::getLoggedinUser());
-
-        return Factory::response([
-            'isActive' => $manager->isActive(),
-            'settings' => $manager->get(),
-        ]);
+        return Factory::response([]);
     }
 
     /**
      * Equivalent to HTTP POST method
      * @param array $pages
      * @return mixed|null
+     * @throws Exception
      */
     public function post($pages)
     {
+        $type = $pages[0] ?? null;
+
+        // Check and validate user
+
         $user = Session::getLoggedinUser();
 
-        if (isset($pages[0]) && $pages[0]) {
+        if (isset($pages[1]) && $pages[1]) {
             if (!Session::isAdmin()) {
                 return Factory::response([
                     'status' => 'error',
@@ -66,8 +53,31 @@ class settings implements Interfaces\Api
                 ]);
             }
 
-            $user = new User($pages[0]);
+            $user = new User($pages[1]);
         }
+
+        // Check uploaded file
+
+        /** @var \Zend\Diactoros\UploadedFile[] $files */
+        $files = $this->request->getUploadedFiles();
+
+        if (!$files || !isset($files['file'])) {
+            return Factory::response([
+                'status' => 'error',
+                'message' => 'Missing file',
+            ]);
+        }
+
+        $file = $files['file'];
+
+        if ($file->getError()) {
+            return Factory::response([
+                'status' => 'error',
+                'message' => sprintf('Error %s when uploading file', $files['file']->getError()),
+            ]);
+        }
+
+        // Get Pro managers
 
         /** @var Manager $manager */
         $manager = Di::_()->get('Pro\Manager');
@@ -82,23 +92,19 @@ class settings implements Interfaces\Api
             ]);
         }
 
-        if (isset($_POST['domain'])) {
-            /** @var ProDomain $proDomain */
-            $proDomain = Di::_()->get('Pro\Domain');
-
-            if (!$proDomain->isAvailable($_POST['domain'], (string) $user->guid)) {
-                return Factory::response([
-                    'status' => 'error',
-                    'message' => 'This domain is taken',
-                ]);
-            }
-        }
+        /** @var AssetsManager $assetsManager */
+        $assetsManager = Di::_()->get('Pro\Assets\Manager');
+        $assetsManager
+            ->setType($type)
+            ->setUser($user)
+            ->setActor(Session::getLoggedinUser());
 
         try {
-            $success = $manager->set($_POST);
+            $success = $assetsManager
+                ->set($file);
 
             if (!$success) {
-                throw new Exception('Cannot save Pro settings');
+                throw new Exception(sprintf("Cannot save Pro %s asset", $type));
             }
         } catch (\Exception $e) {
             return Factory::response([
