@@ -337,7 +337,8 @@ class newsfeed implements Interfaces\Api
                                         ->setURL($embeded->getURL())
                                         ->setThumbnail($embeded->getIconUrl())
                                         ->setFromEntity($embeded)
-                                        ->setMessage($message);
+                                        ->setMessage($message)
+                                        ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false);
                                 } else {
                                     $activity->setRemind((new Activity())
                                         ->setTimeCreated($embeded->time_created)
@@ -347,7 +348,8 @@ class newsfeed implements Interfaces\Api
                                         ->setThumbnail($embeded->getIconUrl())
                                         ->setFromEntity($embeded)
                                         ->export())
-                                        ->setMessage($message);
+                                        ->setMessage($message)
+                                        ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false);
                                 }
                                 $save->setEntity($activity)
                                     ->save();
@@ -361,6 +363,7 @@ class newsfeed implements Interfaces\Api
                                             'mature' => $embeded instanceof Flaggable ? $embeded->getFlag('mature') : false
                                         ])
                                         ->setTitle($embeded->title)
+                                        ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false)
                                         ->setBlurb($embeded->description)
                                         ->setMessage($message);
                                 } else {
@@ -375,6 +378,7 @@ class newsfeed implements Interfaces\Api
                                                 'mature' => $embeded instanceof Flaggable ? $embeded->getFlag('mature') : false
                                             ])
                                             ->setMature($embeded instanceof Flaggable ? $embeded->getFlag('mature') : false)
+                                            ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false)
                                             ->setTitle($embeded->title)
                                             ->setBlurb($embeded->description)
                                             ->export()
@@ -395,6 +399,7 @@ class newsfeed implements Interfaces\Api
                                         'gif' => (bool) $embeded->gif ?? false,
                                     ]])
                                         ->setMature($embeded instanceof Flaggable ? $embeded->getFlag('mature') : false)
+                                        ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false)
                                         ->setFromEntity($embeded)
                                         ->setTitle($embeded->title)
                                         ->setBlurb($embeded->description)
@@ -538,6 +543,7 @@ class newsfeed implements Interfaces\Api
                 $activity = new Activity();
 
                 $activity->setMature(isset($_POST['mature']) && !!$_POST['mature']);
+                $activity->setNsfw($_POST['nsfw'] ?? []);
 
                 $user = Core\Session::getLoggedInUser();
 

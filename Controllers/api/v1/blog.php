@@ -271,7 +271,7 @@ class blog implements Interfaces\Api
         }
 
         if ($blog->isMonetized()) {
-            if ($blog->isNsfw()) {
+            if ($blog->getNsfw()) {
                 return Factory::response([
                     'status' => 'error',
                     'message' => 'Cannot monetize an explicit blog'
