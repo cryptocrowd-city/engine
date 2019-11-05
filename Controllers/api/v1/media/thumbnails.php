@@ -7,13 +7,13 @@
  */
 namespace Minds\Controllers\api\v1\media;
 
+use Minds\Api\Factory;
+use Minds\Common;
 use Minds\Core;
 use Minds\Core\Di\Di;
-use Minds\Helpers;
+use Minds\Core\Features\Manager as FeaturesManager;
 use Minds\Entities;
 use Minds\Interfaces;
-use Minds\Api\Factory;
-use Minds\Core\Features\Manager as FeaturesManager;
 
 class thumbnails implements Interfaces\Api, Interfaces\ApiIgnorePam
 {
@@ -48,7 +48,7 @@ class thumbnails implements Interfaces\Api, Interfaces\ApiIgnorePam
 
         $featuresManager = new FeaturesManager();
 
-        if ($entity->access_id !== ACCESS_PUBLIC && $featuresManager->has('cdn-jwt')) {
+        if ($entity->access_id !== Common\Access::PUBLIC && $featuresManager->has('cdn-jwt')) {
             error_log("{$_SERVER['REQUEST_URI']} was hit, and should not have been");
 
             return Factory::response([

@@ -4,11 +4,13 @@
  */
 namespace Minds\Controllers\fs\v1;
 
+use Minds\Api\Factory;
+use Minds\Common;
 use Minds\Core;
 use Minds\Core\Di\Di;
+use Minds\Core\Features\Manager as FeaturesManager;
 use Minds\Entities;
 use Minds\Interfaces;
-use Minds\Core\Features\Manager as FeaturesManager;
 
 class thumbnail extends Core\page implements Interfaces\page
 {
@@ -19,7 +21,15 @@ class thumbnail extends Core\page implements Interfaces\page
         }
 
         Core\Security\ACL::$ignore = true;
-        $guid = $pages[0];
+        $guid = $pages[0] ?? null;
+
+        if (!$guid) {
+            return Factory::response([
+                'status' => 'error',
+                'message' => 'guid must be provided'
+            ]);
+        }
+
         $size = isset($pages[1]) ? $pages[1] : null;
 
         $entity = Entities\Factory::build($guid);
@@ -33,7 +43,7 @@ class thumbnail extends Core\page implements Interfaces\page
 
         $featuresManager = new FeaturesManager;
 
-        if ($entity->access_id !== ACCESS_PUBLIC && $featuresManager->has('cdn-jwt')) {
+        if ($entity->access_id !== Common\Access::PUBLIC && $featuresManager->has('cdn-jwt')) {
             $signedUri = new Core\Security\SignedUri();
             $uri = (string) \Zend\Diactoros\ServerRequestFactory::fromGlobals()->getUri();
             if (!$signedUri->confirm($uri)) {
