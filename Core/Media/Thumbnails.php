@@ -8,11 +8,15 @@ use Minds\Entities;
 
 class Thumbnails
 {
+    /** @var Core\Config */
     protected $config;
+    /** @var Core\EntitiesBuilder */
+    protected $entitiesBuilder;
 
-    public function __construct($config = null)
+    public function __construct($config = null, $entitiesBuilder = null)
     {
         $this->config = $config ?: Di::_()->get('Config');
+        $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
     }
 
     /**
@@ -23,7 +27,7 @@ class Thumbnails
     public function get($entity, $size)
     {
         if (is_string($entity)) {
-            $entity = Entities\Factory::build($entity);
+            $entity = $this->entitiesBuilder->build($entity);
         }
         if (!$entity || !Core\Security\ACL::_()->read($entity)) {
             return false;
