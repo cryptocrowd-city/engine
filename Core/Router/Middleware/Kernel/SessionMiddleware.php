@@ -1,30 +1,43 @@
-<?php declare(strict_types=1);
+<?php
 /**
- * AdminMiddleware
+ * SessionMiddleware
  * @author edgebal
  */
 
-namespace Minds\Core\Router\Middleware;
+namespace Minds\Core\Router\Middleware\Kernel;
 
-use Minds\Core\Router\Exceptions\ForbiddenException;
-use Minds\Core\Router\Exceptions\UnauthorizedException;
-use Minds\Core\Security\XSRF;
-use Minds\Entities\User;
+use Minds\Core\Di\Di;
+use Minds\Core\Session;
+use Minds\Core\Sessions\Manager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class AdminMiddleware implements MiddlewareInterface
+class SessionMiddleware implements MiddlewareInterface
 {
+    /** @var Manager */
+    protected $session;
+
     /** @var string */
     protected $attributeName = '_user';
 
     /**
-     * @param string $attributeName
-     * @return AdminMiddleware
+     * SessionMiddleware constructor.
+     * @param Manager $session
      */
-    public function setAttributeName(string $attributeName): AdminMiddleware
+    public function __construct(
+        $session = null
+    )
+    {
+        $this->session = $session ?: Di::_()->get('Sessions\Manager');
+    }
+
+    /**
+     * @param string $attributeName
+     * @return SessionMiddleware
+     */
+    public function setAttributeName(string $attributeName): SessionMiddleware
     {
         $this->attributeName = $attributeName;
         return $this;
@@ -39,23 +52,17 @@ class AdminMiddleware implements MiddlewareInterface
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      * @return ResponseInterface
-     * @throws ForbiddenException
-     * @throws UnauthorizedException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (
-            !$request->getAttribute($this->attributeName) ||
-            !XSRF::validateRequest()
-        ) {
-            throw new UnauthorizedException();
-        }
+        if (!$request->getAttribute($this->attributeName)) {
+            $this->session
+                ->withRouterRequest($request);
 
-        /** @var User $currentUser */
-        $currentUser = $request->getAttribute($this->attributeName);
-
-        if (!$currentUser->isAdmin()) {
-            throw new ForbiddenException();
+            return $handler->handle(
+                $request
+                    ->withAttribute($this->attributeName, Session::getLoggedinUser() ?: null)
+            );
         }
 
         return $handler

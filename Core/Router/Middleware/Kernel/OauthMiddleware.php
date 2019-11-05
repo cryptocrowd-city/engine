@@ -1,28 +1,28 @@
-<?php declare(strict_types=1);
+<?php
 /**
- * LoggedInMiddleware
+ * OauthMiddleware
  * @author edgebal
  */
 
-namespace Minds\Core\Router\Middleware;
+namespace Minds\Core\Router\Middleware\Kernel;
 
-use Minds\Core\Router\Exceptions\UnauthorizedException;
-use Minds\Core\Security\XSRF;
+use Minds\Core\Session;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Zend\Diactoros\Response;
 
-class LoggedInMiddleware implements MiddlewareInterface
+class OauthMiddleware implements MiddlewareInterface
 {
     /** @var string */
     protected $attributeName = '_user';
 
     /**
      * @param string $attributeName
-     * @return LoggedInMiddleware
+     * @return OauthMiddleware
      */
-    public function setAttributeName(string $attributeName): LoggedInMiddleware
+    public function setAttributeName(string $attributeName): OauthMiddleware
     {
         $this->attributeName = $attributeName;
         return $this;
@@ -34,18 +34,16 @@ class LoggedInMiddleware implements MiddlewareInterface
      * Processes an incoming server request in order to produce a response.
      * If unable to produce the response itself, it may delegate to the provided
      * request handler to do so.
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
-     * @throws UnauthorizedException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (
-            !$request->getAttribute($this->attributeName) ||
-            !XSRF::validateRequest()
-        ) {
-            throw new UnauthorizedException();
+        if (!$request->getAttribute($this->attributeName)) {
+            Session::withRouterRequest($request, new Response());
+
+            return $handler->handle(
+                $request
+                    ->withAttribute($this->attributeName, Session::getLoggedinUser() ?: null)
+            );
         }
 
         return $handler

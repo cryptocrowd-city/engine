@@ -49,6 +49,15 @@ class Router
             ->pipe(new Kernel\JsonPayloadMiddleware())
             ->pipe(new Kernel\FrameSecurityMiddleware())
             ->pipe(
+                (new Kernel\SessionMiddleware())
+                    ->setAttributeName('_user')
+            )
+            ->pipe(
+                (new Kernel\OauthMiddleware())
+                    ->setAttributeName('_user')
+            )
+            ->pipe(new Kernel\XsrfCookieMiddleware())
+            ->pipe(
                 (new Kernel\RequestHandlerMiddleware())
                     ->setAttributeName('_request-handler')
             )

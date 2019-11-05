@@ -1,33 +1,19 @@
-<?php declare(strict_types=1);
+<?php
 /**
- * LoggedInMiddleware
+ * XsrfCookieMiddleware
  * @author edgebal
  */
 
-namespace Minds\Core\Router\Middleware;
+namespace Minds\Core\Router\Middleware\Kernel;
 
-use Minds\Core\Router\Exceptions\UnauthorizedException;
 use Minds\Core\Security\XSRF;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class LoggedInMiddleware implements MiddlewareInterface
+class XsrfCookieMiddleware implements MiddlewareInterface
 {
-    /** @var string */
-    protected $attributeName = '_user';
-
-    /**
-     * @param string $attributeName
-     * @return LoggedInMiddleware
-     */
-    public function setAttributeName(string $attributeName): LoggedInMiddleware
-    {
-        $this->attributeName = $attributeName;
-        return $this;
-    }
-
     /**
      * Process an incoming server request.
      *
@@ -37,16 +23,10 @@ class LoggedInMiddleware implements MiddlewareInterface
      * @param ServerRequestInterface $request
      * @param RequestHandlerInterface $handler
      * @return ResponseInterface
-     * @throws UnauthorizedException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (
-            !$request->getAttribute($this->attributeName) ||
-            !XSRF::validateRequest()
-        ) {
-            throw new UnauthorizedException();
-        }
+        XSRF::setCookie();
 
         return $handler
             ->handle($request);
