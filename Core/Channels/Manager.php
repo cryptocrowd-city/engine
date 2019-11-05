@@ -139,7 +139,6 @@ class Manager
                     throw new \Exception("{$delegateClassName} deletion failed for {$userGuid}");
                 }
 
-                $this->metricsDelegate->onDelete($this->user);
             } catch (\Exception $e) {
                 // TODO: Fail?
                 error_log((string) $e);
@@ -147,6 +146,7 @@ class Manager
             }
         }
 
+        $this->metricsDelegate->onDelete($this->user);
         $this->logoutDelegate->logout($this->user);
 
         return true;
