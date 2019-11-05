@@ -381,6 +381,7 @@ $CONFIG->set('blockchain_override', [
 ]);
 
 $CONFIG->set('plus', [
+    'handler' => '',
     'tokens' => [
         'month' => 5,
         'year' => 50
@@ -540,7 +541,7 @@ $CONFIG->set('transcoder', [
             'bitrate' => 500,
             'audio_bitrate' => 80,
             'formats' => [ 'mp4', 'webm' ],
-            'charge' => false,
+            'pro' => false,
         ],
         [
             'width' => 1280,
@@ -548,7 +549,7 @@ $CONFIG->set('transcoder', [
             'bitrate' => 2000,
             'audio_bitrate' => 128,
             'formats' => [ 'mp4', 'webm' ],
-            'charge' => false,
+            'pro' => false,
         ],
         [
             'width' => 1920,
@@ -556,7 +557,7 @@ $CONFIG->set('transcoder', [
             'bitrate' => 2000,
             'audio_bitrate' => 128,
             'formats' => [ 'mp4', 'webm' ],
-            'charge' => true,
+            'pro' => true,
         ],
     ]
 ]);
@@ -576,7 +577,32 @@ $CONFIG->set('gitlab', [
 ]);
 
 $CONFIG->set('pro', [
+    'handler' => '',
     'root_domains' => ['minds.com', 'www.minds.com', 'localhost'],
     'subdomain_suffix' => 'minds.com',
     'dynamodb_table_name' => 'traefik',
+]);
+
+
+$CONFIG->set('upgrades', [
+    'pro' => [
+        'monthly' => [
+            'tokens' => 240,
+            'usd' => 60,
+        ],
+        'yearly' => [
+            'tokens' => 2400,
+            'usd' => 600,
+        ]
+    ],
+    'plus' => [
+        'monthly' => [
+            'tokens' => 28,
+            'usd' => 7,
+        ],
+        'yearly' => [
+            'tokens' => 240,
+            'usd' => 60,
+        ]
+    ],
 ]);
