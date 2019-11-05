@@ -77,22 +77,16 @@ class RouteResolverMiddleware implements MiddlewareInterface
         // Pre PSR-7 Controllers
 
         if ($prePsr7Fallback->shouldRoute($request->getUri()->getPath())) {
-            return $handler
-                ->handle(
-                    $request
-                        ->withAttribute($this->attributeName, [$prePsr7Fallback, 'handle'])
-                )
+            return $prePsr7Fallback
+                ->handle($request)
                 ->withHeader('X-Route-Resolver', 'pre-psr7');
         }
 
         // Static HTML
 
         if ($request->getAttribute('accept') === 'html') {
-            return $handler
-                ->handle(
-                    $request
-                        ->withAttribute($this->attributeName, [$prePsr7Fallback, 'handleStatic'])
-                )
+            return $prePsr7Fallback
+                ->handleStatic($request)
                 ->withHeader('X-Route-Resolver', 'pre-psr7-static');
         }
 

@@ -39,13 +39,13 @@ class Router
             ); // TODO: Ensure it works with reverse proxy
 
         $response = $dispatcher
-            ->pipe(new Kernel\CorsMiddleware())
             ->pipe(new Kernel\ContentNegotiationMiddleware())
             ->pipe(new Kernel\ErrorHandlerMiddleware())
             ->pipe(
                 (new Kernel\RouteResolverMiddleware())
                     ->setAttributeName('_request-handler')
-            )
+            ) // Note: Pre-PSR7 routes will not advance further than this
+            ->pipe(new Kernel\CorsMiddleware())
             ->pipe(new Kernel\JsonPayloadMiddleware())
             ->pipe(new Kernel\FrameSecurityMiddleware())
             ->pipe(
