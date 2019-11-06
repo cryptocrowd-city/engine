@@ -59,7 +59,7 @@ class Route
      * @param string[] $middleware
      * @return Route
      */
-    public function using(array $middleware): Route
+    public function withMiddleware(array $middleware): Route
     {
         $instance = clone($this);
         $instance->setMiddleware(array_merge($instance->getMiddleware(), $middleware));

@@ -20,7 +20,7 @@ class Routes extends ModuleRoutes
     {
         $this->route
             ->withPrefix('api/v3/newsfeed')
-            ->using([
+            ->withMiddleware([
                 LoggedInMiddleware::class,
             ])
             ->do(function (Route $route) {
