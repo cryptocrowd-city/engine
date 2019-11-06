@@ -36,10 +36,18 @@ class Spam
          }
 
         if ($foundSpam) {
-            throw new \Exception('Sorry, you included a reference to a domain name linked to spam. You can not use short urls (eg. bit.ly). Please remove it and try again');
+            throw new \Exception("Sorry, you included a reference to a domain name linked to spam (${foundSpam})");
         }
     }
 
+    /**
+     * Runs through a body of text, checking it for values.
+     *
+     * @param [type] $haystack - Body of text.
+     * @param [type] $needles - Array of values to be searched for.
+     * @param integer $offset - offset to start.
+     * @return boolean|string - The matching value.
+     */
     protected function strposa($haystack, $needles, $offset = 0)
     {
         if (!is_array($needles)) {
@@ -47,8 +55,9 @@ class Spam
         }
         foreach ($needles as $query) {
             if (stripos($haystack, $query, $offset) !== false) {
-                return true;
-            } // stop on first true result
+                // stop on first true result
+                return $query;
+            } 
         }
         return false;
     }
