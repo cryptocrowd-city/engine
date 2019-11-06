@@ -39,8 +39,7 @@ class Exported
         $thirdPartyNetworks = null,
         $i18n = null,
         $blockchain = null
-    )
-    {
+    ) {
         $this->config = $config ?: Di::_()->get('Config');
         $this->thirdPartyNetworks = $thirdPartyNetworks ?: Di::_()->get('ThirdPartyNetworks\Manager');
         $this->i18n = $i18n ?: Di::_()->get('I18n');

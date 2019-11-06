@@ -12,7 +12,7 @@ class Provider extends DiProvider
 {
     public function register()
     {
-        $this->di->bind('Front\Index', function() {
+        $this->di->bind('Front\Index', function () {
             return new Index();
         }, [ 'useFactory' => true ]);
     }

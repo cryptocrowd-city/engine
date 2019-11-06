@@ -43,8 +43,7 @@ class Index
     public function __construct(
         $configExported = null,
         $proDomain = null
-    )
-    {
+    ) {
         $this->configExported = $configExported ?: Di::_()->get('Config\Exported');
         $this->proDomain = $proDomain ?: Di::_()->get('Pro\Domain');
 
