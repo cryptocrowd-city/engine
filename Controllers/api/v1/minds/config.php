@@ -21,7 +21,7 @@ class config implements Interfaces\Api, Interfaces\ApiIgnorePam
     public function get($pages)
     {
         return Factory::response(
-            (new Core\Config\Exported())
+            Core\Di\Di::_()->get('Config\Exported')
                 ->export()
         );
     }

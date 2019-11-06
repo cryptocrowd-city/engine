@@ -50,7 +50,7 @@ class Exported
     /**
      * @return array
      */
-    public function export()
+    public function export(): array
     {
         $context = defined('__MINDS_CONTEXT__') ? __MINDS_CONTEXT__ : 'app';
 
