@@ -286,17 +286,19 @@ class ManagerSpec extends ObjectBehavior
             $this->search
         );
 
+        $spamUrl = 'movieblog.tumblr.com';
+
         $blog->getType()
             ->willReturn('object');
 
         $blog->getSubtype()
             ->willReturn('blog');
-
+            
         $blog->getBody()
             ->shouldBeCalled()
-            ->willReturn('movieblog.tumblr.com');
+            ->willReturn($spamUrl);
 
-        $this->shouldThrow(new \Exception('Sorry, you included a reference to a domain name linked to spam. You can not use short urls (eg. bit.ly). Please remove it and try again'))
+        $this->shouldThrow(new \Exception("Sorry, you included a reference to a domain name linked to spam (${spamUrl})"))
             ->duringAdd($blog);
     }
 }

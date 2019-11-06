@@ -57,7 +57,7 @@ class Spam
             if (stripos($haystack, $query, $offset) !== false) {
                 // stop on first true result
                 return $query;
-            } 
+            }
         }
         return false;
     }
