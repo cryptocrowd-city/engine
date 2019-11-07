@@ -113,7 +113,8 @@ class OpenSSL implements EncryptionInterface
             return [
                 'status' => 'error',
                 'message' => "Unable to unlock private key."
-              ];        }
+              ];
+        }
         openssl_pkey_export($private_key, $pkeyout, $newpass);
         return $pkeyout;
     }
