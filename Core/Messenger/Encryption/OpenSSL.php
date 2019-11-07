@@ -110,8 +110,10 @@ class OpenSSL implements EncryptionInterface
     {
         $private_key = openssl_get_privatekey($private_key, $password);
         if (!$private_key) {
-            throw new \Exception('Could not decrypt private key');
-        }
+            return [
+                'status' => 'error',
+                'message' => "Unable to unlock private key."
+              ];        }
         openssl_pkey_export($private_key, $pkeyout, $newpass);
         return $pkeyout;
     }
