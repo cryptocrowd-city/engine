@@ -82,12 +82,6 @@ class SpamSpec extends ObjectBehavior
             ->duringCheck($group);
     }
 
-
-
-
-
-
-
     public function it_should_detect_NO_spam_in_a_blog(Blog $blog, Config $config)
     {
         $config->get('prohibited_domains')
