@@ -138,7 +138,6 @@ class Manager
                 if (!$done) {
                     throw new \Exception("{$delegateClassName} deletion failed for {$userGuid}");
                 }
-
             } catch (\Exception $e) {
                 // TODO: Fail?
                 error_log((string) $e);
