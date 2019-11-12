@@ -60,6 +60,11 @@ class Balance
         }
 
         $balance = $this->token->balanceOf($address);
+
+        if ($balance === null) {
+            throw new \Exception('Unable to retrieve balance');
+        }
+        
         $this->cache->set($cacheKey, serialize($balance), 60);
 
         return $balance;
