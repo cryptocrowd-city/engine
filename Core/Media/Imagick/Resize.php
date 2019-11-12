@@ -127,44 +127,18 @@ class Resize
 
         $params = $this->getResizeParameters();
 
-        // If is animated,
-        // if ($this->image->getNumberImages() > 1) {
-        $this->image = $this->image->coalesceImages();
+        // First crop the image
+        $this->image->cropImage(
+            $params['selectionwidth'],
+            $params['selectionheight'],
+            $params['xoffset'],
+            $params['yoffset']
+        );
 
-        foreach ($this->image as $frame) {
-            error_log("processing frame...");
-            // Crop into square.
-            $frame->cropImage(
-                    $params['selectionwidth'],
-                    $params['selectionheight'],
-                    $params['xoffset'],
-                    $params['yoffset']
-                );
-
-            // Resize canvas to new image
-            $frame->setImagePage(0, 0, 0, 0);
-
-            // If selected with / height differ from selection width/height, then we need to resize
-            if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
-                $frame->thumbnailImage($params['newwidth'], $params['newheight']);
-            }
+        // If selected with / height differ from selection width/height, then we need to resize
+        if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
+            $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
         }
-
-        $this->image = $this->image->deconstructImages();
-        // } else {
-        //     // Crop the image to selection dimensions
-        //     $this->image->cropImage(
-        //         $params['selectionwidth'],
-        //         $params['selectionheight'],
-        //         $params['xoffset'],
-        //         $params['yoffset']
-        //     );
-
-        //     // If selected with / height differ from selection width/height, then we need to resize
-        //     if ($params['selectionwidth'] !== $params['newwidth'] || $params['selectionheight'] !== $params['newheight']) {
-        //         $this->image->thumbnailImage($params['newwidth'], $params['newheight']);
-        //     }
-        // }
 
         $this->output = $this->image;
 
