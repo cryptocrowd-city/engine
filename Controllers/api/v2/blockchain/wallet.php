@@ -47,7 +47,7 @@ class wallet implements Interfaces\Api
                 try {
                     $onChainBalanceVal = BigNumber::_($onChainBalance->get());
                 } catch (\Exception $e) {
-                    $onChainBalanceVal = null;    
+                    $onChainBalanceVal = null;
                 }
 
                 $offChainBalance = Di::_()->get('Blockchain\Wallets\OffChain\Balance');
@@ -56,7 +56,7 @@ class wallet implements Interfaces\Api
                 $offchainAvailableVal = BigNumber::_($offChainBalance->getAvailable());
 
                 
-                $balance = $onChainBalanceVal 
+                $balance = $onChainBalanceVal
                     ? $onChainBalanceVal->add($offChainBalanceVal)
                     : $offChainBalanceVal;
 
