@@ -10,7 +10,7 @@ namespace Minds\Controllers\fs\v1;
 use Minds\Core;
 use Minds\Entities;
 use Minds\Interfaces;
-use Minds\Api\Factory;
+use Minds\Helpers\File;
 
 class paywall implements Interfaces\FS
 {
@@ -31,7 +31,7 @@ class paywall implements Interfaces\FS
                   $contents = file_get_contents(Core\Di\Di::_()->get('Config')->get('path') . 'engine/Assets/photos/andromeda-galaxy.jpg');
               }
 
-              $mimetype = Core\File::getMime($contents);
+              $mimetype = File::getMime($contents);
               header('Content-Type: '.$mimetype);
               header('Expires: ' . date('r', time() + 864000));
               header("Pragma: public");

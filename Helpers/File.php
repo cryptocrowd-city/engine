@@ -1,6 +1,6 @@
 <?php
 
-namespace Minds\Core;
+namespace Minds\Helpers;
 
 class File
 {

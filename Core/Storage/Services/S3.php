@@ -5,7 +5,7 @@ namespace Minds\Core\Storage\Services;
 use Aws\S3\S3Client;
 use Minds\Core\Config;
 use Minds\Core\Di\Di;
-use Minds\Core\File;
+use Minds\Helpers\File;
 
 class S3 implements ServiceInterface
 {

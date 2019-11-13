@@ -6,9 +6,9 @@ namespace Minds\Controllers\fs\v1;
 
 use Minds\Core;
 use Minds\Core\Di\Di;
-use Minds\Entities;
 use Minds\Interfaces;
 use Minds\Core\Features\Manager as FeaturesManager;
+use Minds\Helpers\File;
 
 class thumbnail extends Core\page implements Interfaces\page
 {
@@ -47,7 +47,7 @@ class thumbnail extends Core\page implements Interfaces\page
             }
 
             try {
-                $contentType = Core\File::getMime($contents);
+                $contentType = File::getMime($contents);
             } catch (\Exception $e) {
                 error_log($e);
                 $contentType = 'image/jpeg';

@@ -10,7 +10,7 @@ namespace Minds\Controllers\fs\v1;
 use Minds\Core;
 use Minds\Entities;
 use Minds\Interfaces;
-use Minds\Api\Factory;
+use Minds\Helpers\File;
 
 class avatars implements Interfaces\FS
 {
@@ -60,7 +60,7 @@ class avatars implements Interfaces\FS
         }
 
         if (!empty($contents)) {
-            $mimetype = Core\File::getMime($contents);
+            $mimetype = File::getMime($contents);
         } else {
             $mimetype = 'image/jpeg';
         }

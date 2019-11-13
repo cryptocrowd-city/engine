@@ -9,7 +9,7 @@
 namespace Minds\Core\Media\Proxy;
 
 use Minds\Core\Di\Di;
-use Minds\Core\File;
+use Minds\Helpers\File;
 use Minds\Core\Http\Curl\Client;
 use Minds\Traits\MagicAttributes;
 
