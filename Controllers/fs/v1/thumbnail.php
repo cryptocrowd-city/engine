@@ -47,8 +47,7 @@ class thumbnail extends Core\page implements Interfaces\page
             }
 
             try {
-                $finfo = new \finfo(FILEINFO_MIME);
-                $contentType = $finfo->buffer($contents) ?: 'image/jpeg';
+                $contentType = Core\File::getMime($contents);
             } catch (\Exception $e) {
                 error_log($e);
                 $contentType = 'image/jpeg';

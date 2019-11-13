@@ -102,9 +102,7 @@ class banners implements Interfaces\FS
             }
         }
 
-        $finfo    = finfo_open(FILEINFO_MIME);
-        $mimetype = finfo_buffer($finfo, $content);
-        finfo_close($finfo);
+        $mimetype = Core\File::getMime($content);
 
         header('Content-Type: '.$mimetype);
         header('Expires: ' . date('r', time() + 864000));

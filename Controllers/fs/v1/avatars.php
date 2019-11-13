@@ -59,10 +59,8 @@ class avatars implements Interfaces\FS
             $contents = file_get_contents($filepath);
         }
 
-        if ($filepath) {
-            $finfo    = finfo_open(FILEINFO_MIME);
-            $mimetype = finfo_file($finfo, $filepath);
-            finfo_close($finfo);
+        if (!empty($contents)) {
+            $mimetype = Core\File::getMime($contents);
         } else {
             $mimetype = 'image/jpeg';
         }

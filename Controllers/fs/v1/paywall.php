@@ -31,9 +31,7 @@ class paywall implements Interfaces\FS
                   $contents = file_get_contents(Core\Di\Di::_()->get('Config')->get('path') . 'engine/Assets/photos/andromeda-galaxy.jpg');
               }
 
-              $finfo    = finfo_open(FILEINFO_MIME);
-              $mimetype = finfo_file($finfo, $filepath);
-              finfo_close($finfo);
+              $mimetype = Core\File::getMime($contents);
               header('Content-Type: '.$mimetype);
               header('Expires: ' . date('r', time() + 864000));
               header("Pragma: public");

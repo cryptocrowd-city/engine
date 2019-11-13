@@ -5,6 +5,7 @@ namespace Minds\Core\Storage\Services;
 use Aws\S3\S3Client;
 use Minds\Core\Config;
 use Minds\Core\Di\Di;
+use Minds\Core\File;
 
 class S3 implements ServiceInterface
 {
@@ -62,9 +63,7 @@ class S3 implements ServiceInterface
 
     public function write($data)
     {
-        //TODO: check mime performance here
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($data);
+        $mimeType = File::getMimeType($data);
 
         $write =  $this->s3->putObject([
           // 'ACL' => 'public-read',
