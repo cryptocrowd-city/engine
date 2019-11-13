@@ -18,7 +18,7 @@ class File
 
     protected static function getType(&$data, int $type): string
     {
-        $header = substr($data,0, self::HEADER_LENGTH);
+        $header = substr($data, 0, self::HEADER_LENGTH);
         $finfo = new \finfo($type);
         $type = $finfo->buffer($header);
         unset($finfo);
