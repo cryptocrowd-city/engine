@@ -139,13 +139,18 @@ class Manager
                 ->setKey($key)
                 ->decode($jwt);
 
+            $ssoKey = $data['key'];
+
             $sessionToken = $this->cache
-                ->get($data['key']);
+                ->get($ssoKey);
 
             if ($sessionToken) {
                 $this->sessions
                     ->withString($sessionToken)
                     ->save();
+
+                $this->cache
+                    ->destroy($ssoKey);
             }
 
             return true;
