@@ -20,8 +20,7 @@ class ProDelegate
      */
     public function __construct(
         $proDomain = null
-    )
-    {
+    ) {
         $this->proDomain = $proDomain ?: Di::_()->get('Pro\Domain');
     }
 

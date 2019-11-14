@@ -1,6 +1,6 @@
 <?php
 /**
- * connect
+ * authorize
  * @author edgebal
  */
 
@@ -9,11 +9,13 @@ namespace Minds\Controllers\api\v2\sso;
 use Exception;
 use Minds\Api\Factory;
 use Minds\Core\Di\Di;
+use Minds\Core\Session;
 use Minds\Core\SSO\Manager;
+use Minds\Entities\User;
 use Minds\Interfaces;
 use Zend\Diactoros\ServerRequest;
 
-class connect implements Interfaces\Api, Interfaces\ApiIgnorePam
+class authorize implements Interfaces\Api, Interfaces\ApiIgnorePam
 {
     /** @var ServerRequest */
     public $request;
@@ -36,31 +38,45 @@ class connect implements Interfaces\Api, Interfaces\ApiIgnorePam
      */
     public function post($pages)
     {
-        $origin = $this->request->getServerParams()['HTTP_ORIGIN'] ?? '';
+        $host = $this->request->getServerParams()['HTTP_HOST'] ?? '';
 
-        if (!$origin) {
+        if (!$host) {
             return Factory::response([
                 'status' => 'error',
-                'message' => 'No HTTP Origin header'
+                'message' => 'No HTTP Host header',
             ]);
         }
-
-        $domain = parse_url($origin, PHP_URL_HOST);
 
         /** @var Manager $sso */
         $sso = Di::_()->get('SSO');
         $sso
-            ->setDomain($domain);
+            ->setDomain($host);
 
         if (!$sso->isAllowed()) {
             return Factory::response([
                 'status' => 'error',
-                'message' => 'Domain not allowed'
+                'message' => 'Domain not allowed',
             ]);
         }
 
+        // TODO: Use headers
+        $jwt = $_POST['token'];
+
+        $success = $sso
+            ->authorize($jwt);
+
+        if (!$success) {
+            return Factory::response([
+                'status' => 'error',
+                'message' => 'Invalid token',
+            ]);
+        }
+
+        /** @var User $currentUser */
+        $currentUser = Session::getLoggedinUser();
+
         return Factory::response([
-            'token' => $sso->generateToken()
+            'user' => $currentUser ? $currentUser->export() : null,
         ]);
     }
 

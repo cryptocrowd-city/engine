@@ -6,13 +6,33 @@
 
 namespace Minds\Core\SSO;
 
+use Exception;
+use Lcobucci\JWT\Token as JwtToken;
+use Minds\Common\Jwt;
+use Minds\Core\Config;
 use Minds\Core\Data\cache\abstractCacher;
 use Minds\Core\Di\Di;
+use Minds\Core\Sessions\Manager as SessionsManager;
 
 class Manager
 {
+    /** @var int */
+    const JTW_EXPIRE = 300;
+
+    /** @var string */
+    const SESSION_COOKIE = 'minds_sess';
+
+    /** @var Config */
+    protected $config;
+
     /** @var abstractCacher */
     protected $cache;
+
+    /** @var Jwt */
+    protected $jwt;
+
+    /** @var SessionsManager */
+    protected $sessions;
 
     /** @var Delegates\ProDelegate */
     protected $proDelegate;
@@ -22,15 +42,23 @@ class Manager
 
     /**
      * Manager constructor.
+     * @param Config $config
      * @param abstractCacher $cache
+     * @param Jwt $jwt
+     * @param SessionsManager $sessions
      * @param Delegates\ProDelegate $proDelegate
      */
     public function __construct(
+        $config = null,
         $cache = null,
+        $jwt = null,
+        $sessions = null,
         $proDelegate = null
-    )
-    {
+    ) {
+        $this->config = $config ?: Di::_()->get('Config');
         $this->cache = $cache ?: Di::_()->get('Cache');
+        $this->jwt = $jwt ?: new Jwt();
+        $this->sessions = $sessions ?: Di::_()->get('Sessions\Manager');
         $this->proDelegate = $proDelegate ?: new Delegates\ProDelegate();
     }
 
@@ -58,18 +86,75 @@ class Manager
 
     /**
      * @return string
+     * @throws Exception
      */
-    public function generateToken(): string
+    public function generateToken(): ?string
     {
-        return $this->domain;
+        $now = time();
+        $session = $this->sessions->getSession();
+
+        if (!$session->getUserGuid()) {
+            return null;
+        }
+
+        $key = $this->config->get('oauth')['encryption_key'] ?? '';
+
+        if (!$key) {
+            throw new Exception('Invalid encryption key');
+        }
+
+        $sessionToken = (string) $session->getToken();
+        $sessionTokenHash = hash('sha256', $key . $sessionToken);
+
+        $ssoKey = implode(':', ['sso', $this->domain, $sessionTokenHash, $this->jwt->randomString()]);
+
+        $jwt = $this->jwt
+            ->setKey($key)
+            ->encode([
+                'key' => $ssoKey,
+                'domain' => $this->domain,
+            ], $now, $now + static::JTW_EXPIRE);
+
+        $this->cache
+            ->set($ssoKey, $sessionToken, static::JTW_EXPIRE * 2);
+
+        return $jwt;
     }
 
     /**
-     * @param string $token
+     * @param string $jwt
      * @return bool
+     * @throws Exception
      */
-    public function verify(string $token): bool
+    public function authorize(string $jwt): bool
     {
+        if (!$jwt) {
+            return false;
+        }
 
+        $key = $this->config->get('oauth')['encryption_key'] ?? '';
+
+        if (!$key) {
+            throw new Exception('Invalid encryption key');
+        }
+
+        try {
+            $data = $this->jwt
+                ->setKey($key)
+                ->decode($jwt);
+
+            $sessionToken = $this->cache
+                ->get($data['key']);
+
+            if ($sessionToken) {
+                $this->sessions
+                    ->withString($sessionToken)
+                    ->save();
+            }
+
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }

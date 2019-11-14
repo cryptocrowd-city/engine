@@ -12,7 +12,7 @@ class Provider extends DiProvider
 {
     public function register()
     {
-        $this->di->bind('SSO', function() {
+        $this->di->bind('SSO', function () {
             return new Manager();
         });
     }
