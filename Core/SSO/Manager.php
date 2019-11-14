@@ -89,7 +89,7 @@ class Manager
         $now = time();
         $session = $this->sessions->getSession();
 
-        if (!$session->getUserGuid()) {
+        if (!$session || !$session->getUserGuid()) {
             return null;
         }
 
