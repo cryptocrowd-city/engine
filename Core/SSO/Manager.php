@@ -7,7 +7,6 @@
 namespace Minds\Core\SSO;
 
 use Exception;
-use Lcobucci\JWT\Token as JwtToken;
 use Minds\Common\Jwt;
 use Minds\Core\Config;
 use Minds\Core\Data\cache\abstractCacher;
@@ -18,9 +17,6 @@ class Manager
 {
     /** @var int */
     const JTW_EXPIRE = 300;
-
-    /** @var string */
-    const SESSION_COOKIE = 'minds_sess';
 
     /** @var Config */
     protected $config;
