@@ -26,6 +26,7 @@ class ProDelegate
 
     public function isAllowed($domain)
     {
-        return (bool) $this->proDomain->lookup($domain);
+        return $this->proDomain->isRoot($domain)
+           || (bool) $this->proDomain->lookup($domain);
     }
 }
