@@ -139,6 +139,10 @@ class Manager
                 ->setKey($key)
                 ->decode($jwt);
 
+            if ($this->domain !== $data['domain']) {
+                throw new Exception('Invalid domain');
+            }
+
             $ssoKey = $data['key'];
 
             $sessionToken = $this->cache
