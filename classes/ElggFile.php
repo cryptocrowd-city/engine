@@ -320,4 +320,11 @@ class ElggFile extends ElggObject {
 		return $this->filestore;
 	}
 
+    /**
+     * Executed prior to object serialization
+     */
+    public function __sleep()
+    {
+        unset($this->handle);
+    }
 }
