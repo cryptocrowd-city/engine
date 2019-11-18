@@ -213,7 +213,7 @@ class Image extends File
      * Extend exporting
      */
     public function export()
-    {        
+    {
         $export = parent::export();
         $export['thumbnail_src'] = $this->getIconUrl('xlarge');
         $export['thumbnail'] = $export['thumbnail_src'];
