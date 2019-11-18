@@ -2,12 +2,9 @@
 
 namespace Minds\Core\Security;
 
-use Minds\Core\Di\Di;
-use Minds\Core\Events\Dispatcher;
-use Minds\Core\Security\TwoFactor;
-use Minds\Exceptions;
 use Minds\Helpers\Text;
 use Minds\Core\Config;
+use Minds\Core\Security\ProhibitedDomains;
 
 class Spam
 {
@@ -15,14 +12,14 @@ class Spam
     protected $config;
 
     public function __construct(
-        $config = null
+        $prohibitedDomains = null
     ) {
-        $this->config = $config ?: Di::_()->get('Config');
+        $this->prohibitedDomains = $prohibitedDomains ?? new ProhibitedDomains();
     }
     
     public function check($entity)
     {
-        $prohibitedDomains = $this->config->get('prohibited_domains');
+        $prohibitedDomains = $this->prohibitedDomains->get();
         $foundSpam = false;
 
         switch ($entity->getType()) {

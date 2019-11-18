@@ -7,6 +7,7 @@ use Minds\Core\Events\Dispatcher;
 use Minds\Core\Security\TwoFactor;
 use Minds\Exceptions;
 use Minds\Helpers\Text;
+use Minds\Core\Security\ProhibitedDomains;
 
 class Events
 {
@@ -16,10 +17,13 @@ class Events
     /** @var Config $config */
     protected $config;
 
-    public function __construct()
+    /** @var ProhibitedDomains */
+    protected $prohibitedDomains;
+
+    public function __construct($prohibitedDomains = null)
     {
         $this->sms = Di::_()->get('SMS');
-        $this->config = $config ?: Di::_()->get('Config');
+        $this->prohibitedDomains = $prohibitedDomains ?? new ProhibitedDomains();
     }
 
     public function register()
@@ -55,9 +59,9 @@ class Events
      * @param $object - excepts fields description, briefdescription, message and title.
      * @return boolean - true if prohibited domain found.
      */
-    public function containsProhibitedDomain($object)
+    public function containsProhibitedDomain($object): string
     {
-        $prohibitedDomains = $this->config->get('prohibited_domains');
+        $prohibitedDomains = $this->prohibitedDomains->get();
         $bodies = [
             $object->description,
             $object->briefdescription,
@@ -70,7 +74,7 @@ class Events
                 return $found;
             }
         }
-        return false;
+        return "";
     }
 
     /**

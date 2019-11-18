@@ -10,6 +10,7 @@ use Minds\Core\Comments\Comment;
 use Minds\Entities\User;
 use Minds\Entities\Group;
 use Minds\Entities\Entity;
+use Minds\Core\Security\ProhibitedDomains;
 
 class SpamSpec extends ObjectBehavior
 {
@@ -18,13 +19,16 @@ class SpamSpec extends ObjectBehavior
         $this->shouldHaveType('Minds\Core\Security\Spam');
     }
 
-    public function it_should_detect_spam_in_a_blog(Blog $blog, Config $config)
+    public function it_should_detect_spam_in_a_blog(
+        Blog $blog,
+        ProhibitedDomains $prohibitedDomains
+    )
     {
-        $config->get('prohibited_domains')
+        $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
 
-        $this->beConstructedWith($config);
+        $this->beConstructedWith($prohibitedDomains);
 
         $blog->getBody()->shouldBeCalled()->willReturn('test bit.ly test');
         $blog->getType()->shouldBeCalled()->willReturn('object');
@@ -34,13 +38,16 @@ class SpamSpec extends ObjectBehavior
             ->duringCheck($blog);
     }
 
-    public function it_should_detect_spam_in_a_comment(Comment $comment, Config $config)
+    public function it_should_detect_spam_in_a_comment(
+        Comment $comment,
+        ProhibitedDomains $prohibitedDomains
+    )
     {
-        $config->get('prohibited_domains')
+        $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
 
-        $this->beConstructedWith($config);
+        $this->beConstructedWith($prohibitedDomains);
 
         $comment = new Comment();
         $comment->setBody('test bit.ly test');
@@ -50,13 +57,16 @@ class SpamSpec extends ObjectBehavior
             ->duringCheck($comment);
     }
 
-    public function it_should_detect_spam_in_a_user(User $user, Config $config)
+    public function it_should_detect_spam_in_a_user(
+        User $user,
+        ProhibitedDomains $prohibitedDomains
+    )
     {
-        $config->get('prohibited_domains')
+        $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
 
-        $this->beConstructedWith($config);
+        $this->beConstructedWith($prohibitedDomains);
 
         $user = new User('123');
         $user['briefdescription'] = 'test bit.ly test';
@@ -66,13 +76,16 @@ class SpamSpec extends ObjectBehavior
             ->duringCheck($user);
     }
    
-    public function it_should_detect_spam_in_a_group(Group $group, Config $config)
+    public function it_should_detect_spam_in_a_group(
+        Group $group,
+        ProhibitedDomains $prohibitedDomains
+    )
     {
-        $config->get('prohibited_domains')
+        $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
 
-        $this->beConstructedWith($config);
+        $this->beConstructedWith($prohibitedDomains);
 
         $group = new Group();
         $group->setBriefdescription('test bit.ly test');
@@ -82,13 +95,16 @@ class SpamSpec extends ObjectBehavior
             ->duringCheck($group);
     }
 
-    public function it_should_detect_NO_spam_in_a_blog(Blog $blog, Config $config)
+    public function it_should_detect_NO_spam_in_a_blog(
+        Blog $blog,
+        ProhibitedDomains $prohibitedDomains
+    )
     {
-        $config->get('prohibited_domains')
+        $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
 
-        $this->beConstructedWith($config);
+        $this->beConstructedWith($prohibitedDomains);
 
         $blog->getBody()->shouldBeCalled()->willReturn('test bit.nospam test');
         $blog->getType()->shouldBeCalled()->willReturn('object');
@@ -97,13 +113,16 @@ class SpamSpec extends ObjectBehavior
         $this->check($blog)->shouldReturn(false);
     }
 
-    public function it_should_detect_NO_spam_in_a_comment(Comment $comment, Config $config)
+    public function it_should_detect_NO_spam_in_a_comment(
+        Comment $comment,
+        ProhibitedDomains $prohibitedDomains
+    )
     {
-        $config->get('prohibited_domains')
+        $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
 
-        $this->beConstructedWith($config);
+        $this->beConstructedWith($prohibitedDomains);
 
         $comment = new Comment();
         $comment->setBody('test bit.nospam test');
@@ -112,13 +131,16 @@ class SpamSpec extends ObjectBehavior
         $this->check($comment)->shouldReturn(false);
     }
 
-    public function it_should_detect_NO_spam_in_a_user(User $user, Config $config)
+    public function it_should_detect_NO_spam_in_a_user(
+        User $user,
+        ProhibitedDomains $prohibitedDomains
+    )
     {
-        $config->get('prohibited_domains')
+        $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
 
-        $this->beConstructedWith($config);
+        $this->beConstructedWith($prohibitedDomains);
 
         $user = new User('123');
         $user['briefdescription'] = 'test bit.nospam test';
@@ -127,13 +149,16 @@ class SpamSpec extends ObjectBehavior
         $this->check($user)->shouldReturn(false);
     }
    
-    public function it_should_detect_NO_spam_in_a_group(Group $group, Config $config)
+    public function it_should_detect_NO_spam_in_a_group(
+        Group $group, 
+        ProhibitedDomains $prohibitedDomains
+    )
     {
-        $config->get('prohibited_domains')
+        $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
 
-        $this->beConstructedWith($config);
+        $this->beConstructedWith($prohibitedDomains);
 
         $group = new Group();
         $group->setBriefdescription('test bit.nospam test');
