@@ -22,8 +22,7 @@ class SpamSpec extends ObjectBehavior
     public function it_should_detect_spam_in_a_blog(
         Blog $blog,
         ProhibitedDomains $prohibitedDomains
-    )
-    {
+    ) {
         $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
@@ -41,8 +40,7 @@ class SpamSpec extends ObjectBehavior
     public function it_should_detect_spam_in_a_comment(
         Comment $comment,
         ProhibitedDomains $prohibitedDomains
-    )
-    {
+    ) {
         $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
@@ -60,8 +58,7 @@ class SpamSpec extends ObjectBehavior
     public function it_should_detect_spam_in_a_user(
         User $user,
         ProhibitedDomains $prohibitedDomains
-    )
-    {
+    ) {
         $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
@@ -79,8 +76,7 @@ class SpamSpec extends ObjectBehavior
     public function it_should_detect_spam_in_a_group(
         Group $group,
         ProhibitedDomains $prohibitedDomains
-    )
-    {
+    ) {
         $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
@@ -98,8 +94,7 @@ class SpamSpec extends ObjectBehavior
     public function it_should_detect_NO_spam_in_a_blog(
         Blog $blog,
         ProhibitedDomains $prohibitedDomains
-    )
-    {
+    ) {
         $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
@@ -116,8 +111,7 @@ class SpamSpec extends ObjectBehavior
     public function it_should_detect_NO_spam_in_a_comment(
         Comment $comment,
         ProhibitedDomains $prohibitedDomains
-    )
-    {
+    ) {
         $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
@@ -134,8 +128,7 @@ class SpamSpec extends ObjectBehavior
     public function it_should_detect_NO_spam_in_a_user(
         User $user,
         ProhibitedDomains $prohibitedDomains
-    )
-    {
+    ) {
         $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
@@ -150,10 +143,9 @@ class SpamSpec extends ObjectBehavior
     }
    
     public function it_should_detect_NO_spam_in_a_group(
-        Group $group, 
+        Group $group,
         ProhibitedDomains $prohibitedDomains
-    )
-    {
+    ) {
         $prohibitedDomains->get()
             ->shouldBeCalled()
             ->willReturn(['bit.ly']);
