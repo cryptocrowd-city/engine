@@ -278,13 +278,13 @@ class ManagerSpec extends ObjectBehavior
     public function it_should_check_for_spam(Blog $blog, Spam $spam)
     {
         $this->beConstructedWith(
-                $this->repository,
-                $this->paywallReview,
-                $this->slug,
-                $this->feeds,
-                $this->spam,
-                $this->search
-            );
+            $this->repository,
+            $this->paywallReview,
+            $this->slug,
+            $this->feeds,
+            $this->spam,
+            $this->search
+        );
 
         $spamUrl = 'movieblog.tumblr.com';
 
