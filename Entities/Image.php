@@ -213,11 +213,7 @@ class Image extends File
      * Extend exporting
      */
     public function export()
-    {
-        error_log(var_export($this->nsfw, true));
-        error_log(var_export($this->getFlag('nsfw'), true));
-        error_log("^^^^^^^^^^^^^^^^^");
-        
+    {        
         $export = parent::export();
         $export['thumbnail_src'] = $this->getIconUrl('xlarge');
         $export['thumbnail'] = $export['thumbnail_src'];
