@@ -32,7 +32,7 @@ class Feeds
     public function __construct($entitiesBuilder = null, $propagateRejection = null)
     {
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
-        $this->propagateRejection = $propagateRejection ?: new PropagateRejection();
+        $this->propagateRejection = $propagateRejection ?? new PropagateRejection();
     }
 
     /**

@@ -11,7 +11,7 @@ use Minds\Entities\Group;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Spec\Minds\Mocks;
-use Core\Groups\Delegates\PropagateRejection;
+use Minds\Core\Groups\Delegates\PropagateRejection;
 
 class FeedsSpec extends ObjectBehavior
 {
@@ -54,7 +54,7 @@ class FeedsSpec extends ObjectBehavior
 
         $this->_entitiesBuilder = $entitiesBuilder;
 
-        $this->_propagateRejection = $propagateRejection;
+        $this->_propagateRejection = $propagateRejection ?? new PropagateRejection();
 
         $this->beConstructedWith($entitiesBuilder, $propagateRejection);
     }
