@@ -43,12 +43,7 @@ class wallet implements Interfaces\Api
             case 'balance':
                 $onChainBalance = Di::_()->get('Blockchain\Wallets\OnChain\Balance');
                 $onChainBalance->setUser(Session::getLoggedinUser());
-                
-                try {
-                    $onChainBalanceVal = BigNumber::_($onChainBalance->get());
-                } catch (\Exception $e) {
-                    $onChainBalanceVal = null;
-                }
+                $onChainBalanceVal = BigNumber::_($onChainBalance->get());
 
                 $offChainBalance = Di::_()->get('Blockchain\Wallets\OffChain\Balance');
                 $offChainBalance->setUser(Session::getLoggedinUser());
