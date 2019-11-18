@@ -11,6 +11,7 @@ use Minds\Core\Di\Di;
 use Minds\Core\Features\Manager as FeaturesManager;
 use Minds\Entities;
 use Minds\Interfaces;
+use Minds\Helpers\File;
 
 class thumbnail extends Core\page implements Interfaces\page
 {
@@ -69,8 +70,7 @@ class thumbnail extends Core\page implements Interfaces\page
             }
 
             try {
-                $finfo = new \finfo(FILEINFO_MIME);
-                $contentType = $finfo->buffer($contents) ?: 'image/jpeg';
+                $contentType = File::getMime($contents);
             } catch (\Exception $e) {
                 error_log($e);
                 $contentType = 'image/jpeg';
