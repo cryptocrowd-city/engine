@@ -90,6 +90,6 @@ class BalanceSpec extends ObjectBehavior
 
         $this->setUser($user);
 
-        $this->shouldThrow(new \Exception("Unable to retrieve balance"))->duringGet();
+        $this->get()->shouldReturn(null);
     }
 }
