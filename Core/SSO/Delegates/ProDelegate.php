@@ -24,7 +24,11 @@ class ProDelegate
         $this->proDomain = $proDomain ?: Di::_()->get('Pro\Domain');
     }
 
-    public function isAllowed($domain)
+    /**
+     * @param string $domain
+     * @return bool
+     */
+    public function isAllowed(string $domain): bool
     {
         return $this->proDomain->isRoot($domain)
            || (bool) $this->proDomain->lookup($domain);
