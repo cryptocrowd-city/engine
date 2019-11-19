@@ -59,8 +59,8 @@ class ProMiddleware implements RouterMiddleware
         $serverParams = $request->getServerParams() ?? [];
         $originalHost = $serverParams['HTTP_HOST'];
 
-        $scheme = $request->getUri()->getScheme();
         $host = parse_url($serverParams['HTTP_ORIGIN'] ?? '', PHP_URL_HOST) ?: $originalHost;
+        $scheme = parse_url($serverParams['HTTP_ORIGIN'] ?? '', PHP_URL_SCHEME) ?: $request->getUri()->getScheme();
 
         if (!$host) {
             return null;
