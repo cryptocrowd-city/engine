@@ -159,6 +159,7 @@ class Manager
 
             return true;
         } catch (Exception $e) {
+            error_log((string) $e);
             return false;
         }
     }

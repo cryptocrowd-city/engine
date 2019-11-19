@@ -59,7 +59,6 @@ class authorize implements Interfaces\Api, Interfaces\ApiIgnorePam
             ]);
         }
 
-        // TODO: Use headers
         $jwt = $_POST['token'];
 
         $success = $sso
