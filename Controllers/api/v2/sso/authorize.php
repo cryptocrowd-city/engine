@@ -38,19 +38,21 @@ class authorize implements Interfaces\Api, Interfaces\ApiIgnorePam
      */
     public function post($pages)
     {
-        $host = $this->request->getServerParams()['HTTP_HOST'] ?? '';
+        $origin = $this->request->getServerParams()['HTTP_ORIGIN'] ?? '';
 
-        if (!$host) {
+        if (!$origin) {
             return Factory::response([
                 'status' => 'error',
-                'message' => 'No HTTP Host header',
+                'message' => 'No HTTP Origin header'
             ]);
         }
+
+        $domain = parse_url($origin, PHP_URL_HOST);
 
         /** @var Manager $sso */
         $sso = Di::_()->get('SSO');
         $sso
-            ->setDomain($host);
+            ->setDomain($domain);
 
         if (!$sso->isAllowed()) {
             return Factory::response([
