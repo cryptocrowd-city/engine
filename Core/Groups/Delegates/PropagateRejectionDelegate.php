@@ -19,7 +19,7 @@ class PropagateRejectionDelegate
     public function __construct(
         Delete $delete = null
     ) {
-        $this->delete = $delete ?? new Delete();    
+        $this->delete = $delete ?? new Delete();
     }
 
     /**
