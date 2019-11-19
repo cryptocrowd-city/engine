@@ -7,23 +7,20 @@ use Minds\Core\Events\Dispatcher;
 use Minds\Core\Security\TwoFactor;
 use Minds\Exceptions;
 use Minds\Helpers\Text;
-use Minds\Core\Security\ProhibitedDomains;
+use Minds\Core\Security\Spam;
 
 class Events
 {
     /** @var SMS $sms */
     protected $sms;
 
-    /** @var Config $config */
-    protected $config;
+    /** @var Spam */
+    protected $spam;
 
-    /** @var ProhibitedDomains */
-    protected $prohibitedDomains;
-
-    public function __construct($prohibitedDomains = null)
+    public function __construct($spam = null)
     {
         $this->sms = Di::_()->get('SMS');
-        $this->prohibitedDomains = $prohibitedDomains ?? new ProhibitedDomains();
+        $this->spam = $spam ?? new Spam();
     }
 
     public function register()
@@ -36,45 +33,15 @@ class Events
     public function onCreateHook($hook, $type, $params, $return = null)
     {
         $object = $params;
-        $foundSpam = $this->containsProhibitedDomain($object);
 
-        if ($foundSpam) {
-            throw new \Exception("Sorry, you included a reference to a domain name linked to spam (${foundSpam})");
+        if ($this->spam->check($object)) {
             if (PHP_SAPI != 'cli') {
                 forward(REFERRER);
             }
             return false;
         }
 
-        if ($type == 'group' && $this->strposa($object->getBriefDescription(), $this->prohibitedDomains())) {
-            return false;
-        }
-
         return true;
-    }
-
-    /**
-     * Returns true if the object bodies contain a prohibited domain.
-     *
-     * @param $object - excepts fields description, briefdescription, message and title.
-     * @return boolean - true if prohibited domain found.
-     */
-    public function containsProhibitedDomain($object): string
-    {
-        $prohibitedDomains = $this->prohibitedDomains->get();
-        $bodies = [
-            $object->description,
-            $object->briefdescription,
-            $object->message,
-            $object->title
-        ];
-        foreach ($bodies as $text) {
-            $found = Text::strposa($text, $prohibitedDomains);
-            if ($found) {
-                return $found;
-            }
-        }
-        return "";
     }
 
     /**

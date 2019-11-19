@@ -8,8 +8,8 @@ use Minds\Core\Security\ProhibitedDomains;
 
 class Spam
 {
-    /** @var Config $config */
-    protected $config;
+    /** @var ProhibitedDomains $prohibitedDomains */
+    protected $prohibitedDomains;
 
     public function __construct(
         $prohibitedDomains = null
@@ -27,6 +27,8 @@ class Spam
                 $foundSpam = Text::strposa($entity->getBody(), $prohibitedDomains);
                 break;
             case 'activity':
+                $foundSpam = Text::strposa($entity->getMessage(), $prohibitedDomains);
+                break;
             case 'object':
                 if ($entity->getSubtype() === 'blog') {
                     $foundSpam = Text::strposa($entity->getBody(), $prohibitedDomains);
