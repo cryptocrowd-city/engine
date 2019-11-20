@@ -16,7 +16,7 @@ use Minds\Core\Sessions\Manager as SessionsManager;
 class Manager
 {
     /** @var int */
-    const JTW_EXPIRE = 300;
+    const JWT_EXPIRE = 300;
 
     /** @var Config */
     protected $config;
@@ -109,10 +109,10 @@ class Manager
             ->encode([
                 'key' => $ssoKey,
                 'domain' => $this->domain,
-            ], $now, $now + static::JTW_EXPIRE);
+            ], $now, $now + static::JWT_EXPIRE);
 
         $this->cache
-            ->set($ssoKey, $sessionToken, static::JTW_EXPIRE * 2);
+            ->set($ssoKey, $sessionToken, static::JWT_EXPIRE * 2);
 
         return $jwt;
     }
