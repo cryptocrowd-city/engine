@@ -187,7 +187,7 @@ class Video extends MindsObject
             'title' => null,
             'description' => null,
             'license' => null,
-            'mature' => null,
+            'nsfw' => null,
             'boost_rejection_reason' => null,
             'hidden' => null,
             'access_id' => null,
@@ -204,7 +204,7 @@ class Video extends MindsObject
             'hidden',
             'access_id',
             'container_guid',
-            'mature',
+            'nsfw',
             'boost_rejection_reason',
             'rating',
             'time_sent',
@@ -218,9 +218,13 @@ class Video extends MindsObject
 
             if ($field == 'access_id') {
                 $data[$field] = (int) $data[$field];
-            } elseif (in_array($field, ['mature', 'full_hd'], true)) {
+            } elseif (in_array($field, ['full_hd'], true)) {
                 $this->setFlag($field, !!$data[$field]);
                 continue;
+            }
+
+            if (in_array($field, ['nsfw'], true)) {
+                $this->nsfw = !is_array($data['nsfw']) ? json_decode($data['nsfw']) : $data['nsfw'];
             }
 
             $this->$field = $data[$field];
