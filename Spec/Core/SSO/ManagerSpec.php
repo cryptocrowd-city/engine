@@ -2,6 +2,7 @@
 
 namespace Spec\Minds\Core\SSO;
 
+use Exception;
 use Minds\Common\Jwt;
 use Minds\Core\Config;
 use Minds\Core\Data\cache\abstractCacher;
@@ -61,33 +62,13 @@ class ManagerSpec extends ObjectBehavior
         $this->shouldHaveType(Manager::class);
     }
 
-    public function it_should_check_if_allowed()
-    {
+    public function it_should_generate_token(
+        Session $session
+    ) {
         $this->proDelegate->isAllowed('phpspec.test')
             ->shouldBeCalled()
             ->willReturn(true);
 
-        $this
-            ->setDomain('phpspec.test')
-            ->isAllowed()
-            ->shouldReturn(true);
-    }
-
-    public function it_should_check_if_not_allowed()
-    {
-        $this->proDelegate->isAllowed('phpspec.test')
-            ->shouldBeCalled()
-            ->willReturn(false);
-
-        $this
-            ->setDomain('phpspec.test')
-            ->isAllowed()
-            ->shouldReturn(false);
-    }
-
-    public function it_should_generate_token(
-        Session $session
-    ) {
         $this->sessions->getSession()
             ->shouldBeCalled()
             ->willReturn($session);
@@ -134,6 +115,10 @@ class ManagerSpec extends ObjectBehavior
 
     public function it_should_not_generate_a_token_if_logged_out()
     {
+        $this->proDelegate->isAllowed('phpspec.test')
+            ->shouldBeCalled()
+            ->willReturn(true);
+
         $this->sessions->getSession()
             ->shouldBeCalled()
             ->willReturn(null);
@@ -146,6 +131,10 @@ class ManagerSpec extends ObjectBehavior
 
     public function it_should_authorize()
     {
+        $this->proDelegate->isAllowed('phpspec.test')
+            ->shouldBeCalled()
+            ->willReturn(true);
+
         $this->jwt->setKey('~key~')
             ->shouldBeCalled()
             ->willReturn($this->jwt);
@@ -175,12 +164,16 @@ class ManagerSpec extends ObjectBehavior
 
         $this
             ->setDomain('phpspec.test')
-            ->authorize('~jwt~')
-            ->shouldReturn(true);
+            ->shouldNotThrow(Exception::class)
+            ->duringAuthorize('~jwt~');
     }
 
     public function it_should_not_authorize_if_domain_mismatches()
     {
+        $this->proDelegate->isAllowed('other-phpspec.test')
+            ->shouldBeCalled()
+            ->willReturn(true);
+
         $this->jwt->setKey('~key~')
             ->shouldBeCalled()
             ->willReturn($this->jwt);
@@ -196,8 +189,8 @@ class ManagerSpec extends ObjectBehavior
             ->shouldNotBeCalled();
 
         $this
-            ->setDomain('phpspec-invalid.test')
-            ->authorize('~jwt~')
-            ->shouldReturn(false);
+            ->setDomain('other-phpspec.test')
+            ->shouldThrow(new Exception('Domain mismatch'))
+            ->duringAuthorize('~jwt~');
     }
 }

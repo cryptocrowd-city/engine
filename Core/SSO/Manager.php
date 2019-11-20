@@ -71,7 +71,7 @@ class Manager
     /**
      * @return bool
      */
-    public function isAllowed(): bool
+    protected function isAllowed(): bool
     {
         if ($this->proDelegate->isAllowed($this->domain)) {
             return true;
@@ -86,6 +86,10 @@ class Manager
      */
     public function generateToken(): ?string
     {
+        if (!$this->isAllowed()) {
+            throw new Exception('Invalid domain');
+        }
+
         $now = time();
         $session = $this->sessions->getSession();
 
@@ -119,13 +123,17 @@ class Manager
 
     /**
      * @param string $jwt
-     * @return bool
+     * @return void
      * @throws Exception
      */
-    public function authorize(string $jwt): bool
+    public function authorize(string $jwt): void
     {
         if (!$jwt) {
-            return false;
+            throw new Exception('Invalid JTW');
+        }
+
+        if (!$this->isAllowed()) {
+            throw new Exception('Invalid domain');
         }
 
         $key = $this->config->get('oauth')['encryption_key'] ?? '';
@@ -134,33 +142,26 @@ class Manager
             throw new Exception('Invalid encryption key');
         }
 
-        try {
-            $data = $this->jwt
-                ->setKey($key)
-                ->decode($jwt);
+        $data = $this->jwt
+            ->setKey($key)
+            ->decode($jwt);
 
-            if ($this->domain !== $data['domain']) {
-                throw new Exception('Invalid domain');
-            }
+        if ($this->domain !== $data['domain']) {
+            throw new Exception('Domain mismatch');
+        }
 
-            $ssoKey = $data['key'];
+        $ssoKey = $data['key'];
 
-            $sessionToken = $this->cache
-                ->get($ssoKey);
+        $sessionToken = $this->cache
+            ->get($ssoKey);
 
-            if ($sessionToken) {
-                $this->sessions
-                    ->withString($sessionToken)
-                    ->save();
+        if ($sessionToken) {
+            $this->sessions
+                ->withString($sessionToken)
+                ->save();
 
-                $this->cache
-                    ->destroy($ssoKey);
-            }
-
-            return true;
-        } catch (Exception $e) {
-            error_log((string) $e);
-            return false;
+            $this->cache
+                ->destroy($ssoKey);
         }
     }
 }

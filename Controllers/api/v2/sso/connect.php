@@ -52,16 +52,18 @@ class connect implements Interfaces\Api, Interfaces\ApiIgnorePam
         $sso
             ->setDomain($domain);
 
-        if (!$sso->isAllowed()) {
+        try {
+            return Factory::response([
+                'token' => $sso->generateToken()
+            ]);
+        } catch (Exception $e) {
+            error_log((string) $e);
+
             return Factory::response([
                 'status' => 'error',
-                'message' => 'Domain not allowed'
+                'message' => 'Cannot connect',
             ]);
         }
-
-        return Factory::response([
-            'token' => $sso->generateToken()
-        ]);
     }
 
     /**

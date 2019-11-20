@@ -54,22 +54,15 @@ class authorize implements Interfaces\Api, Interfaces\ApiIgnorePam
         $sso
             ->setDomain($domain);
 
-        if (!$sso->isAllowed()) {
+        try {
+            $sso
+                ->authorize($_POST['token']);
+        } catch (Exception $e) {
+            error_log((string) $e);
+
             return Factory::response([
                 'status' => 'error',
-                'message' => 'Domain not allowed',
-            ]);
-        }
-
-        $jwt = $_POST['token'];
-
-        $success = $sso
-            ->authorize($jwt);
-
-        if (!$success) {
-            return Factory::response([
-                'status' => 'error',
-                'message' => 'Invalid token',
+                'message' => 'Cannot authorize',
             ]);
         }
 
