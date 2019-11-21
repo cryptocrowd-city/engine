@@ -189,6 +189,7 @@ class Image extends File
             'thumbnail',
             'cinemr_guid',
             'license',
+            'mature',
             'nsfw',
             'boost_rejection_reason',
             'rating',
@@ -221,6 +222,7 @@ class Image extends File
         $export['thumbs:up:count'] = Helpers\Counters::get($this->guid, 'thumbs:up');
         $export['thumbs:down:count'] = Helpers\Counters::get($this->guid, 'thumbs:down');
         $export['description'] = $this->description; //videos need to be able to export html.. sanitize soon!
+        $export['mature'] = $this->mature ?: $this->getFlag('mature');
         $export['nsfw'] = $this->nsfw ?: [];
         $export['rating'] = $this->getRating();
         $export['width'] = $this->width ?: 0;
@@ -264,6 +266,7 @@ class Image extends File
             'title' => null,
             'description' => null,
             'license' => null,
+            'mature' => null,
             'nsfw' => null,
             'boost_rejection_reason' => null,
             'hidden' => null,
@@ -282,6 +285,7 @@ class Image extends File
             'batch_guid',
             'access_id',
             'container_guid',
+            'mature',
             'nsfw',
             'boost_rejection_reason',
             'rating',
@@ -298,6 +302,8 @@ class Image extends File
             } elseif ($field == 'nsfw') {
                 $this->nsfw = !is_array($data['nsfw']) ? json_decode($data['nsfw']) : $data['nsfw'];
                 continue;
+            } elseif ($field == 'mature') {
+                $this->setFlag('mature', !!$data['mature']);
             }
 
             $this->$field = $data[$field];
@@ -343,6 +349,7 @@ class Image extends File
             [[
                 'src' => \elgg_get_site_url() . 'fs/v1/thumbnail/' . $this->guid,
                 'href' => \elgg_get_site_url() . 'media/' . ($this->container_guid ? $this->container_guid . '/' : '') . $this->guid,
+                'mature' => $this->getFlag('mature'),
                 'nsfw' => $this->getFlag('nsfw'),
                 'width' => $this->width ?? 0,
                 'height' => $this->height ?? 0,

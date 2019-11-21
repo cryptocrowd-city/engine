@@ -55,6 +55,10 @@ class CreateActivitySpec extends ObjectBehavior
         $blog->getIconUrl()
             ->shouldBeCalled()
             ->willReturn('http://phpspec/icon.spec.ext');
+        
+        $blog->isMature()
+            ->shouldBeCalled()
+            ->willReturn(false);
 
         $blog->getNsfw()
             ->shouldBeCalled()

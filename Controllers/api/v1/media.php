@@ -266,6 +266,7 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
         
         $entity->patch([
             'title' => isset($data['name']) ? $data['name'] : '',
+            'mature' => isset($data['mature']) && !!$data['mature'],
             'nsfw' => !is_array($_POST['nsfw']) ? json_decode($_POST['nsfw']) : $_POST['nsfw'],
             'batch_guid' => 0,
             'access_id' => 0,

@@ -58,6 +58,7 @@ class CreateActivity
             ->setURL($blog->getURL())
             ->setThumbnail($blog->getIconUrl())
             ->setFromEntity($blog)
+            ->setMature($blog->isMature())
             ->setNsfw($blog->getNsfw())
             ->setOwner($owner->export())
             ->setWireThreshold($blog->getWireThreshold())
