@@ -8,39 +8,34 @@ use Minds\Core\Security\ProhibitedDomains;
 
 class Spam
 {
-    /** @var ProhibitedDomains $prohibitedDomains */
-    protected $prohibitedDomains;
-
-    public function __construct(
-        $prohibitedDomains = null
-    ) {
-        $this->prohibitedDomains = $prohibitedDomains ?? new ProhibitedDomains();
-    }
-    
-    public function check($entity)
+    /**
+     * Check for spam
+     * @param mixed $entity
+     * @return bool
+     */
+    public function check($entity): bool
     {
-        $prohibitedDomains = $this->prohibitedDomains->get();
         $foundSpam = false;
 
         switch ($entity->getType()) {
             case 'comment':
-                $foundSpam = Text::strposa($entity->getBody(), $prohibitedDomains);
+                $foundSpam = Text::strposa($entity->getBody(), ProhibitedDomains::DOMAINS);
                 break;
             case 'activity':
-                $foundSpam = Text::strposa($entity->getMessage(), $prohibitedDomains);
+                $foundSpam = Text::strposa($entity->getMessage(), ProhibitedDomains::DOMAINS);
                 break;
             case 'object':
                 if ($entity->getSubtype() === 'blog') {
-                    $foundSpam = Text::strposa($entity->getBody(), $prohibitedDomains);
+                    $foundSpam = Text::strposa($entity->getBody(), ProhibitedDomains::DOMAINS);
                     break;
                 }
-                $foundSpam = Text::strposa($entity->getDescription(), $prohibitedDomains);
+                $foundSpam = Text::strposa($entity->getDescription(), ProhibitedDomains::DOMAINS);
                 break;
             case 'user':
-                $foundSpam = Text::strposa($entity->briefdescription, $prohibitedDomains);
+                $foundSpam = Text::strposa($entity->briefdescription, ProhibitedDomains::DOMAINS);
                 break;
             case 'group':
-                $foundSpam = Text::strposa($entity->getBriefDescription(), $prohibitedDomains);
+                $foundSpam = Text::strposa($entity->getBriefDescription(), ProhibitedDomains::DOMAINS);
                 break;
             default:
                 error_log("[spam-check]: $entity->type:$entity->subtype not supported");

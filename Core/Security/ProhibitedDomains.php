@@ -3,29 +3,13 @@
 namespace Minds\Core\Security;
 
 /**
- * @author Ben
- * @desc holds the list of prohibited domains.
+ * Domains listed here has been blacklisted due to spam.
+ * Short urls are also not allowed due to security issues.
  */
 class ProhibitedDomains
 {
-    public function __construct()
-    {
-    }
-
-    /**
-     * getter for prohibitedDomains
-     *
-     * @return array an array of prohibited domains.
-     */
-    public function get(): array
-    {
-        return $this->prohibitedDomains;
-    }
-
-    private $prohibitedDomains = [ //shorts
-        //	't.co', 'goo.gl', 'ow.ly', 'bitly.com', 'bit.ly','tinyurl.com','bit.do','go2.do',
-        //	'adf.ly', 'adcrun.ch', 'zpag.es','ity.im', 'q.gs', 'lnk.co', 'is.gd',
-        //full
+    /** @var array */
+    const DOMAINS = [
         'movieblog.tumblr.com',
         'moviehdstream.wordpress.com',
         'moviehq.tumblr.com',
@@ -263,7 +247,6 @@ class ProhibitedDomains
         'samuelsconstruction.build',
         'pmwares.com',
         'watchesofwales.co.uk',
-        //'.ru',
         'zotero.org',
         'speakerdeck.com',
         'freesiteslike.com',
