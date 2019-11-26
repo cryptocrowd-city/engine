@@ -23,12 +23,6 @@ class SpamSpec extends ObjectBehavior
         Blog $blog,
         ProhibitedDomains $prohibitedDomains
     ) {
-        $prohibitedDomains->get()
-            ->shouldBeCalled()
-            ->willReturn(['bit.ly']);
-
-        $this->beConstructedWith($prohibitedDomains);
-
         $blog->getBody()->shouldBeCalled()->willReturn('test bit.ly test');
         $blog->getType()->shouldBeCalled()->willReturn('object');
         $blog->getSubtype()->shouldBeCalled()->willReturn('blog');
@@ -41,12 +35,6 @@ class SpamSpec extends ObjectBehavior
         Comment $comment,
         ProhibitedDomains $prohibitedDomains
     ) {
-        $prohibitedDomains->get()
-            ->shouldBeCalled()
-            ->willReturn(['bit.ly']);
-
-        $this->beConstructedWith($prohibitedDomains);
-
         $comment = new Comment();
         $comment->setBody('test bit.ly test');
         $comment->setType('comment');
@@ -59,12 +47,6 @@ class SpamSpec extends ObjectBehavior
         User $user,
         ProhibitedDomains $prohibitedDomains
     ) {
-        $prohibitedDomains->get()
-            ->shouldBeCalled()
-            ->willReturn(['bit.ly']);
-
-        $this->beConstructedWith($prohibitedDomains);
-
         $user = new User('123');
         $user['briefdescription'] = 'test bit.ly test';
         $user['type'] = 'user';
@@ -77,12 +59,6 @@ class SpamSpec extends ObjectBehavior
         Group $group,
         ProhibitedDomains $prohibitedDomains
     ) {
-        $prohibitedDomains->get()
-            ->shouldBeCalled()
-            ->willReturn(['bit.ly']);
-
-        $this->beConstructedWith($prohibitedDomains);
-
         $group = new Group();
         $group->setBriefdescription('test bit.ly test');
         $group->setType('group');
@@ -95,12 +71,6 @@ class SpamSpec extends ObjectBehavior
         Blog $blog,
         ProhibitedDomains $prohibitedDomains
     ) {
-        $prohibitedDomains->get()
-            ->shouldBeCalled()
-            ->willReturn(['bit.ly']);
-
-        $this->beConstructedWith($prohibitedDomains);
-
         $blog->getBody()->shouldBeCalled()->willReturn('test bit.nospam test');
         $blog->getType()->shouldBeCalled()->willReturn('object');
         $blog->getSubtype()->shouldBeCalled()->willReturn('blog');
@@ -112,12 +82,6 @@ class SpamSpec extends ObjectBehavior
         Comment $comment,
         ProhibitedDomains $prohibitedDomains
     ) {
-        $prohibitedDomains->get()
-            ->shouldBeCalled()
-            ->willReturn(['bit.ly']);
-
-        $this->beConstructedWith($prohibitedDomains);
-
         $comment = new Comment();
         $comment->setBody('test bit.nospam test');
         $comment->setType('comment');
@@ -129,12 +93,6 @@ class SpamSpec extends ObjectBehavior
         User $user,
         ProhibitedDomains $prohibitedDomains
     ) {
-        $prohibitedDomains->get()
-            ->shouldBeCalled()
-            ->willReturn(['bit.ly']);
-
-        $this->beConstructedWith($prohibitedDomains);
-
         $user = new User('123');
         $user['briefdescription'] = 'test bit.nospam test';
         $user['type'] = 'user';
@@ -146,12 +104,6 @@ class SpamSpec extends ObjectBehavior
         Group $group,
         ProhibitedDomains $prohibitedDomains
     ) {
-        $prohibitedDomains->get()
-            ->shouldBeCalled()
-            ->willReturn(['bit.ly']);
-
-        $this->beConstructedWith($prohibitedDomains);
-
         $group = new Group();
         $group->setBriefdescription('test bit.nospam test');
         $group->setType('group');

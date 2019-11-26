@@ -13,7 +13,7 @@ class Spam
      * @param mixed $entity
      * @return bool
      */
-    public function check($entity): bool
+    public function check($entity): ?bool
     {
         $foundSpam = false;
 
