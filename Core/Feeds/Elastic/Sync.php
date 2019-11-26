@@ -42,8 +42,7 @@ class Sync
     public function __construct(
         $repository = null,
         $counters = null
-    )
-    {
+    ) {
         $this->repository = $repository ?: new Repository();
         $this->counters = $counters ?: Di::_()->get('Entities\Counters');
     }
