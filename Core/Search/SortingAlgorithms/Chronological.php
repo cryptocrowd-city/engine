@@ -10,6 +10,14 @@ namespace Minds\Core\Search\SortingAlgorithms;
 class Chronological implements SortingAlgorithm
 {
     /**
+     * @return bool
+     */
+    public function isTimestampConstrain(): bool
+    {
+        return false;
+    }
+
+    /**
      * @param string $period
      * @return $this
      */
