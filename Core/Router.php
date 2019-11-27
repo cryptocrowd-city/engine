@@ -14,7 +14,26 @@ use Zend\Diactoros\Uri;
 
 class Router
 {
-    public function route($uri = null, $method = null, $host = null)
+    /** @var Dispatcher */
+    protected $dispatcher;
+
+    /**
+     * Router constructor.
+     * @param Dispatcher $dispatcher
+     */
+    public function __construct(
+        $dispatcher = null
+    )
+    {
+        $this->dispatcher = $dispatcher ?: Di::_()->get('Router');
+    }
+
+    /**
+     * @param string|null $uri
+     * @param string|null $method
+     * @param string|null $host
+     */
+    public function route(string $uri = null, string $method = null, string $host = null): void
     {
         if (!$uri) {
             $uri = strtok($_SERVER['REDIRECT_ORIG_URI'] ?? $_SERVER['REQUEST_URI'], '?');
@@ -28,9 +47,6 @@ class Router
             $host = $_SERVER['HTTP_HOST'];
         }
 
-        /** @var Dispatcher $dispatcher */
-        $dispatcher = Di::_()->get('Router');
-
         $request = ServerRequestFactory::fromGlobals()
             ->withMethod($method)
             ->withUri(
@@ -38,7 +54,7 @@ class Router
                     ->withHost($host)
             ); // TODO: Ensure it works with reverse proxy
 
-        $response = $dispatcher
+        $response = $this->dispatcher
             ->pipe(new Kernel\ContentNegotiationMiddleware())
             ->pipe(new Kernel\ErrorHandlerMiddleware())
             ->pipe(
