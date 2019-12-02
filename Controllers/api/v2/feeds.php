@@ -4,6 +4,7 @@ namespace Minds\Controllers\api\v2;
 
 use Minds\Api\Exportable;
 use Minds\Api\Factory;
+use Minds\Common\Repository\Response;
 use Minds\Core;
 use Minds\Core\Di\Di;
 use Minds\Entities\Factory as EntitiesFactory;
@@ -196,25 +197,14 @@ class feeds implements Interfaces\Api
         }
 
         try {
-            $entities = [];
+            $entities = new Response();
             $fallbackAt = null;
             $i = 0;
 
-            while (count($entities) < $limit) {
+            while ($entities->count() < $limit) {
                 $rows = $manager->getList($opts);
 
-                if (!$sync) {
-                    // Remove all unlisted content, if ES document is not in sync, it'll
-                    // also remove pending activities
-                    $rows = $rows->filter([$elasticEntities, 'filter']);
-
-                    if ($asActivities) {
-                        // Cast to ephemeral Activity entities, if another type
-                        $rows = $rows->map([$elasticEntities, 'cast']);
-                    }
-                }
-
-                $entities = array_merge($entities, $rows->toArray());
+                $entities = $entities->pushArray($rows->toArray());
 
                 if (
                     $opts['algorithm'] !== 'top' ||
@@ -231,6 +221,17 @@ class feeds implements Interfaces\Api
 
                 if (!$fallbackAt) {
                     $fallbackAt = $from;
+                }
+            }
+
+            if (!$sync) {
+                // Remove all unlisted content, if ES document is not in sync, it'll
+                // also remove pending activities
+                $entities = $entities->filter([$elasticEntities, 'filter']);
+
+                if ($asActivities) {
+                    // Cast to ephemeral Activity entities, if another type
+                    $entities = $entities->map([$elasticEntities, 'cast']);
                 }
             }
 
