@@ -28,8 +28,7 @@ class SessionMiddleware implements MiddlewareInterface
      */
     public function __construct(
         $session = null
-    )
-    {
+    ) {
         $this->session = $session ?: Di::_()->get('Sessions\Manager');
     }
 

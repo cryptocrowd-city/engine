@@ -23,8 +23,7 @@ class Router
      */
     public function __construct(
         $dispatcher = null
-    )
-    {
+    ) {
         $this->dispatcher = $dispatcher ?: Di::_()->get('Router');
     }
 
