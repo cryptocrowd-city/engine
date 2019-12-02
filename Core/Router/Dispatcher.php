@@ -14,6 +14,19 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class Dispatcher implements RequestHandlerInterface
 {
+    /** @var MiddlewareInterface */
+    protected $emptyResponseMiddleware;
+
+    /**
+     * Dispatcher constructor.
+     * @param MiddlewareInterface $emptyResponseMiddleware
+     */
+    public function __construct(
+        $emptyResponseMiddleware = null
+    ) {
+        $this->emptyResponseMiddleware = $emptyResponseMiddleware ?: new EmptyResponseMiddleware();
+    }
+
     /** @var MiddlewareInterface[] */
     protected $middleware = [];
 
@@ -37,7 +50,7 @@ class Dispatcher implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         if (count($this->middleware) === 0) {
-            return (new EmptyResponseMiddleware())->process($request, $this);
+            return $this->emptyResponseMiddleware->process($request, $this);
         }
 
         $middleware = array_shift($this->middleware);
