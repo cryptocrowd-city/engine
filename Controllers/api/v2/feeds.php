@@ -12,6 +12,13 @@ use Minds\Interfaces;
 
 class feeds implements Interfaces\Api
 {
+    const PERIOD_FALLBACK = [
+        '12h' => '7d',
+        '24h' => '7d',
+        '7d' => '30d',
+        '30d' => '1y'
+    ];
+
     /**
      * Gets a list of suggested hashtags, including the ones the user has opted in
      * @param array $pages
@@ -20,6 +27,9 @@ class feeds implements Interfaces\Api
     public function get($pages)
     {
         Factory::isLoggedIn();
+
+        $now = time();
+        $periodsInSecs = Core\Feeds\Elastic\Repository::PERIODS;
 
         /** @var User $currentUser */
         $currentUser = Core\Session::getLoggedinUser();
@@ -140,9 +150,10 @@ class feeds implements Interfaces\Api
         /** @var Core\Feeds\Elastic\Manager $manager */
         $manager = Di::_()->get('Feeds\Elastic\Manager');
 
-        /** @var Core\Feeds\Elastic\Entities $entities */
-        $entities = new Core\Feeds\Elastic\Entities();
-        $entities->setActor($currentUser);
+        /** @var Core\Feeds\Elastic\Entities $elasticEntities */
+        $elasticEntities = new Core\Feeds\Elastic\Entities();
+        $elasticEntities
+            ->setActor($currentUser);
 
         $opts = [
             'cache_key' => Core\Session::getLoggedInUserGuid(),
@@ -185,22 +196,48 @@ class feeds implements Interfaces\Api
         }
 
         try {
-            $result = $manager->getList($opts);
+            $entities = [];
+            $fallbackAt = null;
+            $i = 0;
 
-            if (!$sync) {
-                // Remove all unlisted content, if ES document is not in sync, it'll
-                // also remove pending activities
-                $result = $result->filter([$entities, 'filter']);
+            while (count($entities) < $limit) {
+                $rows = $manager->getList($opts);
 
-                if ($asActivities) {
-                    // Cast to ephemeral Activity entities, if another type
-                    $result = $result->map([$entities, 'cast']);
+                if (!$sync) {
+                    // Remove all unlisted content, if ES document is not in sync, it'll
+                    // also remove pending activities
+                    $rows = $rows->filter([$elasticEntities, 'filter']);
+
+                    if ($asActivities) {
+                        // Cast to ephemeral Activity entities, if another type
+                        $rows = $rows->map([$elasticEntities, 'cast']);
+                    }
+                }
+
+                $entities = array_merge($entities, $rows->toArray());
+
+                if (
+                    $opts['algorithm'] !== 'top' ||
+                    !isset(static::PERIOD_FALLBACK[$opts['period']]) ||
+                    ++$i > 2 // Stop at 2nd fallback (i.e. 12h > 7d > 30d)
+                ) {
+                    break;
+                }
+
+                $period = $opts['period'];
+                $from = $now - $periodsInSecs[$period];
+                $opts['from_timestamp'] = $from * 1000;
+                $opts['period'] = static::PERIOD_FALLBACK[$period];
+
+                if (!$fallbackAt) {
+                    $fallbackAt = $from;
                 }
             }
 
             return Factory::response([
                 'status' => 'success',
-                'entities' => Exportable::_($result),
+                'entities' => Exportable::_($entities),
+                'fallback_at' => $fallbackAt,
                 'load-next' => $limit + $offset,
             ]);
         } catch (\Exception $e) {
