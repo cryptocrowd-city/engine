@@ -1,6 +1,9 @@
 <?php
 /**
- * Ref
+ * Ref.
+ * Holds a forward reference to a provider and a method.
+ * Used by PSR-7 Router to resolve DI bindings.
+ *
  * @author edgebal
  */
 
