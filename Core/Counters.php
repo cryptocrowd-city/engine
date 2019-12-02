@@ -4,18 +4,27 @@
  */
 namespace Minds\Core;
 
+use Minds\Common\StaticToInstance;
 use Minds\Helpers\Counters as CountersHelper;
+use ReflectionException;
 
-class Counters
+/**
+ * Class Counters
+ * @package Minds\Core
+ * @method increment($entity, $metric, $value = 1, $client = null)
+ * @method decrement($entity, $metric, $value = 1, $client = null)
+ * @method incrementBatch($entities, $metric, $value = 1, $client = null)
+ * @method get($entity, $metric, $cache = true, $client = null)
+ * @method clear($entity, $metric, $value = 0, $client = null)
+ */
+class Counters extends StaticToInstance
 {
     /**
-     * @param mixed $entity
-     * @param string $metric
-     * @param bool $cache
-     * @return int
+     * Counters constructor.
+     * @throws ReflectionException
      */
-    public function get($entity, string $metric, $cache = true): int
+    public function __construct()
     {
-        return CountersHelper::get($entity, $metric, $cache);
+        parent::__construct(new CountersHelper());
     }
 }
