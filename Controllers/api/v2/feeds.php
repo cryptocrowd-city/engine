@@ -130,6 +130,8 @@ class feeds implements Interfaces\Api
 
         $sync = (bool) ($_GET['sync'] ?? false);
 
+        $periodFallback = (bool) ($_GET['period_fallback'] ?? false);
+
         $asActivities = (bool) ($_GET['as_activities'] ?? true);
 
         $query = isset($_GET['query']) ? urldecode($_GET['query']) : null;
@@ -207,6 +209,7 @@ class feeds implements Interfaces\Api
                 $entities = $entities->pushArray($rows->toArray());
 
                 if (
+                    !$periodFallback ||
                     $opts['algorithm'] !== 'top' ||
                     !isset(static::PERIOD_FALLBACK[$opts['period']]) ||
                     ++$i > 2 // Stop at 2nd fallback (i.e. 12h > 7d > 30d)
