@@ -15,6 +15,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
+use function Sentry\captureException;
 
 class ErrorHandlerMiddleware implements MiddlewareInterface
 {
@@ -43,10 +44,14 @@ class ErrorHandlerMiddleware implements MiddlewareInterface
             $message = 'Forbidden';
             $status = 403;
         } catch (Exception $e) {
-            // TODO: Handle Sentry
+            // Log
 
+            // TODO: Monolog
             error_log((string) $e);
-            // TODO: Nicer logging
+
+            // Sentry
+
+            captureException($e);
         }
 
         switch ($request->getAttribute('accept')) {
