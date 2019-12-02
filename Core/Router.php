@@ -7,8 +7,10 @@
 namespace Minds\Core;
 
 use Minds\Core\Di\Di;
+use Minds\Core\Features\Manager as Features;
 use Minds\Core\Router\Dispatcher;
 use Minds\Core\Router\Middleware\Kernel;
+use Minds\Core\Router\PrePsr7\Fallback;
 use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\Uri;
 
@@ -17,14 +19,26 @@ class Router
     /** @var Dispatcher */
     protected $dispatcher;
 
+    /** @var Features */
+    protected $features;
+
+    /** @var Fallback */
+    protected $fallback;
+
     /**
      * Router constructor.
      * @param Dispatcher $dispatcher
+     * @param Features $features
+     * @param Fallback $fallback
      */
     public function __construct(
-        $dispatcher = null
+        $dispatcher = null,
+        $features = null,
+        $fallback = null
     ) {
         $this->dispatcher = $dispatcher ?: Di::_()->get('Router');
+        $this->features = $features ?: Di::_()->get('Features');
+        $this->fallback = $fallback ?: new Fallback();
     }
 
     /**
@@ -34,6 +48,11 @@ class Router
      */
     public function route(string $uri = null, string $method = null, string $host = null): void
     {
+        if (!$this->features->has('psr7-router')) {
+            $this->fallback->route();
+            return;
+        }
+
         if (!$uri) {
             $uri = strtok($_SERVER['REDIRECT_ORIG_URI'] ?? $_SERVER['REQUEST_URI'], '?');
         }

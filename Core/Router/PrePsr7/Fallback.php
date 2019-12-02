@@ -105,4 +105,12 @@ class Fallback
 
         return new HtmlResponse($html, 200);
     }
+
+    /**
+     * Complete routing fallback
+     */
+    public function route()
+    {
+        (new Router())->route();
+    }
 }
