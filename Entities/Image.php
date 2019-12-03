@@ -401,7 +401,7 @@ class Image extends File
      * Set description
      * @return Image
      */
-    public function setDescription($description): Video
+    public function setDescription($description): Image
     {
         $this->description = $description;
         return $this;
