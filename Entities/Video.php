@@ -296,4 +296,23 @@ class Video extends MindsObject
         $this->time_sent = $time_sent;
         return $this;
     }
+
+    /**
+     * Return description
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description  ?: '';
+    }
+
+    /**
+     * Set description
+     * @return Image
+     */
+    public function setDescription($description): Video
+    {
+        $this->description = $description;
+        return $this;
+    }
 }
