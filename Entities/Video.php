@@ -307,9 +307,11 @@ class Video extends MindsObject
     }
 
     /**
-     * Set description
-     * @return Image
-     */
+    * Set description
+    *
+    * @param string $description - description to be set.
+    * @return Video
+    */
     public function setDescription($description): Video
     {
         $this->description = $description;
