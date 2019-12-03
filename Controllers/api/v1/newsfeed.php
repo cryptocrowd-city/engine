@@ -338,7 +338,7 @@ class newsfeed implements Interfaces\Api
                                         ->setThumbnail($embeded->getIconUrl())
                                         ->setFromEntity($embeded)
                                         ->setMessage($message)
-                                        ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false);
+                                        ->setNsfw($embeded->getNSFW());
                                 } else {
                                     $activity->setRemind((new Activity())
                                         ->setTimeCreated($embeded->time_created)
@@ -349,7 +349,7 @@ class newsfeed implements Interfaces\Api
                                         ->setFromEntity($embeded)
                                         ->export())
                                         ->setMessage($message)
-                                        ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false);
+                                        ->setNsfw($embeded->getNSFW());
                                 }
                                 $save->setEntity($activity)
                                     ->save();
@@ -364,7 +364,7 @@ class newsfeed implements Interfaces\Api
                                             'full_hd' => $embeded->getFlag('full_hd') ?? false,
                                         ])
                                         ->setTitle($embeded->title)
-                                        ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false)
+                                        ->setNsfw($embeded->getNSFW())                                        
                                         ->setBlurb($embeded->description)
                                         ->setMessage($message);
                                 } else {
@@ -379,7 +379,7 @@ class newsfeed implements Interfaces\Api
                                                 'mature' => $embeded instanceof Flaggable ? $embeded->getFlag('mature') : false
                                             ])
                                             ->setMature($embeded instanceof Flaggable ? $embeded->getFlag('mature') : false)
-                                            ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false)
+                                            ->setNsfw($embeded->getNSFW())                                        
                                             ->setTitle($embeded->title)
                                             ->setBlurb($embeded->description)
                                             ->export()
@@ -400,7 +400,7 @@ class newsfeed implements Interfaces\Api
                                         'gif' => (bool) $embeded->gif ?? false,
                                     ]])
                                         ->setMature($embeded instanceof Flaggable ? $embeded->getFlag('mature') : false)
-                                        ->setNsfw($embeded instanceof Flaggable ? $embeded->getFlag('nsfw') : false)
+                                        ->setNsfw($embeded->getNSFW())                                        
                                         ->setFromEntity($embeded)
                                         ->setTitle($embeded->title)
                                         ->setBlurb($embeded->description)
@@ -418,6 +418,7 @@ class newsfeed implements Interfaces\Api
                                                 'gif' => (bool) $embeded->gif ?? false,
                                             ]])
                                             ->setMature($embeded instanceof Flaggable ? $embeded->getFlag('mature') : false)
+                                            ->setNsfw($embeded->getNSFW())
                                             ->setFromEntity($embeded)
                                             ->setTitle($embeded->title)
                                             ->setBlurb($embeded->description)

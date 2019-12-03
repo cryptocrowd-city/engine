@@ -299,9 +299,6 @@ class Image extends File
 
             if ($field == 'access_id') {
                 $data[$field] = (int) $data[$field];
-            } elseif ($field == 'nsfw') {
-                $this->nsfw = !is_array($data['nsfw']) ? json_decode($data['nsfw']) : $data['nsfw'];
-                continue;
             } elseif ($field == 'mature') {
                 $this->setFlag('mature', !!$data['mature']);
             }

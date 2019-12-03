@@ -52,6 +52,7 @@ class CreateActivity
         }
 
         $owner = $blog->getOwnerEntity();
+
         $activity = (new Activity())
             ->setTitle($blog->getTitle())
             ->setBlurb(strip_tags($blog->getBody()))
