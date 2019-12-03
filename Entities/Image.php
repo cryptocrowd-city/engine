@@ -398,9 +398,11 @@ class Image extends File
     }
 
     /**
-     * Set description
-     * @return Image
-     */
+    * Set description
+    *
+    * @param string $description - description to be set.
+    * @return Image
+    */
     public function setDescription($description): Image
     {
         $this->description = $description;
