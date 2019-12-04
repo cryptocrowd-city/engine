@@ -190,7 +190,6 @@ class Image extends File
             'cinemr_guid',
             'license',
             'mature',
-            'nsfw',
             'boost_rejection_reason',
             'rating',
             'width',
@@ -223,7 +222,6 @@ class Image extends File
         $export['thumbs:down:count'] = Helpers\Counters::get($this->guid, 'thumbs:down');
         $export['description'] = $this->description; //videos need to be able to export html.. sanitize soon!
         $export['mature'] = $this->mature ?: $this->getFlag('mature');
-        $export['nsfw'] = $this->nsfw ?: [];
         $export['rating'] = $this->getRating();
         $export['width'] = $this->width ?: 0;
         $export['height'] = $this->height ?: 0;
@@ -301,6 +299,8 @@ class Image extends File
                 $data[$field] = (int) $data[$field];
             } elseif ($field == 'mature') {
                 $this->setFlag('mature', !!$data['mature']);
+            } elseif ($field == 'nsfw') {
+                $this->setNsfw($data['nsfw']);
             }
 
             $this->$field = $data[$field];
