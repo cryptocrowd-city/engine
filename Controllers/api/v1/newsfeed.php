@@ -364,7 +364,7 @@ class newsfeed implements Interfaces\Api
                                             'full_hd' => $embeded->getFlag('full_hd') ?? false,
                                         ])
                                         ->setTitle($embeded->title)
-                                        ->setNsfw($embeded->getNSFW())                                        
+                                        ->setNsfw($embeded->getNSFW())
                                         ->setBlurb($embeded->description)
                                         ->setMessage($message);
                                 } else {
@@ -379,7 +379,7 @@ class newsfeed implements Interfaces\Api
                                                 'mature' => $embeded instanceof Flaggable ? $embeded->getFlag('mature') : false
                                             ])
                                             ->setMature($embeded instanceof Flaggable ? $embeded->getFlag('mature') : false)
-                                            ->setNsfw($embeded->getNSFW())                                        
+                                            ->setNsfw($embeded->getNSFW())
                                             ->setTitle($embeded->title)
                                             ->setBlurb($embeded->description)
                                             ->export()
@@ -400,7 +400,7 @@ class newsfeed implements Interfaces\Api
                                         'gif' => (bool) $embeded->gif ?? false,
                                     ]])
                                         ->setMature($embeded instanceof Flaggable ? $embeded->getFlag('mature') : false)
-                                        ->setNsfw($embeded->getNSFW())                                        
+                                        ->setNsfw($embeded->getNSFW())
                                         ->setFromEntity($embeded)
                                         ->setTitle($embeded->title)
                                         ->setBlurb($embeded->description)

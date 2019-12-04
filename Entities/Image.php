@@ -347,7 +347,7 @@ class Image extends File
                 'src' => \elgg_get_site_url() . 'fs/v1/thumbnail/' . $this->guid,
                 'href' => \elgg_get_site_url() . 'media/' . ($this->container_guid ? $this->container_guid . '/' : '') . $this->guid,
                 'mature' => $this->getFlag('mature'),
-                'nsfw' => $this->getFlag('nsfw'),
+                'nsfw' => $this->nsfw ?: [],
                 'width' => $this->width ?? 0,
                 'height' => $this->height ?? 0,
                 'gif' => (bool) ($this->gif ?? false),
