@@ -225,10 +225,6 @@ class Video extends MindsObject
                 continue;
             }
 
-            if (in_array($field, ['nsfw'], true)) {
-                $this->nsfw = !is_array($data['nsfw']) ? json_decode($data['nsfw']) : $data['nsfw'];
-            }
-
             $this->$field = $data[$field];
         }
 

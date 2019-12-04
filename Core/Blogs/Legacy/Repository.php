@@ -212,7 +212,6 @@ class Repository
         if (isset($fields['published'])) {
             $fields['published'] = $fields['published'] ? '1' : '0';
         }
-
         if (!$fields) {
             return $guid;
         }
