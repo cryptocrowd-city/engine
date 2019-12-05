@@ -15,7 +15,7 @@ class Top implements SortingAlgorithm
      */
     public function isTimestampConstrain(): bool
     {
-        return true;
+        return false; // Old period-based algorithms shouldn't be constrained
     }
 
     /**
