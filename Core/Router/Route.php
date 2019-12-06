@@ -91,6 +91,7 @@ class Route
         }
 
         $route = sprintf("/%s/%s", trim($this->getPrefix(), '/'), trim($route, '/'));
+        $route = trim($route, '/');
 
         foreach ($methods as $method) {
             $this->registry->register($method, $route, $binding, $this->middleware);

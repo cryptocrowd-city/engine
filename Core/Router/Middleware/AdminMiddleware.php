@@ -20,6 +20,15 @@ class AdminMiddleware implements MiddlewareInterface
     /** @var string */
     protected $attributeName = '_user';
 
+    /** @var callable */
+    private $xsrfValidateRequest;
+
+    public function __construct(
+        $xsrfValidateRequest = null
+    ) {
+        $this->xsrfValidateRequest = $xsrfValidateRequest ?: [XSRF::class, 'validateRequest'];
+    }
+
     /**
      * @param string $attributeName
      * @return AdminMiddleware
@@ -46,7 +55,7 @@ class AdminMiddleware implements MiddlewareInterface
     {
         if (
             !$request->getAttribute($this->attributeName) ||
-            !XSRF::validateRequest()
+            !call_user_func($this->xsrfValidateRequest)
         ) {
             throw new UnauthorizedException();
         }

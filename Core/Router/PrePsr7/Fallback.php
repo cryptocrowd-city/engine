@@ -17,6 +17,25 @@ use Zend\Diactoros\Stream;
 
 class Fallback
 {
+    /** @var string[] */
+    const ALLOWED = [
+        '/api/v1/',
+        '/api/v2/',
+        '/emails/',
+        '/fs/v1',
+        '/oauth2/',
+        '/checkout',
+        '/deeplinks',
+        '/icon',
+        '/sitemap',
+        '/sitemaps',
+        '/thumbProxy',
+        '/archive',
+        '/wall',
+        '/not-supported',
+        '/apple-app-site-association',
+    ];
+
     /** @var Config */
     protected $config;
 
@@ -36,28 +55,10 @@ class Fallback
      */
     public function shouldRoute(string $route): bool
     {
-        $allowed = [
-            '/api/v1/',
-            '/api/v2/',
-            '/emails/',
-            '/fs/v1',
-            '/oauth2/',
-            '/checkout',
-            '/deeplinks',
-            '/icon',
-            '/sitemap',
-            '/sitemaps',
-            '/thumbProxy',
-            '/archive',
-            '/wall',
-            '/not-supported',
-            '/apple-app-site-association',
-        ];
-
         $route = sprintf("/%s", ltrim($route, '/'));
         $shouldFallback = false;
 
-        foreach ($allowed as $allowedRoute) {
+        foreach (static::ALLOWED as $allowedRoute) {
             if (stripos($route, $allowedRoute) === 0) {
                 $shouldFallback = true;
                 break;

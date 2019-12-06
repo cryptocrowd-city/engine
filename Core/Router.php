@@ -70,7 +70,7 @@ class Router
             ->withUri(
                 (new Uri($uri))
                     ->withHost($host)
-            ); // TODO: Ensure it works with reverse proxy
+            );
 
         $response = $this->dispatcher
             ->pipe(new Kernel\ContentNegotiationMiddleware())
