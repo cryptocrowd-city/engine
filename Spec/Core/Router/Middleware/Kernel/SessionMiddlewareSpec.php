@@ -12,4 +12,8 @@ class SessionMiddlewareSpec extends ObjectBehavior
     {
         $this->shouldHaveType(SessionMiddleware::class);
     }
+
+    /**
+     * Untestable due to the use of Session as static class
+     */
 }

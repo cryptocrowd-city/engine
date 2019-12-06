@@ -12,4 +12,8 @@ class XsrfCookieMiddlewareSpec extends ObjectBehavior
     {
         $this->shouldHaveType(XsrfCookieMiddleware::class);
     }
+
+    /**
+     * Untestable due to the use of XSRF as static class
+     */
 }
