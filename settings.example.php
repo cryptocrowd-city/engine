@@ -482,6 +482,7 @@ $CONFIG->set('features', [
     'permissions' => false,
     'pro' => false,
     'webtorrent' => false,
+    'top-feeds-by-age' => true,
 ]);
 
 $CONFIG->set('email', [
