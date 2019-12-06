@@ -19,6 +19,19 @@ use function Sentry\captureException;
 
 class ErrorHandlerMiddleware implements MiddlewareInterface
 {
+    /** @var bool */
+    protected $sentryEnabled = true;
+
+    /**
+     * @param bool $sentryEnabled
+     * @return ErrorHandlerMiddleware
+     */
+    public function setSentryEnabled(bool $sentryEnabled): ErrorHandlerMiddleware
+    {
+        $this->sentryEnabled = $sentryEnabled;
+        return $this;
+    }
+
     /**
      * Process an incoming server request.
      *
@@ -51,7 +64,9 @@ class ErrorHandlerMiddleware implements MiddlewareInterface
 
             // Sentry
 
-            captureException($e);
+            if ($this->sentryEnabled) {
+                captureException($e);
+            }
         }
 
         switch ($request->getAttribute('accept')) {

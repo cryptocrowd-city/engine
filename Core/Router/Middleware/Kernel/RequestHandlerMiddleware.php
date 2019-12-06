@@ -53,11 +53,15 @@ class RequestHandlerMiddleware implements MiddlewareInterface
                 // Pipe route-specific middleware
 
                 foreach ($requestHandler->getMiddleware() as $middleware) {
-                    if (!class_exists($middleware)) {
-                        throw new Exception("{$middleware} does not exist");
-                    }
+                    if (is_string($middleware)) {
+                        if (!class_exists($middleware)) {
+                            throw new Exception("{$middleware} does not exist");
+                        }
 
-                    $middlewareInstance = new $middleware;
+                        $middlewareInstance = new $middleware;
+                    } else {
+                        $middlewareInstance = $middleware;
+                    }
 
                     if (!($middlewareInstance instanceof MiddlewareInterface)) {
                         throw new Exception("{$middleware} is not a middleware");

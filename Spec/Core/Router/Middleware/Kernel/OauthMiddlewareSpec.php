@@ -12,4 +12,8 @@ class OauthMiddlewareSpec extends ObjectBehavior
     {
         $this->shouldHaveType(OauthMiddleware::class);
     }
+
+    /**
+     * Untestable due to the use of Session as static class
+     */
 }
