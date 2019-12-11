@@ -165,19 +165,11 @@ class Manager
                 if (!($stripeAccount->individual->ssn_last_4i ?? null) && $account->getSSN()) {
                     $stripeAccount->individual->ssn_last_4 = $account->getSSN();
                 }
-
-                if (!$account->individual->id_number_provided && $account->getPersonalIdNumber()) {
-                    $account->individual->id_number = $account->getPersonalIdNumber();
-                }
             }
 
-            /*if ($account->getAccountNumber()) {
-                $stripeAccount->external_account->account_number = $account->getAccountNumber();
+            if (!$account->individual->id_number_provided && $account->getPersonalIdNumber()) {
+                $stripeAccount->individual->id_number = $account->getPersonalIdNumber();
             }
-
-            if ($account->getRoutingNumber()) {
-                $stripeAccount->external_account->routing_number = $account->getRoutingNumber();
-            }*/
 
             if ($account->getEmail()) {
                 $stripeAccount->individual->email = $account->getEmail();
