@@ -36,6 +36,9 @@ class Account
     /** @var string $id */
     private $id;
 
+    /** @var User */
+    private $user;
+
     /** @var string $userGuid */
     private $userGuid;
 
@@ -55,10 +58,10 @@ class Account
     private $url;
 
     /** @var string $dob */
-    private $dob;
+    private $dateOfBirth;
 
     /** @var string $ssn */
-    private $ssn;
+    private $sSN;
 
     /** @var string $personalIdNumber */
     private $personalIdNumber;
@@ -119,6 +122,9 @@ class Account
 
     /** @var string $requirement */
     private $requirement;
+
+    /** @var string */
+    private $ip;
 
     /** @var array $exportable */
     private $exportable = [
