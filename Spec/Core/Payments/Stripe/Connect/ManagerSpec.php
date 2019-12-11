@@ -64,6 +64,10 @@ class ManagerSpec extends ObjectBehavior
             ->willReturn(null);
         $account->getPersonalIdNumber()
             ->willReturn(null);
+        $account->getEmail()
+            ->willReturn('test@minds.com');
+        $account->getUrl()
+            ->willReturn('https://minds.com/test');
         
         $this->accountInstance->create(Argument::any())
             ->shouldBeCalled()

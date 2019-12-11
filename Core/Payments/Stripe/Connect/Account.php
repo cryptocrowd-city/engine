@@ -24,6 +24,10 @@ use Minds\Traits\MagicAttributes;
  * @method Account getSSN(): string
  * @method Account getPersonalIdNumber(): string
  * @method Account getUser(): User
+ * @method string getEmail()
+ * @method Account setEmail(string $email)
+ * @method string getUrl()
+ * @method Account setUrl(string $url)
  */
 class Account
 {
@@ -46,6 +50,9 @@ class Account
 
     /** @var string $email */
     private $email;
+
+    /** @var string $url */
+    private $url;
 
     /** @var string $dob */
     private $dob;

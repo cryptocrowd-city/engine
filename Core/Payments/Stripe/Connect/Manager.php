@@ -81,6 +81,14 @@ class Manager
             $data['individual']['gender'] = $account->getGender();
         }
 
+        if ($account->getEmail()) {
+            $data['individual']['email'] = $account->getEmail();
+        }
+
+        if ($account->getUrl()) {
+            $data['business_profile']['url'] = $account->getUrl();
+        }
+
         if ($account->getPhoneNumber()) {
             $data['individual']['phone'] = "+" . $account->getPhoneNumber();
         }
