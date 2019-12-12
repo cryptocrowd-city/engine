@@ -28,6 +28,8 @@ use Minds\Traits\MagicAttributes;
  * @method Account setEmail(string $email)
  * @method string getUrl()
  * @method Account setUrl(string $url)
+ * @method array getMetadata()
+ * @method Account setMetdata(array $metadata)
  */
 class Account
 {
@@ -125,6 +127,9 @@ class Account
 
     /** @var string */
     private $ip;
+
+    /** @var array */
+    private $metadata;
 
     /** @var array $exportable */
     private $exportable = [
