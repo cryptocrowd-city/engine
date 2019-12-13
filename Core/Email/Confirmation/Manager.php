@@ -111,19 +111,34 @@ class Manager
      */
     public function confirm(string $jwt): bool
     {
-        if ($this->user->isEmailConfirmed()) {
-            throw new Exception('User email was already confirmed');
-        }
-
         $config = $this->config->get('email_confirmation');
 
-        $data = $this->jwt
-            ->setKey($config['signing_key'])
-            ->decode($this->user->getEmailConfirmationToken());
+        if ($this->user) {
+            throw new Exception('Confirmation user is inferred from JWT');
+        }
 
         $confirmation = $this->jwt
             ->setKey($config['signing_key'])
             ->decode($jwt); // Should throw if expired
+
+        if (
+            !$confirmation['user_guid'] ||
+            !$confirmation['code']
+        ) {
+            throw new Exception('Invalid JWT');
+        }
+
+        $user = new User($confirmation['user_guid'], false);
+
+        if (!$user || !$user->guid) {
+            throw new Exception('Invalid user');
+        } elseif ($user->isEmailConfirmed()) {
+            throw new Exception('User email was already confirmed');
+        }
+
+        $data = $this->jwt
+            ->setKey($config['signing_key'])
+            ->decode($user->getEmailConfirmationToken());
 
         if (
             $data['user_guid'] !== $confirmation['user_guid'] ||
@@ -132,7 +147,7 @@ class Manager
             throw new Exception('Invalid confirmation token data');
         }
 
-        $this->user
+        $user
             ->setEmailConfirmationToken('')
             ->setEmailConfirmedAt(time())
             ->save();
@@ -140,7 +155,7 @@ class Manager
         $this->queue
             ->setQueue('WelcomeEmail')
             ->send([
-                'user_guid' => (string) $this->user->guid,
+                'user_guid' => (string) $user->guid,
             ]);
 
         return true;

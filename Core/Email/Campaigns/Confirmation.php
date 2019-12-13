@@ -83,9 +83,10 @@ class Confirmation extends EmailCampaign
      */
     public function send()
     {
-        if ($this->canSend()) {
+        if ($this->user && $this->user->getEmail()) {
             $this->mailer->queue(
-                $this->build()
+                $this->build(),
+                true
             );
 
             $this->saveCampaignLog();

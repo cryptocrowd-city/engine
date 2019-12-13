@@ -37,7 +37,7 @@ class ConfirmationUrlDelegate
             '%s?%s',
             $this->config->get('site_url'),
             http_build_query(array_merge($params, [
-                'token' => $user->getEmailConfirmationToken(),
+                '__e_cnf_token' => $user->getEmailConfirmationToken(),
             ])),
         );
     }
