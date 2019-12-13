@@ -52,6 +52,10 @@ class Events
         Dispatcher::register('welcome_email', 'all', function ($opts) {
             $this->sendCampaign(new Delegates\WelcomeSender(), $opts->getParameters());
         });
+
+        Dispatcher::register('confirmation_email', 'all', function ($opts) {
+            $this->sendCampaign(new Delegates\ConfirmationSender(), $opts->getParameters());
+        });
     }
 
     private function sendCampaign(SenderInterface $sender, $params)
