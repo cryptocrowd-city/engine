@@ -63,7 +63,7 @@ class Confirmation extends EmailCampaign
         $this->template->setTemplate('default.tpl');
         $this->template->setBody('./Templates/confirmation.tpl');
         $this->template->set('user', $this->user);
-        $this->template->set('confirmation_url', $this->confirmationManager->generateConfirmationUrl());
+        $this->template->set('confirmation_url', $this->confirmationManager->generateConfirmationUrl($tracking));
 
         $message = new Message();
         $message
