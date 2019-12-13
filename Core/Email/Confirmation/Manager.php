@@ -71,13 +71,13 @@ class Manager
             throw new Exception('User email was already confirmed');
         }
 
-        $config = $this->config->get('email');
+        $config = $this->config->get('email_confirmation');
 
         $now = time();
-        $expires = $now + $config['confirmation_expires'];
+        $expires = $now + $config['expiration'];
 
         $token = $this->jwt
-            ->setKey($config['confirmation_encryption_key'])
+            ->setKey($config['signing_key'])
             ->encode([
                 'user_guid' => (string) $this->user->guid,
                 'code' => $this->jwt->randomString(),
@@ -115,14 +115,14 @@ class Manager
             throw new Exception('User email was already confirmed');
         }
 
-        $config = $this->config->get('email');
+        $config = $this->config->get('email_confirmation');
 
         $data = $this->jwt
-            ->setKey($config['confirmation_encryption_key'])
+            ->setKey($config['signing_key'])
             ->decode($this->user->getEmailConfirmationToken());
 
         $confirmation = $this->jwt
-            ->setKey($config['confirmation_encryption_key'])
+            ->setKey($config['signing_key'])
             ->decode($jwt); // Should throw if expired
 
         if (
