@@ -14,6 +14,7 @@ use Minds\Core\Di\Di;
 use Minds\Core\Queue\Client as QueueClientFactory;
 use Minds\Core\Queue\Interfaces\QueueClient;
 use Minds\Entities\User;
+use Minds\Entities\UserFactory;
 
 class Manager
 {
@@ -26,8 +27,8 @@ class Manager
     /** @var QueueClient */
     protected $queue;
 
-    /** @var Delegates\ConfirmationUrlDelegate */
-    protected $confirmationUrlDelegate;
+    /** @var UserFactory */
+    protected $userFactory;
 
     /** @var User */
     protected $user;
@@ -37,19 +38,19 @@ class Manager
      * @param Config $config
      * @param Jwt $jwt
      * @param QueueClient $queue
-     * @param Delegates\ConfirmationUrlDelegate $confirmationUrlDelegate
+     * @param UserFactory $userFactory
      * @throws Exception
      */
     public function __construct(
         $config = null,
         $jwt = null,
         $queue = null,
-        $confirmationUrlDelegate = null
+        $userFactory = null
     ) {
         $this->config = $config ?: Di::_()->get('Config');
         $this->jwt = $jwt ?: new Jwt();
         $this->queue = $queue ?: QueueClientFactory::build();
-        $this->confirmationUrlDelegate = $confirmationUrlDelegate ?: new Delegates\ConfirmationUrlDelegate();
+        $this->userFactory = $userFactory ?: new UserFactory();
     }
 
     /**
@@ -95,16 +96,6 @@ class Manager
     }
 
     /**
-     * @param array $params
-     * @return string
-     */
-    public function generateConfirmationUrl(array $params = []): string
-    {
-        return $this->confirmationUrlDelegate
-            ->generate($this->user, $params);
-    }
-
-    /**
      * @param string $jwt
      * @return bool
      * @throws Exception
@@ -122,13 +113,14 @@ class Manager
             ->decode($jwt); // Should throw if expired
 
         if (
+            !$confirmation ||
             !$confirmation['user_guid'] ||
             !$confirmation['code']
         ) {
             throw new Exception('Invalid JWT');
         }
 
-        $user = new User($confirmation['user_guid'], false);
+        $user = $this->userFactory->build($confirmation['user_guid'], false);
 
         if (!$user || !$user->guid) {
             throw new Exception('Invalid user');

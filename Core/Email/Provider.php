@@ -45,5 +45,9 @@ class Provider extends DiProvider
         $this->di->bind('Email\Confirmation', function ($di) {
             return new Confirmation\Manager();
         }, ['useFactory' => true]);
+
+        $this->di->bind('Email\Confirmation\Url', function ($di) {
+            return new Confirmation\Url();
+        }, ['useFactory' => true]);
     }
 }

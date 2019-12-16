@@ -8,7 +8,7 @@
 namespace Minds\Core\Email\Campaigns;
 
 use Minds\Core\Di\Di;
-use Minds\Core\Email\Confirmation\Manager as ConfirmationManager;
+use Minds\Core\Email\Confirmation\Url as ConfirmationUrl;
 use Minds\Core\Email\Mailer;
 use Minds\Core\Email\Message;
 use Minds\Core\Email\Template;
@@ -21,23 +21,23 @@ class Confirmation extends EmailCampaign
     /** @var Mailer */
     protected $mailer;
 
-    /** @var ConfirmationManager */
-    protected $confirmationManager;
+    /** @var ConfirmationUrl */
+    protected $confirmationUrl;
 
     /**
      * Confirmation constructor.
      * @param Template $template
      * @param Mailer $mailer
-     * @param ConfirmationManager $confirmationManager
+     * @param ConfirmationUrl $confirmationUrl
      */
     public function __construct(
         $template = null,
         $mailer = null,
-        $confirmationManager = null
+        $confirmationUrl = null
     ) {
         $this->template = $template ?: new Template();
         $this->mailer = $mailer ?: new Mailer();
-        $this->confirmationManager = $confirmationManager ?: Di::_()->get('Email\Confirmation');
+        $this->confirmationUrl = $confirmationUrl ?: Di::_()->get('Email\Confirmation\Url');
     }
 
     /**
@@ -55,15 +55,17 @@ class Confirmation extends EmailCampaign
             'state' => 'new',
         ];
 
-        $this->confirmationManager
-            ->setUser($this->user);
-
         $subject = 'Confirm your Minds email (Action required)';
 
         $this->template->setTemplate('default.tpl');
         $this->template->setBody('./Templates/confirmation.tpl');
         $this->template->set('user', $this->user);
-        $this->template->set('confirmation_url', $this->confirmationManager->generateConfirmationUrl($tracking));
+        $this->template->set(
+            'confirmation_url',
+            $this->confirmationUrl
+                ->setUser($this->user)
+                ->generate($tracking)
+        );
 
         $message = new Message();
         $message
@@ -84,6 +86,8 @@ class Confirmation extends EmailCampaign
     public function send()
     {
         if ($this->user && $this->user->getEmail()) {
+            // User is still not enabled
+
             $this->mailer->queue(
                 $this->build(),
                 true
