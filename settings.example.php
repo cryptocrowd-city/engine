@@ -481,6 +481,7 @@ $CONFIG->set('features', [
     'permissions' => false,
     'pro' => false,
     'webtorrent' => false,
+    'homepage-and-onboarding' => true,
 ]);
 
 $CONFIG->set('email', [
