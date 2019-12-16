@@ -38,6 +38,9 @@ class Confirmation extends EmailCampaign
         $this->template = $template ?: new Template();
         $this->mailer = $mailer ?: new Mailer();
         $this->confirmationUrl = $confirmationUrl ?: Di::_()->get('Email\Confirmation\Url');
+
+        $this->campaign = 'global';
+        $this->topic = 'confirmation';
     }
 
     /**
@@ -45,13 +48,10 @@ class Confirmation extends EmailCampaign
      */
     public function build()
     {
-        $campaign = 'global';
-        $topic = 'confirmation';
-
         $tracking = [
             '__e_ct_guid' => $this->user->getGUID(),
-            'campaign' => $campaign,
-            'topic' => $topic,
+            'campaign' => $this->campaign,
+            'topic' => $this->topic,
             'state' => 'new',
         ];
 
@@ -60,6 +60,7 @@ class Confirmation extends EmailCampaign
         $this->template->setTemplate('default.tpl');
         $this->template->setBody('./Templates/confirmation.tpl');
         $this->template->set('user', $this->user);
+        $this->template->set('tracking', http_build_query($tracking));
         $this->template->set(
             'confirmation_url',
             $this->confirmationUrl
@@ -72,7 +73,7 @@ class Confirmation extends EmailCampaign
             ->setTo($this->user)
             ->setMessageId(implode(
                 '-',
-                [ $this->user->guid, sha1($this->user->getEmail()), sha1($campaign . $topic . time()) ]
+                [ $this->user->guid, sha1($this->user->getEmail()), sha1($this->campaign . $this->topic . time()) ]
             ))
             ->setSubject($subject)
             ->setHtml($this->template);
