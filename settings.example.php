@@ -481,6 +481,7 @@ $CONFIG->set('features', [
     'permissions' => false,
     'pro' => false,
     'webtorrent' => false,
+    'top-feeds-by-age' => true,
     'homepage-and-onboarding' => true,
 ]);
 
