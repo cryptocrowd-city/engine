@@ -101,7 +101,14 @@ class ManagerSpec extends ObjectBehavior
             ->duringSendEmail();
     }
 
-    public function it_should_throw_if_email_is_confirmed_during_send(
+    public function it_should_throw_if_no_user_during_send_email()
+    {
+        $this
+            ->shouldThrow(new Exception('User not set'))
+            ->duringSendEmail();
+    }
+
+    public function it_should_throw_if_email_is_confirmed_during_send_email(
         User $user
     ) {
         $user->isEmailConfirmed()
@@ -115,6 +122,34 @@ class ManagerSpec extends ObjectBehavior
             ->setUser($user)
             ->shouldThrow(new Exception('User email was already confirmed'))
             ->duringSendEmail();
+    }
+
+    public function it_should_reset(
+        User $user
+    ) {
+        $user->setEmailConfirmationToken('')
+            ->shouldBeCalled()
+            ->willReturn($user);
+
+        $user->setEmailConfirmedAt(null)
+            ->shouldBeCalled()
+            ->willReturn($user);
+
+        $user->save()
+            ->shouldBeCalled()
+            ->willReturn(true);
+
+        $this
+            ->setUser($user)
+            ->reset()
+            ->shouldReturn(true);
+    }
+
+    public function it_should_throw_if_no_user_during_reset()
+    {
+        $this
+            ->shouldThrow(new Exception('User not set'))
+            ->duringReset();
     }
 
     public function it_should_confirm(

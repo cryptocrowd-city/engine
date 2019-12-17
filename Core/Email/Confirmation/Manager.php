@@ -68,6 +68,10 @@ class Manager
      */
     public function sendEmail(): void
     {
+        if (!$this->user) {
+            throw new Exception('User not set');
+        }
+
         if ($this->user->isEmailConfirmed()) {
             throw new Exception('User email was already confirmed');
         }
@@ -93,6 +97,24 @@ class Manager
             ->send([
                 'user_guid' => (string) $this->user->guid,
             ]);
+    }
+
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    public function reset(): bool
+    {
+        if (!$this->user) {
+            throw new Exception('User not set');
+        }
+
+        $this->user
+            ->setEmailConfirmationToken('')
+            ->setEmailConfirmedAt(null);
+
+        return (bool) $this->user
+            ->save();
     }
 
     /**

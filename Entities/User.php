@@ -661,7 +661,7 @@ class User extends \ElggUser
      * @param int $time
      * @return User
      */
-    public function setEmailConfirmedAt(int $time): User
+    public function setEmailConfirmedAt(?int $time): User
     {
         $this->email_confirmed_at = $time;
         return $this;
