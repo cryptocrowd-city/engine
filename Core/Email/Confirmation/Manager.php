@@ -117,7 +117,7 @@ class Manager
 
         $this->user
             ->setEmailConfirmationToken('')
-            ->setEmailConfirmedAt(null);
+            ->setEmailConfirmedAt(0);
 
         return (bool) $this->user
             ->save();
