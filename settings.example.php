@@ -482,7 +482,9 @@ $CONFIG->set('features', [
     'pro' => false,
     'webtorrent' => false,
     'top-feeds-by-age' => true,
-    'homepage-and-onboarding' => true,
+    'homepage' => true,
+    'onboarding' => true,
+    'register_pages' => true,
 ]);
 
 $CONFIG->set('email', [
