@@ -11,6 +11,7 @@ use Exception;
 use Minds\Common\Jwt;
 use Minds\Core\Config;
 use Minds\Core\Di\Di;
+use Minds\Core\Events\EventsDispatcher;
 use Minds\Core\Queue\Client as QueueClientFactory;
 use Minds\Core\Queue\Interfaces\QueueClient;
 use Minds\Entities\User;
@@ -30,6 +31,9 @@ class Manager
     /** @var UserFactory */
     protected $userFactory;
 
+    /** @var EventsDispatcher */
+    protected $eventsDispatcher;
+
     /** @var User */
     protected $user;
 
@@ -39,18 +43,21 @@ class Manager
      * @param Jwt $jwt
      * @param QueueClient $queue
      * @param UserFactory $userFactory
+     * @param EventsDispatcher $eventsDispatcher
      * @throws Exception
      */
     public function __construct(
         $config = null,
         $jwt = null,
         $queue = null,
-        $userFactory = null
+        $userFactory = null,
+        $eventsDispatcher = null
     ) {
         $this->config = $config ?: Di::_()->get('Config');
         $this->jwt = $jwt ?: new Jwt();
         $this->queue = $queue ?: QueueClientFactory::build();
         $this->userFactory = $userFactory ?: new UserFactory();
+        $this->eventsDispatcher = $eventsDispatcher ?: Di::_()->get('EventsDispatcher');
     }
 
     /**
@@ -92,11 +99,9 @@ class Manager
             ->setEmailConfirmationToken($token)
             ->save();
 
-        $this->queue
-            ->setQueue('ConfirmationEmail')
-            ->send([
-                'user_guid' => (string) $this->user->guid,
-            ]);
+        $this->eventsDispatcher->trigger('confirmation_email', 'all', [
+            'user_guid' => (string) $this->user->guid,
+        ]);
     }
 
     /**

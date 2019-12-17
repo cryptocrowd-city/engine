@@ -2,11 +2,6 @@
     <tbody>
     <tr>
         <td>
-            <p>@<?php echo $vars['user']->username ?>,</p>
-        </td>
-    </tr>
-    <tr>
-        <td>
             <p>
                 Please take a moment to validate your email address. This helps us prevent spam and ensure users are real.
                 Click the button below and we'll know it's you.

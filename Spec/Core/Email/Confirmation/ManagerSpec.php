@@ -6,6 +6,7 @@ use Exception;
 use Minds\Common\Jwt;
 use Minds\Core\Config;
 use Minds\Core\Email\Confirmation\Manager;
+use Minds\Core\Events\EventsDispatcher;
 use Minds\Core\Queue\Interfaces\QueueClient;
 use Minds\Entities\User;
 use Minds\Entities\UserFactory;
@@ -26,16 +27,21 @@ class ManagerSpec extends ObjectBehavior
     /** @var UserFactory */
     protected $userFactory;
 
+    /** @var EventsDispatcher */
+    protected $eventsDispatcher;
+
     public function let(
         Config $config,
         Jwt $jwt,
         QueueClient $queue,
-        UserFactory $userFactory
+        UserFactory $userFactory,
+        EventsDispatcher $eventsDispatcher
     ) {
         $this->config = $config;
         $this->jwt = $jwt;
         $this->queue = $queue;
         $this->userFactory = $userFactory;
+        $this->eventsDispatcher = $eventsDispatcher;
 
         $this->config->get('email_confirmation')
             ->willReturn([
@@ -43,7 +49,7 @@ class ManagerSpec extends ObjectBehavior
                 'signing_key' => '~key~'
             ]);
 
-        $this->beConstructedWith($config, $jwt, $queue, $userFactory);
+        $this->beConstructedWith($config, $jwt, $queue, $userFactory, $eventsDispatcher);
     }
 
     public function it_is_initializable()
@@ -85,11 +91,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
-        $this->queue->setQueue('ConfirmationEmail')
-            ->shouldBeCalled()
-            ->willReturn($this->queue);
-
-        $this->queue->send([
+        $this->eventsDispatcher->trigger('confirmation_email', 'all', [
             'user_guid' => '1000'
         ])
             ->shouldBeCalled()
