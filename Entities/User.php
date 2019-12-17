@@ -915,6 +915,10 @@ class User extends \ElggUser
             $export['deleted'] = $this->getDeleted();
         }
 
+        $export['email_confirmed'] =
+            (!$this->getEmailConfirmationToken() && !$this->getEmailConfirmedAt()) || // Old users poly-fill
+            $this->isEmailConfirmed();
+
         $export['eth_wallet'] = $this->getEthWallet() ?: '';
         $export['rating'] = $this->getRating();
 
