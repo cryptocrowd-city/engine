@@ -134,7 +134,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($user);
 
-        $user->setEmailConfirmedAt(null)
+        $user->setEmailConfirmedAt(0)
             ->shouldBeCalled()
             ->willReturn($user);
 
