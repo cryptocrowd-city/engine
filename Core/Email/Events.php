@@ -60,7 +60,7 @@ class Events
 
     private function sendCampaign(SenderInterface $sender, $params)
     {
-        $user = new User($params['user_guid']);
+        $user = new User($params['user_guid'], $params['cache'] ?? true);
         $sender->send($user);
     }
 }

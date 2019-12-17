@@ -101,6 +101,7 @@ class Manager
 
         $this->eventsDispatcher->trigger('confirmation_email', 'all', [
             'user_guid' => (string) $this->user->guid,
+            'cache' => false,
         ]);
     }
 

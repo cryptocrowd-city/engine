@@ -92,7 +92,8 @@ class ManagerSpec extends ObjectBehavior
             ->willReturn(true);
 
         $this->eventsDispatcher->trigger('confirmation_email', 'all', [
-            'user_guid' => '1000'
+            'user_guid' => '1000',
+            'cache' => false
         ])
             ->shouldBeCalled()
             ->willReturn(true);
