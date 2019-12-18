@@ -8,6 +8,7 @@ namespace Minds\Core\Front;
 
 use Minds\Core\Config\Exported;
 use Minds\Core\Di\Di;
+use Minds\Core\Log;
 use Minds\Core\Pro\Domain as ProDomain;
 use Minds\Core\Pro\Settings;
 use Minds\Core\SEO\Manager;
