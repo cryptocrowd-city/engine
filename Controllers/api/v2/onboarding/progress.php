@@ -23,15 +23,19 @@ class progress implements Interfaces\Api
         $manager = new Manager();
         $manager->setUser(Session::getLoggedInUser());
 
-        $allItems = $manager->getAllItems();
-        $completedItems = $manager->getCompletedItems();
+//        $allItems = $manager->getAllItems();
+//        $completedItems = $manager->getCompletedItems();
 
         return Factory::response([
-            'show_onboarding' => !$manager->wasOnboardingShown() && count($allItems) > count($completedItems) ,
-            'all_items' => $allItems,
-            'completed_items' => $completedItems,
-            'creator_frequency' => $manager->getCreatorFrequency(),
+            'show_onboarding' => $manager->wasOnboardingShown()
         ]);
+
+//        return Factory::response([
+//            'show_onboarding' => !$manager->wasOnboardingShown() && count($allItems) > count($completedItems) ,
+//            'all_items' => $allItems,
+//            'completed_items' => $completedItems,
+//            'creator_frequency' => $manager->getCreatorFrequency(),
+//        ]);
     }
 
     /**
