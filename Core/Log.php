@@ -20,7 +20,8 @@ class Log
      *
      * @return void
      */
-    public static function emergency($message, array $context = []) {
+    public static function emergency($message, array $context = [])
+    {
         Di::_()->get('Logger')->emergency($message, $context);
     }
 
@@ -35,7 +36,8 @@ class Log
      *
      * @return void
      */
-    public static function alert($message, array $context = []) {
+    public static function alert($message, array $context = [])
+    {
         Di::_()->get('Logger')->alert($message, $context);
     }
 
@@ -49,7 +51,8 @@ class Log
      *
      * @return void
      */
-    public static function critical($message, array $context = []) {
+    public static function critical($message, array $context = [])
+    {
         Di::_()->get('Logger')->critical($message, $context);
     }
 
@@ -62,7 +65,8 @@ class Log
      *
      * @return void
      */
-    public static function error($message, array $context = []) {
+    public static function error($message, array $context = [])
+    {
         Di::_()->get('Logger')->error($message, $context);
     }
 
@@ -77,7 +81,8 @@ class Log
      *
      * @return void
      */
-    public static function warning($message, array $context = []) {
+    public static function warning($message, array $context = [])
+    {
         Di::_()->get('Logger')->warning($message, $context);
     }
 
@@ -89,7 +94,8 @@ class Log
      *
      * @return void
      */
-    public static function notice($message, array $context = []) {
+    public static function notice($message, array $context = [])
+    {
         Di::_()->get('Logger')->notice($message, $context);
     }
 
@@ -103,7 +109,8 @@ class Log
      *
      * @return void
      */
-    public static function info($message, array $context = []) {
+    public static function info($message, array $context = [])
+    {
         Di::_()->get('Logger')->info($message, $context);
     }
 
@@ -115,7 +122,8 @@ class Log
      *
      * @return void
      */
-    public static function debug($message, array $context = []) {
+    public static function debug($message, array $context = [])
+    {
         Di::_()->get('Logger')->debug($message, $context);
     }
 
@@ -130,7 +138,8 @@ class Log
      *
      * @throws InvalidArgumentException
      */
-    public static function log($level, $message, array $context = []) {
+    public static function log($level, $message, array $context = [])
+    {
         Di::_()->get('Logger')->log($level, $message, $context);
     }
 }

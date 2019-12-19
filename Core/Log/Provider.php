@@ -15,7 +15,7 @@ class Provider extends DiProvider
 {
     public function register()
     {
-        $this->di->bind('Logger', function($di) {
+        $this->di->bind('Logger', function ($di) {
             /** @var Di $di */
 
             /** @var Config|false $config */
