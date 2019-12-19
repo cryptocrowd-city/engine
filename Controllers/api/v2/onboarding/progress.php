@@ -27,7 +27,7 @@ class progress implements Interfaces\Api
 //        $completedItems = $manager->getCompletedItems();
 
         return Factory::response([
-            'show_onboarding' => $manager->wasOnboardingShown()
+            'show_onboarding' => !$manager->wasOnboardingShown()
         ]);
 
 //        return Factory::response([
