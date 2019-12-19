@@ -31,30 +31,23 @@ class Logger extends MonologLogger
 
         $handlers = [];
 
-        if ($options['isProduction']) {
-            $errorLogHandler = new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, MonologLogger::INFO);
-            $errorLogHandler->setFormatter(
-                new LineFormatter(
-                    "%channel%.%level_name%: %message% %context% %extra%\n",
-                    'c',
-                    false,
-                    true
-                )
-            );
+        $errorLogHandler = new ErrorLogHandler(
+            ErrorLogHandler::OPERATING_SYSTEM,
+            $options['isProduction'] ? MonologLogger::INFO : MonologLogger::DEBUG
+        );
 
-            $handlers[] = $errorLogHandler;
-        } else {
-            $errorLogHandler = new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, MonologLogger::DEBUG);
-            $errorLogHandler->setFormatter(
-                new LineFormatter(
-                    "%channel%.%level_name%: %message% %context% %extra%\n",
-                    'c',
-                    false,
-                    true
-                )
-            );
+        $errorLogHandler
+            ->setFormatter(new LineFormatter(
+                "%channel%.%level_name%: %message% %context% %extra%\n",
+                'c',
+                false,
+                true
+            ));
 
-            $handlers[] = $errorLogHandler;
+        $handlers[] = $errorLogHandler;
+
+        if (!$options['isProduction']) {
+            // Extra handlers for Development Mode
 
             switch ($options['devToolsLogger']) {
                 case 'firephp':
@@ -71,8 +64,11 @@ class Logger extends MonologLogger
                     } catch (Exception $exception) {
                         // If the server-side vendor package is not installed, ignore any warnings.
                     }
+                    break;
             }
         }
+
+        // Create Monolog instance
 
         parent::__construct($channel, $handlers);
     }
