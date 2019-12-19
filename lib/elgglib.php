@@ -840,10 +840,12 @@ function elgg_trigger_plugin_hook($hook, $type, $params = null, $returnvalue = n
  */
 function _elgg_php_exception_handler($exception) {
 	try {
-		\Minds\Core\Log::error((string) $exception->getMessage());
+		\Minds\Core\Log::critical($exception, [ 'exception' => $exception ]);
 	} catch (Exception $loggerException) {
 		$timestamp = time();
 		error_log("Exception #$timestamp: $exception");
+
+		Sentry\captureException($exception);
 	}
 
 	// Wipe any existing output buffer
@@ -854,8 +856,6 @@ function _elgg_php_exception_handler($exception) {
 	header("Cache-Control: no-cache, must-revalidate", true);
 	header('Expires: Fri, 05 Feb 1982 00:00:00 -0500', true);
     // @note Do not send a 500 header because it is not a server error
-
-    Sentry\captureException($exception);
 }
 
 /**

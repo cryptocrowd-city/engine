@@ -22,8 +22,8 @@ class Provider extends DiProvider
             $config = $di->get('Config');
 
             $options = [
-                'isProduction' => $config ? $config->get('development_mode') : true,
-                'devToolsLogger' => $config ? $config->get('dev_tools_logger') : '',
+                'isProduction' => $config ? !$config->get('development_mode') : true,
+                'devToolsLogger' => $config ? $config->get('devtools_logger') : '',
             ];
 
             return new Logger('Minds', $options);

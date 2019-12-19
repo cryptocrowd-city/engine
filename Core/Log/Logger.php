@@ -14,6 +14,8 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\FirePHPHandler;
 use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Logger as MonologLogger;
+use Sentry\Monolog\Handler as SentryHandler;
+use Sentry\SentrySdk;
 
 class Logger extends MonologLogger
 {
@@ -33,20 +35,24 @@ class Logger extends MonologLogger
 
         $errorLogHandler = new ErrorLogHandler(
             ErrorLogHandler::OPERATING_SYSTEM,
-            $options['isProduction'] ? MonologLogger::INFO : MonologLogger::DEBUG
+            $options['isProduction'] ? MonologLogger::INFO : MonologLogger::DEBUG,
+            true,
+            true
         );
 
         $errorLogHandler
             ->setFormatter(new LineFormatter(
                 "%channel%.%level_name%: %message% %context% %extra%\n",
                 'c',
-                false,
+                !$options['isProduction'], // Allow newlines on dev mode
                 true
             ));
 
         $handlers[] = $errorLogHandler;
 
-        if (!$options['isProduction']) {
+        if ($options['isProduction']) {
+            $handlers[] = new SentryHandler(SentrySdk::getCurrentHub());
+        } else {
             // Extra handlers for Development Mode
 
             switch ($options['devToolsLogger']) {
