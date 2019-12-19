@@ -3,6 +3,7 @@
 namespace Minds\Controllers\api\v2\onboarding;
 
 use Minds\Api\Factory;
+use Minds\Core\Di\Di;
 use Minds\Core\Onboarding\Manager;
 use Minds\Core\Session;
 use Minds\Interfaces;
@@ -11,7 +12,7 @@ class progress implements Interfaces\Api
 {
     /**
      * Equivalent to HTTP GET method
-     * @param  array $pages
+     * @param array $pages
      * @return mixed|null
      * @throws \Exception
      */
@@ -23,24 +24,29 @@ class progress implements Interfaces\Api
         $manager = new Manager();
         $manager->setUser(Session::getLoggedInUser());
 
-//        $allItems = $manager->getAllItems();
-//        $completedItems = $manager->getCompletedItems();
+        /** @var \Minds\Core\Features\Manager $manager */
+        $manager = Di::_()->get('Features\Manager');
+
+        if ($manager->has('onboarding-december-2019')) {
+            return Factory::response([
+                'show_onboarding' => !$manager->wasOnboardingShown(),
+            ]);
+        }
+
+        $allItems = $manager->getAllItems();
+        $completedItems = $manager->getCompletedItems();
 
         return Factory::response([
-            'show_onboarding' => !$manager->wasOnboardingShown()
+            'show_onboarding' => !$manager->wasOnboardingShown() && count($allItems) > count($completedItems),
+            'all_items' => $allItems,
+            'completed_items' => $completedItems,
+            'creator_frequency' => $manager->getCreatorFrequency(),
         ]);
-
-//        return Factory::response([
-//            'show_onboarding' => !$manager->wasOnboardingShown() && count($allItems) > count($completedItems) ,
-//            'all_items' => $allItems,
-//            'completed_items' => $completedItems,
-//            'creator_frequency' => $manager->getCreatorFrequency(),
-//        ]);
     }
 
     /**
      * Equivalent to HTTP POST method
-     * @param  array $pages
+     * @param array $pages
      * @return mixed|null
      * @throws \Exception
      */
@@ -51,7 +57,7 @@ class progress implements Interfaces\Api
 
     /**
      * Equivalent to HTTP PUT method
-     * @param  array $pages
+     * @param array $pages
      * @return mixed|null
      */
     public function put($pages)
@@ -61,7 +67,7 @@ class progress implements Interfaces\Api
 
     /**
      * Equivalent to HTTP DELETE method
-     * @param  array $pages
+     * @param array $pages
      * @return mixed|null
      */
     public function delete($pages)
