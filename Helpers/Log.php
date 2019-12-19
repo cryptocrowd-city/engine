@@ -5,7 +5,7 @@
  * @author edgebal
  */
 
-namespace Minds\Core;
+namespace Minds\Helpers;
 
 use Minds\Core\Di\Di;
 use Psr\Log\InvalidArgumentException;
@@ -22,7 +22,7 @@ class Log
      */
     public static function emergency($message, array $context = [])
     {
-        Di::_()->get('Logger')->emergency($message, $context);
+        Di::_()->get('Logger\Singleton')->emergency($message, $context);
     }
 
     /**
@@ -38,7 +38,7 @@ class Log
      */
     public static function alert($message, array $context = [])
     {
-        Di::_()->get('Logger')->alert($message, $context);
+        Di::_()->get('Logger\Singleton')->alert($message, $context);
     }
 
     /**
@@ -53,7 +53,7 @@ class Log
      */
     public static function critical($message, array $context = [])
     {
-        Di::_()->get('Logger')->critical($message, $context);
+        Di::_()->get('Logger\Singleton')->critical($message, $context);
     }
 
     /**
@@ -67,7 +67,7 @@ class Log
      */
     public static function error($message, array $context = [])
     {
-        Di::_()->get('Logger')->error($message, $context);
+        Di::_()->get('Logger\Singleton')->error($message, $context);
     }
 
     /**
@@ -83,7 +83,7 @@ class Log
      */
     public static function warning($message, array $context = [])
     {
-        Di::_()->get('Logger')->warning($message, $context);
+        Di::_()->get('Logger\Singleton')->warning($message, $context);
     }
 
     /**
@@ -96,7 +96,7 @@ class Log
      */
     public static function notice($message, array $context = [])
     {
-        Di::_()->get('Logger')->notice($message, $context);
+        Di::_()->get('Logger\Singleton')->notice($message, $context);
     }
 
     /**
@@ -111,7 +111,7 @@ class Log
      */
     public static function info($message, array $context = [])
     {
-        Di::_()->get('Logger')->info($message, $context);
+        Di::_()->get('Logger\Singleton')->info($message, $context);
     }
 
     /**
@@ -124,7 +124,7 @@ class Log
      */
     public static function debug($message, array $context = [])
     {
-        Di::_()->get('Logger')->debug($message, $context);
+        Di::_()->get('Logger\Singleton')->debug($message, $context);
     }
 
     /**
@@ -140,6 +140,6 @@ class Log
      */
     public static function log($level, $message, array $context = [])
     {
-        Di::_()->get('Logger')->log($level, $message, $context);
+        Di::_()->get('Logger\Singleton')->log($level, $message, $context);
     }
 }

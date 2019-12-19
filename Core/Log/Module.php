@@ -14,7 +14,7 @@ class Module implements ModuleInterface
     /**
      * @inheritDoc
      */
-    public function onInit()
+    public function onInit(): void
     {
         (new Provider())->register();
     }

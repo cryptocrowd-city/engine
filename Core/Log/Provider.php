@@ -28,5 +28,10 @@ class Provider extends DiProvider
 
             return new Logger('Minds', $options);
         }, [ 'useFactory' => false ]);
+
+        $this->di->bind('Logger\Singleton', function ($di) {
+            /** @var Di $di */
+            return $di->get('Logger');
+        }, [ 'useFactory' => true ]);
     }
 }
