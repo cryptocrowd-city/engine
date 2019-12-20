@@ -17,6 +17,13 @@ use Monolog\Logger as MonologLogger;
 use Sentry\Monolog\Handler as SentryHandler;
 use Sentry\SentrySdk;
 
+/**
+ * A PSR-3 logger tailored for Minds. Based off Monolog.
+ *
+ * @package Minds\Core\Log
+ * @see \Monolog\Logger
+ * @see \Psr\Log\LoggerInterface
+ */
 class Logger extends MonologLogger
 {
     /**

@@ -10,6 +10,13 @@ namespace Minds\Helpers;
 use Minds\Core\Di\Di;
 use Psr\Log\InvalidArgumentException;
 
+/**
+ * Static helper class for easy access to Logger singleton
+ * logging methods.
+ *
+ * @package Minds\Helpers
+ * @see \Minds\Core\Log\Logger
+ */
 class Log
 {
     /**
