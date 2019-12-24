@@ -40,6 +40,6 @@ class UrlSpec extends ObjectBehavior
         $this
             ->setUser($user)
             ->generate(['test' => 1, 'phpspec' => 'yes'])
-            ->shouldReturn('https://phpspec.minds.test/?test=1&phpspec=yes&__e_cnf_token=%7Etoken%7E');
+            ->shouldReturn('https://phpspec.minds.test/email-confirmation?test=1&phpspec=yes&__e_cnf_token=%7Etoken%7E');
     }
 }

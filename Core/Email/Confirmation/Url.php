@@ -13,6 +13,9 @@ use Minds\Entities\User;
 
 class Url
 {
+    /** @var string */
+    const EMAIL_CONFIRMATION_PATH = '/email-confirmation';
+
     /** @var Config */
     protected $config;
 
@@ -46,8 +49,9 @@ class Url
     public function generate(array $params = []): string
     {
         return sprintf(
-            '%s?%s',
-            $this->config->get('site_url'),
+            '%s%s?%s',
+            rtrim($this->config->get('site_url'), '/'),
+            static::EMAIL_CONFIRMATION_PATH,
             http_build_query(array_merge($params, [
                 '__e_cnf_token' => $this->user->getEmailConfirmationToken(),
             ])),
