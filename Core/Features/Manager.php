@@ -8,34 +8,38 @@
 
 namespace Minds\Core\Features;
 
-use Minds\Core\Di\Di;
-use Minds\Common\Cookie;
-use Minds\Core\Session;
+use Minds\Entities\User;
 
 class Manager
 {
-    /** @var User $user */
-    private $user;
+    /** @var Repository */
+    protected $repository;
 
-    /** @var Config $config */
-    private $config;
+    /** @var Delegates\CanaryCookieDelegate */
+    protected $canaryCookie;
 
-    /** @var Cookie $cookie */
-    private $cookie;
-    
-    public function __construct($config = null, $cookie = null, $user = null)
-    {
-        $this->config = $config ?: Di::_()->get('Config');
-        $this->cookie = $cookie ?: new Cookie;
-        $this->user = $user ?? Session::getLoggedInUser();
+    /** @var User */
+    protected $user;
+
+    /**
+     * Manager constructor.
+     * @param Repository $repository
+     * @param Delegates\CanaryCookieDelegate $canaryCookie
+     */
+    public function __construct(
+        $repository = null,
+        $canaryCookie = null
+    ) {
+        $this->repository = $repository ?: new Repository();
+        $this->canaryCookie = $canaryCookie ?: new Delegates\CanaryCookieDelegate();
     }
 
     /**
-     * Set the user
+     * Sets the user
      * @param User $user
-     * @return $this
+     * @return Manager
      */
-    public function setUser($user)
+    public function setUser($user): Manager
     {
         $this->user = $user;
         return $this;
@@ -46,13 +50,12 @@ class Manager
      * @param $feature
      * @return bool
      */
-    public function has($feature)
+    public function has($feature): bool
     {
-        $features = $this->config->get('features') ?: [];
+        $features = $this->repository
+            ->fetch();
 
         if (!isset($features[$feature])) {
-            // error_log("[Features\Manager] Feature '{$feature}' is not declared. Assuming false.");
-
             return false;
         }
 
@@ -68,28 +71,22 @@ class Manager
     }
 
     /**
-     * Exports the features array
+     * Exports the whole features array
      * @return array
      */
-    public function export()
+    public function export(): array
     {
-        return $this->config->get('features') ?: [];
+        return $this->repository->fetch();
     }
 
     /**
-     * Set the canary cookie
+     * Sets the canary cookie
      * @param bool $enabled
      * @return void
      */
-    public function setCanaryCookie(bool $enabled = true) : void
+    public function setCanaryCookie(bool $enabled = true): void
     {
-        $this->cookie
-            ->setName('canary')
-            ->setValue((int) $enabled)
-            ->setExpire(0)
-            ->setSecure(true) //only via ssl
-            ->setHttpOnly(true) //never by browser
-            ->setPath('/')
-            ->create();
+        $this->canaryCookie
+            ->onCanaryCookie($enabled);
     }
 }

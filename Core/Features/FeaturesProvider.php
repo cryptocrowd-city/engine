@@ -17,8 +17,9 @@ class FeaturesProvider extends Provider
         $this->di->bind('Features', function ($di) {
             return new Manager();
         }, [ 'useFactory'=> true ]);
+
         $this->di->bind('Features\Manager', function ($di) {
-            return new Manager();
+            return $di->get('Features');
         }, [ 'useFactory'=> true ]);
     }
 }
