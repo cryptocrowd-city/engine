@@ -483,6 +483,7 @@ $CONFIG->set('features', [
     'pro' => false,
     'webtorrent' => false,
     'top-feeds-by-age' => true,
+    'modal-pager' => true,
 ]);
 
 $CONFIG->set('email', [
