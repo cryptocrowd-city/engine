@@ -8,7 +8,8 @@
 
 namespace Minds\Core\Features;
 
-use Minds\Entities\User;
+use Minds\Core\Di\Di;
+use Minds\Core\Sessions\ActiveSession;
 
 /**
  * Features Manager
@@ -19,32 +20,25 @@ class Manager
     /** @var Services\ServiceInterface[] */
     protected $services;
 
-    /** @var User */
-    protected $user;
+    /** @var ActiveSession */
+    protected $activeSession;
 
     /**
      * Manager constructor.
      * @param Services\ServiceInterface[] $services
+     * @param ActiveSession $activeSession
      */
     public function __construct(
-        $services = null
+        $services = null,
+        $activeSession = null
     ) {
         $this->services = $services ?: [
             new Services\Config(),
             new Services\Unleash(),
             new Services\Environment(),
         ];
-    }
 
-    /**
-     * Sets the current user for context
-     * @param User|null $user
-     * @return Manager
-     */
-    public function setUser(?User $user): Manager
-    {
-        $this->user = $user;
-        return $this;
+        $this->activeSession = $activeSession ?: Di::_()->get('Sessions\ActiveSession');
     }
 
     /**
@@ -53,7 +47,7 @@ class Manager
      * @param bool $default
      * @return bool
      */
-    public function has(string $feature, bool $default = false): bool
+    public function has(string $feature, ?bool $default = false): ?bool
     {
         $features = [];
 
@@ -61,7 +55,7 @@ class Manager
             $features = array_merge(
                 $features,
                 $service
-                    ->setUser($this->user)
+                    ->setUser($this->activeSession->getUser())
                     ->fetch()
             );
         }
@@ -85,7 +79,7 @@ class Manager
             $features = array_merge(
                 $features,
                 $service
-                    ->setUser($this->user)
+                    ->setUser($this->activeSession->getUser())
                     ->fetch()
             );
         }
