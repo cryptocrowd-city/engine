@@ -1,31 +1,30 @@
 <?php
 /**
- * Repository
+ * Unleash
  *
  * @author edgebal
  */
 
-namespace Minds\Core\Features;
+namespace Minds\Core\Features\Services;
 
 use Minds\Core\Config;
 use Minds\Core\Di\Di;
-use Minds\Core\Session;
 use Minds\UnleashClient\Config as UnleashConfig;
 use Minds\UnleashClient\Entities\Context;
-use Minds\UnleashClient\Unleash;
+use Minds\UnleashClient\Unleash as UnleashClient;
 
-class Repository
+class Unleash extends BaseService
 {
     /** @var Config */
     protected $config;
 
-    /** @var Unleash */
+    /** @var UnleashClient */
     protected $unleash;
 
     /**
-     * Repository constructor.
+     * Unleash constructor.
      * @param Config $config
-     * @param Unleash $unleash
+     * @param UnleashClient $unleash
      */
     public function __construct(
         $config = null,
@@ -35,7 +34,7 @@ class Repository
         $this->unleash = $unleash ?: $this->initUnleashClient();
     }
 
-    public function initUnleashClient(): Unleash
+    public function initUnleashClient(): UnleashClient
     {
         $configValues = $this->config->get('unleash');
 
@@ -47,30 +46,31 @@ class Repository
             $configValues['metricsIntervalSeconds'] ?? null
         );
 
+        $logger = Di::_()->get('Logger\Singleton');
         $cache = Di::_()->get('Cache\PsrWrapper');
 
-        return new Unleash($config, null, null, $cache);
+        return new UnleashClient($config, $logger, null, $cache);
     }
 
+    /**
+     * @inheritDoc
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
     public function fetch(): array
     {
-        $currentUserGuid = (string) Session::getLoggedInUserGuid();
-
         $context = new Context();
         $context
+            ->setUserGroups($this->getUserGroups())
             ->setRemoteAddress($_SERVER['REMOTE_ADDR'])
             ->setHostName($_SERVER['HTTP_HOST']);
 
-        if ($currentUserGuid) {
+        if ($this->user) {
             $context
-                ->setUserId($currentUserGuid);
+                ->setUserId((string) $this->user->guid);
         }
 
-        $mindsValues = $this->config->get('features') ?: [];
-        $unleashValues = $this->unleash
+        return $this->unleash
             ->setContext($context)
             ->export();
-
-        return array_merge($unleashValues, $mindsValues);
     }
 }

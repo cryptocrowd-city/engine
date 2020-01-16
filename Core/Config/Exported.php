@@ -50,7 +50,7 @@ class Exported
         $this->thirdPartyNetworks = $thirdPartyNetworks ?: Di::_()->get('ThirdPartyNetworks\Manager');
         $this->i18n = $i18n ?: Di::_()->get('I18n');
         $this->blockchain = $blockchain ?: Di::_()->get('Blockchain\Manager');
-        $this->features = $features ?: Di::_()->get('Features');
+        $this->features = $features ?: Di::_()->get('Features\Manager');
     }
 
     /**

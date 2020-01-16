@@ -1,23 +1,27 @@
 <?php
 /**
- * CanaryCookieDelegate
+ * Canary
  *
  * @author edgebal
  */
 
-namespace Minds\Core\Features\Delegates;
+namespace Minds\Core\Features;
 
 use Minds\Common\Cookie;
 
 /**
- * Delegate that controls canary cookie setting
- * @package Minds\Core\Features\Delegates
+ * Controls Canary cookie setting
+ * @package Minds\Core\Features
  */
-class CanaryCookieDelegate
+class Canary
 {
     /** @var Cookie $cookie */
     protected $cookie;
 
+    /**
+     * Canary constructor.
+     * @param Cookie $cookie
+     */
     public function __construct(
         $cookie = null
     ) {
@@ -28,7 +32,7 @@ class CanaryCookieDelegate
      * Sets canary cookie value
      * @param bool $enabled
      */
-    public function onCanaryCookie(bool $enabled): void
+    public function setCookie(bool $enabled): void
     {
         $this->cookie
             ->setName('canary')

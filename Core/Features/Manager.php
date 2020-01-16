@@ -10,64 +10,67 @@ namespace Minds\Core\Features;
 
 use Minds\Entities\User;
 
+/**
+ * Features Manager
+ * @package Minds\Core\Features
+ */
 class Manager
 {
-    /** @var Repository */
-    protected $repository;
-
-    /** @var Delegates\CanaryCookieDelegate */
-    protected $canaryCookie;
+    /** @var Services\ServiceInterface[] */
+    protected $services;
 
     /** @var User */
     protected $user;
 
     /**
      * Manager constructor.
-     * @param Repository $repository
-     * @param Delegates\CanaryCookieDelegate $canaryCookie
+     * @param Services\ServiceInterface[] $services
      */
     public function __construct(
-        $repository = null,
-        $canaryCookie = null
+        $services = null
     ) {
-        $this->repository = $repository ?: new Repository();
-        $this->canaryCookie = $canaryCookie ?: new Delegates\CanaryCookieDelegate();
+        $this->services = $services ?: [
+            new Services\Config(),
+            new Services\Unleash(),
+            new Services\Environment(),
+        ];
     }
 
     /**
-     * Sets the user
-     * @param User $user
+     * Sets the current user for context
+     * @param User|null $user
      * @return Manager
      */
-    public function setUser($user): Manager
+    public function setUser(?User $user): Manager
     {
         $this->user = $user;
         return $this;
     }
 
     /**
-     * Checks if a featured is enabled
-     * @param $feature
+     * Checks if a feature is enabled
+     * @param string $feature
+     * @param bool $default
      * @return bool
      */
-    public function has($feature): bool
+    public function has(string $feature, bool $default = false): bool
     {
-        $features = $this->repository
-            ->fetch();
+        $features = [];
+
+        foreach ($this->services as $service) {
+            $features = array_merge(
+                $features,
+                $service
+                    ->setUser($this->user)
+                    ->fetch()
+            );
+        }
 
         if (!isset($features[$feature])) {
-            return false;
+            return $default;
         }
 
-        if ($features[$feature] === 'admin' && $this->user->isAdmin()) {
-            return true;
-        }
-
-        if ($features[$feature] === 'canary' && $this->user && $this->user->get('canary')) {
-            return true;
-        }
-
-        return $features[$feature] === true;
+        return (bool) $features[$feature];
     }
 
     /**
@@ -76,17 +79,17 @@ class Manager
      */
     public function export(): array
     {
-        return $this->repository->fetch();
-    }
+        $features = [];
 
-    /**
-     * Sets the canary cookie
-     * @param bool $enabled
-     * @return void
-     */
-    public function setCanaryCookie(bool $enabled = true): void
-    {
-        $this->canaryCookie
-            ->onCanaryCookie($enabled);
+        foreach ($this->services as $service) {
+            $features = array_merge(
+                $features,
+                $service
+                    ->setUser($this->user)
+                    ->fetch()
+            );
+        }
+
+        return $features;
     }
 }
