@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "718cc7b76b351fd8b9e412859c261966",
+    "content-hash": "035cc510c8755fece9c1964fc0c4192e",
     "packages": [
         {
             "name": "Minds/Surge",
@@ -1915,15 +1915,21 @@
         {
             "name": "minds/unleash-client-php",
             "version": "dev-epic/unleash-client",
-            "dist": {
-                "type": "path",
-                "url": "../../unleash-client-php",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/minds/unleash-client-php.git",
                 "reference": "49913d5578e2a12a5294a8108f5cde5ed0105068"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/minds%2Funleash-client-php/repository/archive.zip?sha=49913d5578e2a12a5294a8108f5cde5ed0105068",
+                "reference": "49913d5578e2a12a5294a8108f5cde5ed0105068",
+                "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3@dev",
                 "lastguest/murmurhash": "dev-master",
-                "monolog/monolog": "^1.25.1",
+                "monolog/monolog": "1.25.1",
                 "php": ">=7.3",
                 "psr/simple-cache": "^1.0@dev",
                 "zendframework/zend-cache": "^2.9@dev",

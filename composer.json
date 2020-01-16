@@ -59,8 +59,8 @@
             "url": "https://github.com/davegardnerisme/cruftflake.git"
         },
         {
-            "type": "path",
-            "url": "../../unleash-client-php"
+            "type": "vcs",
+            "url": "https://gitlab.com/minds/unleash-client-php.git"
         }
     ],
     "autoload": {
