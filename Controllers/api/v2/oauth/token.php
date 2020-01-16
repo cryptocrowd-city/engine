@@ -70,8 +70,6 @@ class token implements Interfaces\Api, Interfaces\ApiIgnorePam
             $tokenId = $request->getAttribute('oauth_access_token_id');
             $accessTokenRepository->revokeAccessToken($tokenId);
             $refreshTokenRepository->revokeRefreshToken($tokenId);
-            
-
 
             // remove surge token for push notifications.
             $user = Session::getLoggedinUser();
