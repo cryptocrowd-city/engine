@@ -43,9 +43,7 @@ class Manager
             new Services\Unleash(),
             new Services\Environment(),
         ];
-
         $this->activeSession = $activeSession ?: Di::_()->get('Sessions\ActiveSession');
-
         $this->features = ($features ?? Di::_()->get('Features\Keys')) ?: [];
     }
 

@@ -7,6 +7,7 @@
 
 namespace Minds\Core\Features\Services;
 
+use InvalidArgumentException;
 use Minds\Core\Config as MindsConfig;
 use Minds\Core\Di\Di;
 
@@ -30,8 +31,22 @@ class Config extends BaseService
      */
     public function fetch(): array
     {
-        // TODO: Use User context to calculate final values
+        return array_map([$this, '_resolveValue'], $this->config->get('features') ?: []);
+    }
 
-        return $this->config->get('features') ?: [];
+    /**
+     * @param mixed $value
+     * @return bool
+     * @throws InvalidArgumentException
+     */
+    protected function _resolveValue($value): bool
+    {
+        if (is_string($value)) {
+            return in_array(strtolower($value), $this->getUserGroups(), true);
+        } elseif (is_bool($value)) {
+            return $value;
+        }
+
+        throw new InvalidArgumentException();
     }
 }
