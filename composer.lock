@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "035cc510c8755fece9c1964fc0c4192e",
+    "content-hash": "b36af2af0cdb3fed20d5f6d62fed9abd",
     "packages": [
         {
             "name": "Minds/Surge",
@@ -1666,7 +1666,7 @@
         },
         {
             "name": "lastguest/murmurhash",
-            "version": "dev-master",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lastguest/murmurhash-php.git",
@@ -1914,22 +1914,22 @@
         },
         {
             "name": "minds/unleash-client-php",
-            "version": "dev-epic/unleash-client",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/minds/unleash-client-php.git",
-                "reference": "49913d5578e2a12a5294a8108f5cde5ed0105068"
+                "reference": "a9a083f74300391ca17076ed4e89fd15b485fd99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/minds%2Funleash-client-php/repository/archive.zip?sha=49913d5578e2a12a5294a8108f5cde5ed0105068",
-                "reference": "49913d5578e2a12a5294a8108f5cde5ed0105068",
+                "url": "https://gitlab.com/api/v4/projects/minds%2Funleash-client-php/repository/archive.zip?sha=a9a083f74300391ca17076ed4e89fd15b485fd99",
+                "reference": "a9a083f74300391ca17076ed4e89fd15b485fd99",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3@dev",
-                "lastguest/murmurhash": "dev-master",
-                "monolog/monolog": "1.25.1",
+                "lastguest/murmurhash": "^2.0.0",
+                "monolog/monolog": "^1.25.2",
                 "php": ">=7.3",
                 "psr/simple-cache": "^1.0@dev",
                 "zendframework/zend-cache": "^2.9@dev",
@@ -1981,7 +1981,8 @@
                 "client",
                 "minds",
                 "unleash"
-            ]
+            ],
+            "time": "2020-01-21T17:02:31-03:00"
         },
         {
             "name": "mongodb/mongodb",
@@ -4302,16 +4303,16 @@
         },
         {
             "name": "zendframework/zend-cache",
-            "version": "dev-develop",
+            "version": "2.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-cache.git",
-                "reference": "41310c508fdb9aff9eb3b7bc14cb65d464e07ca6"
+                "reference": "cffd54a2dc4db094976d3b3f05e418a047cc9110"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-cache/zipball/41310c508fdb9aff9eb3b7bc14cb65d464e07ca6",
-                "reference": "41310c508fdb9aff9eb3b7bc14cb65d464e07ca6",
+                "url": "https://api.github.com/repos/zendframework/zend-cache/zipball/cffd54a2dc4db094976d3b3f05e418a047cc9110",
+                "reference": "cffd54a2dc4db094976d3b3f05e418a047cc9110",
                 "shasum": ""
             },
             "require": {
@@ -4382,7 +4383,7 @@
                 "zf"
             ],
             "abandoned": "laminas/laminas-cache",
-            "time": "2019-12-31T06:57:57+00:00"
+            "time": "2019-08-29T18:30:41+00:00"
         },
         {
             "name": "zendframework/zend-diactoros",
@@ -4449,24 +4450,24 @@
         },
         {
             "name": "zendframework/zend-eventmanager",
-            "version": "dev-develop",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-eventmanager.git",
-                "reference": "3ad808d60d0df54e16440a71fb9c8a33988e4d78"
+                "reference": "a5e2583a211f73604691586b8406ff7296a946dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-eventmanager/zipball/3ad808d60d0df54e16440a71fb9c8a33988e4d78",
-                "reference": "3ad808d60d0df54e16440a71fb9c8a33988e4d78",
+                "url": "https://api.github.com/repos/zendframework/zend-eventmanager/zipball/a5e2583a211f73604691586b8406ff7296a946dd",
+                "reference": "a5e2583a211f73604691586b8406ff7296a946dd",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.6 || ^7.0"
             },
             "require-dev": {
+                "athletic/athletic": "^0.1",
                 "container-interop/container-interop": "^1.1.0",
-                "phpbench/phpbench": "^0.13",
                 "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1.2",
                 "zendframework/zend-coding-standard": "~1.0.0",
                 "zendframework/zend-stdlib": "^2.7.3 || ^3.0"
@@ -4500,20 +4501,20 @@
                 "zf2"
             ],
             "abandoned": "laminas/laminas-eventmanager",
-            "time": "2019-10-18T07:10:41+00:00"
+            "time": "2018-04-25T15:33:34+00:00"
         },
         {
             "name": "zendframework/zend-json",
-            "version": "dev-develop",
+            "version": "3.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-json.git",
-                "reference": "b7b53ac36056cedfff020fe89139d264c20993b0"
+                "reference": "e9ddb1192d93fe7fff846ac895249c39db75132b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-json/zipball/b7b53ac36056cedfff020fe89139d264c20993b0",
-                "reference": "b7b53ac36056cedfff020fe89139d264c20993b0",
+                "url": "https://api.github.com/repos/zendframework/zend-json/zipball/e9ddb1192d93fe7fff846ac895249c39db75132b",
+                "reference": "e9ddb1192d93fe7fff846ac895249c39db75132b",
                 "shasum": ""
             },
             "require": {
@@ -4551,7 +4552,7 @@
                 "zf"
             ],
             "abandoned": "laminas/laminas-json",
-            "time": "2019-11-02T11:41:55+00:00"
+            "time": "2019-10-09T13:56:13+00:00"
         },
         {
             "name": "zendframework/zend-permissions-rbac",
@@ -4603,16 +4604,16 @@
         },
         {
             "name": "zendframework/zend-serializer",
-            "version": "dev-develop",
+            "version": "2.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-serializer.git",
-                "reference": "2ee41a1463ca5817775a8c89b246390b12ab0321"
+                "reference": "6fb7ae016cfdf0cfcdfa2b989e6a65f351170e21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-serializer/zipball/2ee41a1463ca5817775a8c89b246390b12ab0321",
-                "reference": "2ee41a1463ca5817775a8c89b246390b12ab0321",
+                "url": "https://api.github.com/repos/zendframework/zend-serializer/zipball/6fb7ae016cfdf0cfcdfa2b989e6a65f351170e21",
+                "reference": "6fb7ae016cfdf0cfcdfa2b989e6a65f351170e21",
                 "shasum": ""
             },
             "require": {
@@ -4657,7 +4658,7 @@
                 "zf"
             ],
             "abandoned": "laminas/laminas-serializer",
-            "time": "2019-10-19T08:08:58+00:00"
+            "time": "2019-10-19T08:06:30+00:00"
         },
         {
             "name": "zendframework/zend-servicemanager",
@@ -4730,16 +4731,16 @@
         },
         {
             "name": "zendframework/zend-stdlib",
-            "version": "dev-develop",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-stdlib.git",
-                "reference": "519a966dedc32af62765736eba9900c270e419d8"
+                "reference": "66536006722aff9e62d1b331025089b7ec71c065"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-stdlib/zipball/519a966dedc32af62765736eba9900c270e419d8",
-                "reference": "519a966dedc32af62765736eba9900c270e419d8",
+                "url": "https://api.github.com/repos/zendframework/zend-stdlib/zipball/66536006722aff9e62d1b331025089b7ec71c065",
+                "reference": "66536006722aff9e62d1b331025089b7ec71c065",
                 "shasum": ""
             },
             "require": {
@@ -4773,7 +4774,7 @@
                 "zf"
             ],
             "abandoned": "laminas/laminas-stdlib",
-            "time": "2019-02-07T05:36:36+00:00"
+            "time": "2018-08-28T21:34:05+00:00"
         },
         {
             "name": "zircote/swagger-php",
@@ -6881,7 +6882,7 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": {
         "kramnorth/cinemr-php-sdk": 20,
         "minds/surge": 20,
@@ -6889,8 +6890,7 @@
         "thobbs/phpcassa": 20,
         "tijsverkoyen/twitteroauth": 20,
         "vscn/cruftflake": 20,
-        "zircote/swagger-php": 20,
-        "minds/unleash-client-php": 20
+        "zircote/swagger-php": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
