@@ -9,6 +9,7 @@
 namespace Minds\Core\Features;
 
 use Minds\Core\Di\Di;
+use Minds\Core\Features\Exceptions\FeatureNotImplementedException;
 use Minds\Core\Sessions\ActiveSession;
 
 /**
@@ -23,14 +24,19 @@ class Manager
     /** @var ActiveSession */
     protected $activeSession;
 
+    /** @var string[] */
+    protected $features;
+
     /**
      * Manager constructor.
      * @param Services\ServiceInterface[] $services
      * @param ActiveSession $activeSession
+     * @param string[] $features
      */
     public function __construct(
         $services = null,
-        $activeSession = null
+        $activeSession = null,
+        array $features = null
     ) {
         $this->services = $services ?: [
             new Services\Config(),
@@ -39,41 +45,44 @@ class Manager
         ];
 
         $this->activeSession = $activeSession ?: Di::_()->get('Sessions\ActiveSession');
+
+        $this->features = ($features ?? Di::_()->get('Features\Keys')) ?: [];
     }
 
     /**
      * Checks if a feature is enabled
      * @param string $feature
-     * @param bool $default
      * @return bool
+     * @throws FeatureNotImplementedException
      */
-    public function has(string $feature, ?bool $default = false): ?bool
+    public function has(string $feature): ?bool
     {
-        $features = [];
-
-        foreach ($this->services as $service) {
-            $features = array_merge(
-                $features,
-                $service
-                    ->setUser($this->activeSession->getUser())
-                    ->fetch()
-            );
-        }
+        $features = $this->export();
 
         if (!isset($features[$feature])) {
-            return $default;
+            throw new FeatureNotImplementedException(
+                "${feature}: Not Implemented"
+            );
         }
 
         return (bool) $features[$feature];
     }
 
     /**
-     * Exports the whole features array
+     * Exports the whole features array based on Features DI
      * @return array
      */
     public function export(): array
     {
         $features = [];
+
+        // Initialize array with false values
+
+        foreach ($this->features as $feature) {
+            $features[$feature] = false;
+        }
+
+        // Fetch from every service
 
         foreach ($this->services as $service) {
             $features = array_merge(
@@ -84,6 +93,8 @@ class Manager
             );
         }
 
-        return $features;
+        // Return only whitelisted keys
+
+        return array_intersect_key($features, array_flip($this->features));
     }
 }

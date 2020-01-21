@@ -4,6 +4,7 @@ namespace Spec\Minds\Core\Features;
 
 use Minds\Core\Config;
 use Minds\Core\Di\Di;
+use Minds\Core\Features\Exceptions\FeatureNotImplementedException;
 use Minds\Core\Features\Manager;
 use Minds\Core\Features\Services\ServiceInterface;
 use Minds\Core\Sessions\ActiveSession;
@@ -32,7 +33,8 @@ class ManagerSpec extends ObjectBehavior
 
         $this->beConstructedWith(
             [ $service1, $service2 ],
-            $activeSession
+            $activeSession,
+            ['feature1', 'feature2', 'feature3']
         );
     }
 
@@ -41,7 +43,7 @@ class ManagerSpec extends ObjectBehavior
         $this->shouldHaveType(Manager::class);
     }
 
-    public function it_should_return_false_if_a_feature_does_not_exist(
+    public function it_should_throw_during_has_if_a_feature_does_not_exist(
         User $user
     ) {
         $this->activeSession->getUser()
@@ -67,12 +69,11 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn([
                 'feature2' => true,
-                'feature3' => false,
             ]);
 
         $this
-            ->has('feature99-non-existant')
-            ->shouldReturn(false);
+            ->shouldThrow(FeatureNotImplementedException::class)
+            ->duringHas('feature99-non-existant');
     }
 
     public function it_should_return_false_if_a_feature_exists_and_it_is_deactivated(
@@ -102,6 +103,7 @@ class ManagerSpec extends ObjectBehavior
             ->willReturn([
                 'feature2' => true,
                 'feature3' => false,
+                'unlisted-feature' => true,
             ]);
 
         $this
@@ -136,6 +138,7 @@ class ManagerSpec extends ObjectBehavior
             ->willReturn([
                 'feature2' => true,
                 'feature3' => false,
+                'unlisted-feature' => true,
             ]);
 
         $this
@@ -170,6 +173,7 @@ class ManagerSpec extends ObjectBehavior
             ->willReturn([
                 'feature2' => true,
                 'feature3' => false,
+                'unlisted-feature' => true,
             ]);
 
         $this

@@ -36,13 +36,16 @@ class Logger extends MonologLogger
         $options = array_merge([
             'isProduction' => true,
             'devToolsLogger' => '',
+            'minLogLevel' => null,
         ], $options);
+
+        $level = $options['minLogLevel'] ?? MonologLogger::INFO;
 
         $handlers = [];
 
         $errorLogHandler = new ErrorLogHandler(
             ErrorLogHandler::OPERATING_SYSTEM,
-            $options['isProduction'] ? MonologLogger::INFO : MonologLogger::DEBUG,
+            $level,
             true,
             true
         );
@@ -64,16 +67,16 @@ class Logger extends MonologLogger
 
             switch ($options['devToolsLogger']) {
                 case 'firephp':
-                    $handlers[] = new FirePHPHandler();
+                    $handlers[] = new FirePHPHandler($level);
                     break;
 
                 case 'chromelogger':
-                    $handlers[] = new ChromePHPHandler();
+                    $handlers[] = new ChromePHPHandler($level);
                     break;
 
                 case 'phpconsole':
                     try {
-                        $handlers[] = new PHPConsoleHandler();
+                        $handlers[] = new PHPConsoleHandler(null, null, $level);
                     } catch (Exception $exception) {
                         // If the server-side vendor package is not installed, ignore any warnings.
                     }
