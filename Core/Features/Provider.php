@@ -10,6 +10,10 @@ namespace Minds\Core\Features;
 
 use Minds\Core\Di\Provider as DiProvider;
 
+/**
+ * Features provider
+ * @package Minds\Core\Features
+ */
 class Provider extends DiProvider
 {
     public function register()

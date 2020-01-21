@@ -9,6 +9,10 @@ namespace Minds\Core\Features\Services;
 
 use Minds\Entities\User;
 
+/**
+ * Base service to be used when building integrations
+ * @package Minds\Core\Features\Services
+ */
 abstract class BaseService implements ServiceInterface
 {
     /** @var User */

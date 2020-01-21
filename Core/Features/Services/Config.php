@@ -11,6 +11,10 @@ use InvalidArgumentException;
 use Minds\Core\Config as MindsConfig;
 use Minds\Core\Di\Di;
 
+/**
+ * Static config (settings.php) feature flags service
+ * @package Minds\Core\Features\Services
+ */
 class Config extends BaseService
 {
     /** @var MindsConfig */

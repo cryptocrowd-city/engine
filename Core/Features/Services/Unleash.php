@@ -13,6 +13,10 @@ use Minds\UnleashClient\Config as UnleashConfig;
 use Minds\UnleashClient\Entities\Context;
 use Minds\UnleashClient\Unleash as UnleashClient;
 
+/**
+ * Unleash server (GitLab FF) feature flags service
+ * @package Minds\Core\Features\Services
+ */
 class Unleash extends BaseService
 {
     /** @var Config */
@@ -34,6 +38,10 @@ class Unleash extends BaseService
         $this->unleash = $unleash ?: $this->initUnleashClient();
     }
 
+    /**
+     * Initializes Unleash client package
+     * @return UnleashClient
+     */
     public function initUnleashClient(): UnleashClient
     {
         $configValues = $this->config->get('unleash');
