@@ -39,9 +39,6 @@ class Provider extends DiProvider
                 'wire-multi-currency',
                 'cdn-jwt',
                 'post-scheduler',
-                'test_on_test',
-                'test_group_pro',
-                'test_group_admin',
             ];
         });
 
