@@ -56,7 +56,7 @@ class Unleash extends BaseService
      * @inheritDoc
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function fetch(): array
+    public function fetch(array $keys): array
     {
         $context = new Context();
         $context
@@ -69,8 +69,13 @@ class Unleash extends BaseService
                 ->setUserId((string) $this->user->guid);
         }
 
-        return $this->unleash
-            ->setContext($context)
-            ->export();
+        // Return whitelisted 'features' array with its values resolved
+
+        return array_intersect_key(
+            $this->unleash
+                ->setContext($context)
+                ->export(),
+            array_flip($keys)
+        );
     }
 }

@@ -54,7 +54,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($this->service1);
 
-        $this->service1->fetch()
+        $this->service1->fetch(['feature1', 'feature2', 'feature3'])
             ->shouldBeCalled()
             ->willReturn([
                 'feature1' => true,
@@ -65,7 +65,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($this->service2);
 
-        $this->service2->fetch()
+        $this->service2->fetch(['feature1', 'feature2', 'feature3'])
             ->shouldBeCalled()
             ->willReturn([
                 'feature2' => true,
@@ -87,7 +87,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($this->service1);
 
-        $this->service1->fetch()
+        $this->service1->fetch(['feature1', 'feature2', 'feature3'])
             ->shouldBeCalled()
             ->willReturn([
                 'feature1' => true,
@@ -98,12 +98,11 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($this->service2);
 
-        $this->service2->fetch()
+        $this->service2->fetch(['feature1', 'feature2', 'feature3'])
             ->shouldBeCalled()
             ->willReturn([
                 'feature2' => true,
                 'feature3' => false,
-                'unlisted-feature' => true,
             ]);
 
         $this
@@ -122,7 +121,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($this->service1);
 
-        $this->service1->fetch()
+        $this->service1->fetch(['feature1', 'feature2', 'feature3'])
             ->shouldBeCalled()
             ->willReturn([
                 'feature1' => true,
@@ -133,12 +132,11 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($this->service2);
 
-        $this->service2->fetch()
+        $this->service2->fetch(['feature1', 'feature2', 'feature3'])
             ->shouldBeCalled()
             ->willReturn([
                 'feature2' => true,
                 'feature3' => false,
-                'unlisted-feature' => true,
             ]);
 
         $this
@@ -157,7 +155,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($this->service1);
 
-        $this->service1->fetch()
+        $this->service1->fetch(['feature1', 'feature2', 'feature3'])
             ->shouldBeCalled()
             ->willReturn([
                 'feature1' => true,
@@ -168,12 +166,11 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn($this->service2);
 
-        $this->service2->fetch()
+        $this->service2->fetch(['feature1', 'feature2', 'feature3'])
             ->shouldBeCalled()
             ->willReturn([
                 'feature2' => true,
                 'feature3' => false,
-                'unlisted-feature' => true,
             ]);
 
         $this

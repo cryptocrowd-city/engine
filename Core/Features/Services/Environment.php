@@ -12,7 +12,7 @@ class Environment extends BaseService
     /**
      * @inheritDoc
      */
-    public function fetch(): array
+    public function fetch(array $keys): array
     {
         return [];
     }

@@ -29,12 +29,21 @@ class Config extends BaseService
     /**
      * @inheritDoc
      */
-    public function fetch(): array
+    public function fetch(array $keys): array
     {
-        return array_map([$this, '_resolveValue'], $this->config->get('features') ?: []);
+        // Return whitelisted 'features' array with its values resolved
+
+        return array_intersect_key(
+            array_map(
+                [$this, '_resolveValue'],
+                $this->config->get('features') ?: []
+            ),
+            array_flip($keys)
+        );
     }
 
     /**
+     * Resolve strings to groups. Boolean are returned as is. Other types throw an exception.
      * @param mixed $value
      * @return bool
      * @throws InvalidArgumentException

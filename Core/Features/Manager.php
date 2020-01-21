@@ -25,7 +25,7 @@ class Manager
     protected $activeSession;
 
     /** @var string[] */
-    protected $features;
+    protected $featureKeys;
 
     /**
      * Manager constructor.
@@ -44,7 +44,7 @@ class Manager
             new Services\Environment(),
         ];
         $this->activeSession = $activeSession ?: Di::_()->get('Sessions\ActiveSession');
-        $this->features = ($features ?? Di::_()->get('Features\Keys')) ?: [];
+        $this->featureKeys = ($features ?? Di::_()->get('Features\Keys')) ?: [];
     }
 
     /**
@@ -76,7 +76,7 @@ class Manager
 
         // Initialize array with false values
 
-        foreach ($this->features as $feature) {
+        foreach ($this->featureKeys as $feature) {
             $features[$feature] = false;
         }
 
@@ -87,12 +87,12 @@ class Manager
                 $features,
                 $service
                     ->setUser($this->activeSession->getUser())
-                    ->fetch()
+                    ->fetch($this->featureKeys)
             );
         }
 
-        // Return only whitelisted keys
+        //
 
-        return array_intersect_key($features, array_flip($this->features));
+        return $features;
     }
 }

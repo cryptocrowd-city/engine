@@ -20,7 +20,8 @@ interface ServiceInterface
 
     /**
      * Fetches the whole feature flag set
+     * @param string[] $keys Array of whitelisted keys
      * @return array
      */
-    public function fetch(): array;
+    public function fetch(array $keys): array;
 }
