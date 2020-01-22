@@ -69,8 +69,8 @@ class Unleash extends BaseService
         $context = new Context();
         $context
             ->setUserGroups($this->getUserGroups())
-            ->setRemoteAddress($_SERVER['REMOTE_ADDR'])
-            ->setHostName($_SERVER['HTTP_HOST']);
+            ->setRemoteAddress($_SERVER['REMOTE_ADDR'] ?? '')
+            ->setHostName($_SERVER['HTTP_HOST'] ?? '');
 
         if ($this->user) {
             $context

@@ -31,8 +31,9 @@ class Canary
     /**
      * Sets canary cookie value
      * @param bool $enabled
+     * @return bool
      */
-    public function setCookie(bool $enabled): void
+    public function setCookie(bool $enabled): bool
     {
         $this->cookie
             ->setName('canary')
@@ -42,5 +43,7 @@ class Canary
             ->setHttpOnly(true) //never by browser
             ->setPath('/')
             ->create();
+
+        return true;
     }
 }

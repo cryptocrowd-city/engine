@@ -13,12 +13,26 @@ namespace Minds\Core\Features\Services;
  */
 class Environment extends BaseService
 {
+    /** @var array|null */
+    protected $global = null;
+
+    /**
+     * @param array $global
+     * @return Environment
+     */
+    public function setGlobal(?array $global): Environment
+    {
+        $this->global = $global;
+        return $this;
+    }
+
     /**
      * @inheritDoc
      */
     public function fetch(array $keys): array
     {
         $output = [];
+        $global = $this->global ?? $_ENV;
 
         foreach ($keys as $key) {
             // Convert to variable name
@@ -26,10 +40,10 @@ class Environment extends BaseService
 
             $envName = sprintf('MINDS_FEATURE_%s', strtoupper(preg_replace('/[^a-zA-Z0-9]+/', '_', $key)));
 
-            if (isset($_ENV[$envName])) {
+            if (isset($global[$envName])) {
                 // Read value as string
 
-                $value = (string) $_ENV[$envName];
+                $value = (string) $global[$envName];
 
                 // Resolve group, if not 0 or 1
 
