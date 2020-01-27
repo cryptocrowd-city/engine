@@ -101,7 +101,7 @@ use Minds\Traits\MagicAttributes;
  * @method int getTimeSent()
  * @method Blog setTimeSent(int $time_sent)
  * @method bool getEditorVersion()
- * @method bool setEditorVersion(string $editorVersion)
+ * @method bool setEditorVersion(int $editorVersion)
  */
 class Blog extends RepositoryEntity
 {
@@ -250,8 +250,8 @@ class Blog extends RepositoryEntity
     /** @var int */
     protected $timeSent;
 
-    /** @var bool */
-    protected $editorVersion = '1';
+    /** @var int */
+    protected $editorVersion = 1;
     /**
      * Blog constructor.
      * @param null $eventsDispatcher
