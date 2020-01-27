@@ -40,7 +40,7 @@ class Logger extends MonologLogger
         ], $options);
 
         $isProduction = (bool) $options['isProduction'];
-        $level = $options['minLogLevel'] ?? MonologLogger::INFO;
+        $level = $options['minLogLevel'] ?? MonologLogger::WARNING;
 
         $handlers = [];
 
@@ -62,7 +62,8 @@ class Logger extends MonologLogger
         $handlers[] = $errorLogHandler;
 
         if ($isProduction) {
-            $handlers[] = new SentryHandler(SentrySdk::getCurrentHub(), $level);
+            // Do _NOT_ send INFO or DEBUG
+            $handlers[] = new SentryHandler(SentrySdk::getCurrentHub(), max($level, MonologLogger::WARNING));
         } else {
             // Extra handlers for Development Mode
 
