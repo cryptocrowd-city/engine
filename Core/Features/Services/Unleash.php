@@ -47,9 +47,9 @@ class Unleash extends BaseService
         $configValues = $this->config->get('unleash');
 
         $config = new UnleashConfig(
-            $configValues['apiUrl'] ?? null,
-            $configValues['instanceId'] ?? null,
-            $configValues['applicationName'] ?? null,
+            getenv('UNLEASH_API_URL') ?: ($configValues['apiUrl'] ?? null),
+            getenv('UNLEASH_INSTANCE_ID') ?: ($configValues['instanceId'] ?? null),
+            getenv('MINDS_ENV') ?: ($configValues['applicationName'] ?? 'development'),
             $configValues['pollingIntervalSeconds'] ?? null,
             $configValues['metricsIntervalSeconds'] ?? null
         );
