@@ -5,7 +5,7 @@
  *
  * Note - When adding a new attribute be sure to make
  * necessary changes to to Core/Blogs/Legacy/Entity.php
- * 
+ *
  * @author emi
  */
 
