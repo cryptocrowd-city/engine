@@ -39,6 +39,7 @@ class Logger extends MonologLogger
             'minLogLevel' => null,
         ], $options);
 
+        $isProduction = (bool) $options['isProduction'];
         $level = $options['minLogLevel'] ?? MonologLogger::INFO;
 
         $handlers = [];
@@ -54,14 +55,14 @@ class Logger extends MonologLogger
             ->setFormatter(new LineFormatter(
                 "%channel%.%level_name%: %message% %context% %extra%\n",
                 'c',
-                !$options['isProduction'], // Allow newlines on dev mode
+                !$isProduction, // Allow newlines on dev mode
                 true
             ));
 
         $handlers[] = $errorLogHandler;
 
-        if ($options['isProduction']) {
-            $handlers[] = new SentryHandler(SentrySdk::getCurrentHub());
+        if ($isProduction) {
+            $handlers[] = new SentryHandler(SentrySdk::getCurrentHub(), $level);
         } else {
             // Extra handlers for Development Mode
 
