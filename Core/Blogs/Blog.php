@@ -3,6 +3,9 @@
 /**
  * Minds Blog Entity
  *
+ * Note - When adding a new attribute be sure to make
+ * necessary changes to to Core/Blogs/Legacy/Entity.php
+ * 
  * @author emi
  */
 
@@ -547,18 +550,6 @@ class Blog extends RepositoryEntity
 
         return $this;
     }
-
-    // public function setEditorVersion($version): Blog {
-    //     error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>setting editor version to ".$version);
-    //     $this->editor_version = $version;
-    //     error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>its ".$this->editor_version);
-    //     return $this;
-    // }
-
-    // public function getEditorVersion(): string {
-    //     error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>getting editor version ".$this->editor_version);
-    //     return $this->editor_version ?? '1';
-    // }
 
     /**
      * Defines the exportable members
