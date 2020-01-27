@@ -97,6 +97,8 @@ use Minds\Traits\MagicAttributes;
  * @method bool getAllowComments()
  * @method int getTimeSent()
  * @method Blog setTimeSent(int $time_sent)
+ * @method bool getEditorVersion()
+ * @method bool setEditorVersion(string $editorVersion)
  */
 class Blog extends RepositoryEntity
 {
@@ -245,6 +247,8 @@ class Blog extends RepositoryEntity
     /** @var int */
     protected $timeSent;
 
+    /** @var bool */
+    protected $editorVersion = '1';
     /**
      * Blog constructor.
      * @param null $eventsDispatcher
@@ -544,6 +548,18 @@ class Blog extends RepositoryEntity
         return $this;
     }
 
+    // public function setEditorVersion($version): Blog {
+    //     error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>setting editor version to ".$version);
+    //     $this->editor_version = $version;
+    //     error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>its ".$this->editor_version);
+    //     return $this;
+    // }
+
+    // public function getEditorVersion(): string {
+    //     error_log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>getting editor version ".$this->editor_version);
+    //     return $this->editor_version ?? '1';
+    // }
+
     /**
      * Defines the exportable members
      * @return array
@@ -589,6 +605,7 @@ class Blog extends RepositoryEntity
             'nsfw_lock',
             'allow_comments',
             'time_sent',
+            'editor_version',
             function ($export) {
                 return $this->_extendExport($export);
             }
@@ -617,6 +634,7 @@ class Blog extends RepositoryEntity
         $output['nsfw_lock'] = $this->getNsfwLock();
         $output['allow_comments'] = $this->getAllowComments();
         $output['time_sent'] = $this->getTimeSent();
+        $output['editor_version'] = $this->getEditorVersion();
         $output['header_bg'] = $export['has_header_bg'];
 
         if (!$this->isEphemeral()) {

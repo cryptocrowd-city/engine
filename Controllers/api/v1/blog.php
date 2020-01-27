@@ -251,6 +251,10 @@ class blog implements Interfaces\Api
             }
         }
 
+        if (isset($_POST['editor_version'])) {
+            $blog->setEditorVersion($_POST['editor_version']);
+        }
+
         $blog->setLastSave(time());
 
         if (isset($_POST['wire_threshold'])) {
@@ -297,7 +301,6 @@ class blog implements Interfaces\Api
                 $user->save();
             }
         }
-
         
         if (isset($_POST['time_created'])) {
             try {
