@@ -67,6 +67,24 @@ class Register
             }
 
             try {
+                if (isset($_COOKIE['mwa'])) {
+                    $event = new Core\Analytics\Metrics\Event();
+                    $event
+                        ->setType('action')
+                        ->setProduct('platform')
+                        ->setAction('signup')
+                        ->setUserGuid($params['user']->guid)
+                        ->setUserAgent($_SERVER['HTTP_USER_AGENT'])
+                        ->setCookieId($_COOKIE['mwa'])
+                        ->setLoggedIn(true);
+
+                    $event->push();
+                }
+            } catch (\Exception $e) {
+                error_log((string) $e);
+            }
+
+            try {
                 Core\Queue\Client::build()->setQueue('Registered')
                     ->send([
                         'user_guid' => (string) $params['user']->guid,
