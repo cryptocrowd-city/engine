@@ -43,6 +43,7 @@ class Provider extends DiProvider
                 'wire-multi-currency',
                 'cdn-jwt',
                 'post-scheduler',
+                'ckeditor5',
             ];
         });
 
