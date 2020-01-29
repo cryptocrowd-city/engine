@@ -35,7 +35,7 @@ class ClientFactory
     }
 
     /**
-     * Builds an Unleash Client
+     * Builds an Unleash Client using environment configuration
      * @return Client
      */
     public function build(): Client

@@ -9,6 +9,7 @@ namespace Minds\Core\Features\Services\Unleash;
 
 use Cassandra\Timestamp;
 use Exception;
+use Minds\Common\Repository\Response;
 use Minds\Core\Data\Cassandra\Client;
 use Minds\Core\Data\Cassandra\Prepared\Custom;
 use Minds\Core\Di\Di;
@@ -31,16 +32,17 @@ class Repository
     }
 
     /**
-     * @return Entity[]
+     * Returns a list of all feature toggles cached in Cassandra
+     * @return Response
      */
-    public function getList(): array
+    public function getList(): Response
     {
         $cql = "SELECT * FROM feature_toggles_cache";
 
         $prepared = new Custom();
         $prepared->query($cql);
 
-        $entities = [];
+        $response = new Response();
 
         try {
             $rows = $this->db->request($prepared);
@@ -52,27 +54,28 @@ class Repository
                     ->setData(json_decode($row['data'], true))
                     ->setCreatedAt($row['created_at']->time())
                     ->setStaleAt($row['stale_at']->time());
-                $entities[] = $entity;
+                $response[] = $entity;
             }
         } catch (Exception $e) {
             Log::warning($e);
         }
 
-        return $entities;
+        return $response;
     }
 
     /**
-     * Shortcut method that brings all the data from getList() entities
-     * @return array
+     * Shortcut method that casts all the data from getList() entities
+     * @return Response
      */
-    public function getAllData()
+    public function getAllData(): Response
     {
-        return array_map(function (Entity $entity) {
+        return $this->getList()->map(function (Entity $entity) {
             return $entity->getData();
-        }, $this->getList());
+        });
     }
 
     /**
+     * Adds a new feature toggle entity to Cassandra
      * @param Entity $entity
      * @return bool
      * @throws Exception
@@ -103,6 +106,7 @@ class Repository
     }
 
     /**
+     * Shortcut to add
      * @param Entity $entity
      * @return bool
      * @throws Exception
@@ -113,6 +117,7 @@ class Repository
     }
 
     /**
+     * Deletes an entity. Not implemented.
      * @param string $id
      * @return bool
      * @throws NotImplementedException

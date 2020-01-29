@@ -121,7 +121,11 @@ class Unleash extends BaseService
         // Read features from local repository
 
         $features = $this->unleashFeatureArrayFactory
-            ->build($this->repository->getAllData());
+            ->build(
+                $this->repository
+                    ->getAllData()
+                    ->toArray()
+            );
 
         // Return whitelisted 'features' array with its values resolved
 

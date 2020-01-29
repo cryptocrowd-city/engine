@@ -2,6 +2,7 @@
 
 namespace Spec\Minds\Core\Features\Services;
 
+use Minds\Common\Repository\Response;
 use Minds\Core\Config;
 use Minds\Core\Features\Services\Unleash;
 use Minds\Core\Features\Services\Unleash\Repository;
@@ -79,12 +80,17 @@ class UnleashSpec extends ObjectBehavior
             ->shouldReturn(true);
     }
 
-    public function it_should_fetch()
-    {
+    public function it_should_fetch(
+        Response $response
+    ) {
         $featuresMock = ['featuresMock' . mt_rand()];
         $resolvedFeaturesMock = ['resolvedFeaturesMock' . mt_rand()];
 
         $this->repository->getAllData()
+            ->shouldBeCalled()
+            ->willReturn($response);
+
+        $response->toArray()
             ->shouldBeCalled()
             ->willReturn($featuresMock);
 
@@ -137,12 +143,17 @@ class UnleashSpec extends ObjectBehavior
     }
 
     public function it_should_fetch_with_user(
-        User $user
+        User $user,
+        Response $response
     ) {
         $featuresMock = ['featuresMock' . mt_rand()];
         $resolvedFeaturesMock = ['resolvedFeaturesMock' . mt_rand()];
 
         $this->repository->getAllData()
+            ->shouldBeCalled()
+            ->willReturn($response);
+
+        $response->toArray()
             ->shouldBeCalled()
             ->willReturn($featuresMock);
 

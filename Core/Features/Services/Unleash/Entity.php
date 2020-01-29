@@ -10,7 +10,7 @@ namespace Minds\Core\Features\Services\Unleash;
 use Minds\Traits\MagicAttributes;
 
 /**
- * Class Entity
+ * Entity for cached feature flags
  * @package Minds\Core\Features\Services\Unleash
  * @method string getId()
  * @method Entity setId(string $id)
