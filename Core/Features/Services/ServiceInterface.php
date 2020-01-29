@@ -12,6 +12,13 @@ use Minds\Entities\User;
 interface ServiceInterface
 {
     /**
+     * Sets the current interface to sync/fetch
+     * @param string $environment
+     * @return ServiceInterface
+     */
+    public function setEnvironment(string $environment): ServiceInterface;
+
+    /**
      * Sets the current user to calculate context values
      * @param User|null $user
      * @return ServiceInterface

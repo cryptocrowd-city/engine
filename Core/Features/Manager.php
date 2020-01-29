@@ -28,17 +28,23 @@ class Manager
     /** @var string[] */
     protected $featureKeys;
 
+    /** @var string */
+    protected $environment;
+
     /**
      * Manager constructor.
+     * @param string $environment
      * @param Services\ServiceInterface[] $services
      * @param ActiveSession $activeSession
      * @param string[] $features
      */
     public function __construct(
+        $environment = null,
         $services = null,
         $activeSession = null,
         array $features = null
     ) {
+        $this->environment = $environment;
         $this->services = $services ?: [
             new Services\Config(),
             new Services\Unleash(),
@@ -46,6 +52,26 @@ class Manager
         ];
         $this->activeSession = $activeSession ?: Di::_()->get('Sessions\ActiveSession');
         $this->featureKeys = ($features ?? Di::_()->get('Features\Keys')) ?: [];
+    }
+
+    /**
+     * Sets the current environment
+     * @param string $environment
+     * @return Manager
+     */
+    public function setEnvironment(string $environment): Manager
+    {
+        $this->environment = $environment;
+        return $this;
+    }
+
+    /**
+     * Gets the current environment based on overrides or environment variables
+     * @return string
+     */
+    public function getEnvironment()
+    {
+        return $this->environment ?: getenv('MINDS_ENV') ?: 'development';
     }
 
     /**
@@ -57,7 +83,9 @@ class Manager
     {
         foreach ($this->services as $service) {
             try {
-                $output = $service->sync($ttl) ? 'OK' : 'NOT SYNC\'D';
+                $output = $service
+                    ->setEnvironment($this->getEnvironment())
+                    ->sync($ttl);
             } catch (Exception $e) {
                 $output = $e;
             }
@@ -105,6 +133,7 @@ class Manager
             $features = array_merge(
                 $features,
                 $service
+                    ->setEnvironment($this->getEnvironment())
                     ->setUser($this->activeSession->getUser())
                     ->fetch($this->featureKeys)
             );
