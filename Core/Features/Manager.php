@@ -158,12 +158,22 @@ class Manager
         $output = [
             'environment' => $env,
             'for' => $for ? (string) $for->username : null,
-            'services' => [],
+            'services' => [
+                'Default'
+            ],
             'features' => [],
         ];
 
+        $cache = [];
+
         foreach ($this->featureKeys as $feature) {
-            $output['features'][$feature] = [];
+            $cache[$feature] = [
+                'Default' => false,
+            ];
+
+            foreach ($this->services as $service) {
+                $cache[$feature][$service->getReadableName()] = null;
+            }
         }
 
         foreach ($this->services as $service) {
@@ -180,12 +190,17 @@ class Manager
             );
 
             foreach ($features as $feature => $value) {
-                $output['features'][$feature][] = [
-                    'service' => $service->getReadableName(),
-                    'value' => $value
-                ];
+                $cache[$feature][$service->getReadableName()] = $value;
             }
         }
+
+        foreach ($cache as $name => $services) {
+            $output['features'][] = compact('name', 'services');
+        }
+
+        usort($output['features'], function ($a, $b) {
+            return $a['name'] <=> $b['name'];
+        });
 
         return $output;
     }

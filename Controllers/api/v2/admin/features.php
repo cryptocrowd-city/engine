@@ -22,7 +22,7 @@ class features implements Interfaces\Api, Interfaces\ApiAdminPam
      */
     public function get($pages)
     {
-        $for = Session::getLoggedinUser() ?: null;
+        $for = null;
 
         if (isset($_GET['for'])) {
             try {
@@ -39,7 +39,7 @@ class features implements Interfaces\Api, Interfaces\ApiAdminPam
         /** @var Manager $manager */
         $manager = Di::_()->get('Features\Manager');
         return Factory::response(
-            $manager->dump($for)
+            $manager->breakdown($for)
         );
     }
 
