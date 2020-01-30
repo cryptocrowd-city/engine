@@ -66,6 +66,14 @@ class Unleash extends BaseService
 
     /**
      * @inheritDoc
+     */
+    public function getReadableName(): string
+    {
+        return 'GitLab';
+    }
+
+    /**
+     * @inheritDoc
      * @throws Exception
      */
     public function sync(int $ttl): bool

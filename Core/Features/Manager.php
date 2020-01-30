@@ -12,6 +12,7 @@ use Exception;
 use Minds\Core\Di\Di;
 use Minds\Core\Features\Exceptions\FeatureNotImplementedException;
 use Minds\Core\Sessions\ActiveSession;
+use Minds\Entities\User;
 
 /**
  * Features Manager
@@ -142,5 +143,50 @@ class Manager
         //
 
         return $features;
+    }
+
+    /**
+     * Breakdown for services, features and its individual values for certain user.
+     * Used by admin interface.
+     * @param User|null $for
+     * @return array
+     */
+    public function breakdown(?User $for = null)
+    {
+        $env = $this->getEnvironment();
+
+        $output = [
+            'environment' => $env,
+            'for' => $for ? (string) $for->username : null,
+            'services' => [],
+            'features' => [],
+        ];
+
+        foreach ($this->featureKeys as $feature) {
+            $output['features'][$feature] = [];
+        }
+
+        foreach ($this->services as $service) {
+            $output['services'][] = $service->getReadableName();
+
+            $features = [];
+
+            $features = array_merge(
+                $features,
+                $service
+                    ->setUser($for)
+                    ->setEnvironment($env)
+                    ->fetch($this->featureKeys)
+            );
+
+            foreach ($features as $feature => $value) {
+                $output['features'][$feature][] = [
+                    'service' => $service->getReadableName(),
+                    'value' => $value
+                ];
+            }
+        }
+
+        return $output;
     }
 }

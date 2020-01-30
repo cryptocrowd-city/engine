@@ -12,6 +12,12 @@ use Minds\Entities\User;
 interface ServiceInterface
 {
     /**
+     * Readable name. Used for admin interface.
+     * @return string
+     */
+    public function getReadableName(): string;
+
+    /**
      * Sets the current interface to sync/fetch
      * @param string $environment
      * @return ServiceInterface
