@@ -17,6 +17,14 @@ class Environment extends BaseService
     protected $global = null;
 
     /**
+     * @inheritDoc
+     */
+    public function getReadableName(): string
+    {
+        return 'EnvVars';
+    }
+
+    /**
      * @param array $global
      * @return Environment
      */
@@ -24,6 +32,15 @@ class Environment extends BaseService
     {
         $this->global = $global;
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function sync(int $ttl): bool
+    {
+        // No need for sync
+        return true;
     }
 
     /**
