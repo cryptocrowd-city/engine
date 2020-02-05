@@ -39,6 +39,7 @@ class CassandraProvisioner implements ProvisionerInterface
             }
         } catch (\Exception $e) {
             error_log("Error provisioning cassandra: " . $e->getMessage());
+            exit(1);
         }
  
         return true;

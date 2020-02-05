@@ -85,7 +85,7 @@ class Install extends Cli\Controller implements Interfaces\CliControllerInterfac
                     $provisioner->setupFirstAdmin();
                     $this->out('OK');
                 } catch (\Exception $ex) {
-                    $this->out('Could not setup initial user');
+                    $this->out("Could not setup initial user: {$ex->getMessage()}");
                 }
             }
 

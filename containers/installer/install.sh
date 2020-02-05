@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Exit script wit ERRORLEVEL if any command fails
+set -e
+
 echo "INSTALLING MINDS"
 
 cd /var/www/Minds/engine
