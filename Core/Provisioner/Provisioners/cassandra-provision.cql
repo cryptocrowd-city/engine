@@ -1568,3 +1568,12 @@ CREATE TABLE minds.video_transcodes (
 );
 
 ALTER TABLE minds.video_transcodes ADD failure_reason text;
+
+CREATE TABLE minds.feature_toggles_cache_ns (
+    environment text,
+    feature_name text,
+    data text,
+    created_at timestamp,
+    stale_at timestamp,
+    PRIMARY KEY (environment, feature_name)
+);
