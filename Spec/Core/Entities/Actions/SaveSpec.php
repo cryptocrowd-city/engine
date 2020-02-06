@@ -5,20 +5,27 @@ namespace Spec\Minds\Core\Entities\Actions;
 use Minds\Core\Blogs\Blog;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Events\EventsDispatcher;
+use Minds\Core\Router\Exceptions\UnverifiedEmailException;
+use Minds\Core\Security\ACL;
 use Minds\Entities\User;
 use Minds\Entities\Activity;
 use Minds\Entities\Group;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 
 class SaveSpec extends ObjectBehavior
 {
     /** @var EventsDispatcher */
     protected $dispatcher;
 
-    public function let(EventsDispatcher $dispatcher)
+    /** @var ACL */
+    protected $acl;
+
+    public function let(EventsDispatcher $dispatcher, ACL $acl)
     {
-        $this->beConstructedWith($dispatcher);
+        $this->beConstructedWith($dispatcher, $acl);
         $this->dispatcher = $dispatcher;
+        $this->acl = $acl;
     }
 
     public function it_is_initializable()
@@ -44,15 +51,29 @@ class SaveSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn([]);
 
-        $user->setNsfw([])->shouldBeCalled();
+        $user->setNsfw([])
+            ->shouldBeCalled();
 
         $user->save()
             ->shouldBeCalled()
             ->willReturn(true);
 
+        $this->acl->write($user)
+            ->willReturn(true);
+
         $this->setEntity($user);
 
         $this->save()->shouldReturn(true);
+    }
+
+    public function it_should_fail_to_save_an_entity_if_the_user_is_not_trusted(User $user)
+    {
+        $this->acl->write($user, Argument::any())
+            ->willThrow(UnverifiedEmailException::class);
+
+        $this->setEntity($user);
+
+        $this->shouldThrow(UnverifiedEmailException::class)->during('save');
     }
 
     public function it_should_saev_an_entity_via_the_entity_save_event(Blog $blog)
@@ -75,10 +96,13 @@ class SaveSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
+        $this->acl->write($blog, Argument::any())
+            ->willReturn(true);
+
         $this->setEntity($blog);
         $this->save($blog)->shouldReturn(true);
     }
-    
+
     public function it_should_save_an_entity_using_its_save_method_with_NSFW_from_owner(Activity $activity, User $owner)
     {
         $nsfw = [1, 2, 3, 4, 5, 6];
@@ -114,6 +138,9 @@ class SaveSpec extends ObjectBehavior
 
         $activity->save()
             ->shouldBeCalled()
+            ->willReturn(true);
+
+        $this->acl->write($activity, Argument::any())
             ->willReturn(true);
 
         $this->setEntity($activity);
@@ -158,12 +185,15 @@ class SaveSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
+        $this->acl->write($activity, Argument::any())
+            ->willReturn(true);
+
         $this->setEntity($activity);
 
         $this->save()->shouldReturn(true);
     }
 
-    public function it_should_save_an_entity_using_its_save_method_with_NSFW_from_container(Activity $activity, Group $container)
+    public function it_should_save_an_entity_using_its_save_method_with_NSFW_from_container(Activity $activity, Group $container, User $user)
     {
         $nsfw = [1, 2, 3, 4, 5, 6];
         $container->getNsfw()
@@ -196,12 +226,15 @@ class SaveSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
+        $this->acl->write($activity, Argument::any())
+            ->willReturn(true);
+
         $this->setEntity($activity);
 
         $this->save()->shouldReturn(true);
     }
 
-    public function it_should_save_an_entity_using_its_save_method_with_NSFW_from_group(Activity $activity, Group $container)
+    public function it_should_save_an_entity_using_its_save_method_with_NSFW_from_group(Activity $activity, Group $container, User $user)
     {
         $nsfw = [1, 2, 3, 4, 5, 6];
         $container->getNsfw()
@@ -232,6 +265,9 @@ class SaveSpec extends ObjectBehavior
 
         $activity->save()
             ->shouldBeCalled()
+            ->willReturn(true);
+
+        $this->acl->write($activity, Argument::any())
             ->willReturn(true);
 
         $this->setEntity($activity);
@@ -273,6 +309,9 @@ class SaveSpec extends ObjectBehavior
 
         $activity->save()
             ->shouldBeCalled()
+            ->willReturn(true);
+
+        $this->acl->write($activity, Argument::any())
             ->willReturn(true);
 
         $this->setEntity($activity);
