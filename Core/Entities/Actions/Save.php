@@ -38,8 +38,7 @@ class Save
         $eventsDispatcher = null,
         $acl = null,
         $manager = null
-    )
-    {
+    ) {
         $this->eventsDispatcher = $eventsDispatcher ?: Di::_()->get('EventsDispatcher');
         $this->acl = $acl ?: ACL::_();
     }
