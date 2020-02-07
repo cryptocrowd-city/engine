@@ -10,6 +10,7 @@ namespace Minds\Core\Blogs;
 
 use Minds\Core\Di\Di;
 use Minds\Core\Entities\PropagateProperties;
+use Minds\Core\Security\ACL;
 use Minds\Core\Security\Spam;
 
 class Manager
@@ -26,7 +27,7 @@ class Manager
     /** @var Delegates\Feeds */
     protected $feeds;
 
-    /** @var Spam **/
+    /** @var Spam * */
     protected $spam;
 
     /** @var Delegates\Search */
@@ -34,6 +35,9 @@ class Manager
 
     /** @var PropagateProperties */
     protected $propagateProperties;
+
+    /** @var ACL */
+    protected $acl;
 
     /**
      * Manager constructor.
@@ -53,8 +57,10 @@ class Manager
         $feeds = null,
         $spam = null,
         $search = null,
-        PropagateProperties $propagateProperties = null
-    ) {
+        PropagateProperties $propagateProperties = null,
+        ACL $acl = null
+    )
+    {
         $this->repository = $repository ?: new Repository();
         $this->paywallReview = $paywallReview ?: new Delegates\PaywallReview();
         $this->slug = $slug ?: new Delegates\Slug();
@@ -62,6 +68,7 @@ class Manager
         $this->spam = $spam ?: Di::_()->get('Security\Spam');
         $this->search = $search ?: new Delegates\Search();
         $this->propagateProperties = $propagateProperties ?? Di::_()->get('PropagateProperties');
+        $this->acl = $acl?: ACL::_();
     }
 
     /**
@@ -116,6 +123,10 @@ class Manager
      */
     public function add(Blog $blog)
     {
+        if (!$this->acl->write($blog)) {
+            return false;
+        }
+
         if ($this->spam->check($blog)) {
             return false;
         }
