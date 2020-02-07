@@ -162,8 +162,8 @@ class Router
 
                         header('HTTP/1.1 403 Forbidden', true, 403);
                         echo json_encode([
-                            'error' => $e->getMessage(),
-                            'code' => 403,
+                            'status' => 'error',
+                            'message' => $e->getMessage(),
                             'must_verify' => true
                         ]);
 
