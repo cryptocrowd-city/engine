@@ -210,7 +210,9 @@ class group implements Interfaces\Api
               ->setOwnerObj($user);
         }
 
-        $group->save();
+        if (Core\Security\ACL::_()->write($group)) {
+            $group->save();
+        }
 
         if ($creation) {
             // Join group
