@@ -688,7 +688,6 @@ class User extends \ElggUser
      */
     public function isTrusted(): bool
     {
-        return false;
         return
             (!$this->getEmailConfirmationToken() && !$this->getEmailConfirmedAt()) || // Old users poly-fill
             $this->isEmailConfirmed();
