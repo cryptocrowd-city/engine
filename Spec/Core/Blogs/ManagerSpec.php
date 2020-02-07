@@ -48,8 +48,7 @@ class ManagerSpec extends ObjectBehavior
         Delegates\Search $search,
         PropagateProperties $propagateProperties,
         ACL $acl
-    )
-    {
+    ) {
         $this->beConstructedWith(
             $repository,
             $paywallReview,

@@ -59,8 +59,7 @@ class Manager
         $search = null,
         PropagateProperties $propagateProperties = null,
         ACL $acl = null
-    )
-    {
+    ) {
         $this->repository = $repository ?: new Repository();
         $this->paywallReview = $paywallReview ?: new Delegates\PaywallReview();
         $this->slug = $slug ?: new Delegates\Slug();
