@@ -91,7 +91,7 @@ class blog implements Interfaces\Api
                 }
 
                 $blogs = $repository->getList($opts);
-                
+
                 $export = [];
                 foreach ($blogs as $blog) {
                     if ($blog->getOwnerGuid() != Core\Session::getLoggedInUserGuid() && $blog->getAccessId() != Access::PUBLIC) {
@@ -100,7 +100,7 @@ class blog implements Interfaces\Api
                     $export[] = $blog;
                 }
                 //$export = array_slice($export, 0, $limit);
-                
+
                 $response['entities'] = new Exportable($export);
                 $response['load-next'] = $blogs->getPagingToken();
                 break;
@@ -146,6 +146,8 @@ class blog implements Interfaces\Api
                         break;
                     }
 
+                    $blog->setFullExport(true);
+
                     $response['blog'] = $blog;
                 }
                 break;
@@ -177,7 +179,7 @@ class blog implements Interfaces\Api
             $blog
                 ->setOwnerObj(Core\Session::getLoggedinUser())
                 ->setContainerGuid(Core\Session::getLoggedInUserGuid());
-        
+
             $owner = Core\Session::getLoggedinUser();
             if ($owner->icontime == $owner->time_created) {
                 return Factory::response([
@@ -298,7 +300,7 @@ class blog implements Interfaces\Api
             }
         }
 
-        
+
         if (isset($_POST['time_created'])) {
             try {
                 $timeCreatedDelegate = new Core\Blogs\Delegates\TimeCreatedDelegate();
