@@ -64,7 +64,8 @@ class Install extends Cli\Controller implements Interfaces\CliControllerInterfac
                 if ($installType == "all" || $installType == "cassandra") {
                     $this->out('- Provisioning Cassandra:', $this::OUTPUT_INLINE);
                     $isCleanCassandra = $this->getopt("cleanCassandra") != null;
-                    $provisioner->provisionCassandra(null, $isCleanCassandra);
+                    $exitOnFailure = (bool) $this->getopt("exitOnFailure");
+                    $provisioner->provisionCassandra(null, $isCleanCassandra, $exitOnFailure);
                     $this->out('OK');
 
                     $this->out('- Emptying Cassandra pool:', $this::OUTPUT_INLINE);
