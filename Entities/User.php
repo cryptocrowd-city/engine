@@ -679,6 +679,14 @@ class User extends \ElggUser
     /**
      * @return bool
      */
+    public function isEmailConfirmed(): bool
+    {
+        return (bool) $this->email_confirmed_at;
+    }
+
+    /**
+     * @return bool
+     */
     public function getHideShareButtons(): bool
     {
         return (bool) $this->hide_share_buttons;
@@ -688,17 +696,10 @@ class User extends \ElggUser
      * @param bool $value
      * @return User
      */
-    public function setHideShareButtons(bool $value): User  {
+    public function setHideShareButtons(bool $value): User
+    {
         $this->hide_share_buttons = $value;
         return $this;
-    }
-
-/**
-     * @return bool
-     */
-    public function isEmailConfirmed(): bool
-    {
-        return (bool) $this->email_confirmed_at;
     }
 
     /**
