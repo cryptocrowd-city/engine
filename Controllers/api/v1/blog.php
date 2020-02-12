@@ -220,6 +220,11 @@ class blog implements Interfaces\Api
             $blog->setMature(!!$_POST['mature']);
         }
 
+        if (isset($_POST['nsfw'])) {
+            $nsfw = !is_array($_POST['nsfw']) ? json_decode($_POST['nsfw']) : $_POST['nsfw'];
+            $blog->setNsfw($nsfw);
+        }
+
         if (isset($_POST['wire_threshold'])) {
             $threshold = is_string($_POST['wire_threshold']) ? json_decode($_POST['wire_threshold']) : $_POST['wire_threshold'];
             $blog->setWireThreshold($threshold);
@@ -266,7 +271,7 @@ class blog implements Interfaces\Api
         }
 
         if ($blog->isMonetized()) {
-            if ($blog->isMature()) {
+            if ($blog->getNsfw() || $blog->isMature()) {
                 return Factory::response([
                     'status' => 'error',
                     'message' => 'Cannot monetize an explicit blog'
@@ -283,7 +288,8 @@ class blog implements Interfaces\Api
             }
         }
 
-        if (isset($_POST['mature']) && $_POST['mature']) {
+        if ((isset($_POST['nsfw']) && $_POST['nsfw'])
+            || (isset($_POST['mature']) && $_POST['mature'])) {
             $user = Core\Session::getLoggedInUser();
 
             if (!$user->getMatureContent()) {
@@ -328,6 +334,15 @@ class blog implements Interfaces\Api
             return Factory::response([
                 'status' => 'error',
                 'message' => 'Sorry, your blog must have some content'
+            ]);
+        }
+
+        // This is a first create blog that should have a banner
+        // We are trying to stop spam with this check
+        if ($blog->isPublished() && !$editing && !is_uploaded_file($_FILES['file']['tmp_name'])) {
+            return Factory::response([
+                'status' => 'error',
+                'message' => 'You must upload a banner'
             ]);
         }
 

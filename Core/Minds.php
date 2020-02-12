@@ -4,6 +4,7 @@ namespace Minds\Core;
 
 use Minds\Core\Di\Di;
 use Minds\Core\Events\Dispatcher;
+use Minds\Interfaces\ModuleInterface;
 
 /**
  * Core Minds Engine.
@@ -15,7 +16,10 @@ class Minds extends base
     public static $booted = false;
 
     private $modules = [
+        Log\Module::class,
         Events\Module::class,
+        Features\Module::class,
+        SSO\Module::class,
         Email\Module::class,
         Experiments\Module::class,
         Helpdesk\Module::class,
@@ -27,7 +31,9 @@ class Minds extends base
         Referrals\Module::class,
         Reports\Module::class,
         VideoChat\Module::class,
+        Feeds\Module::class,
         Front\Module::class,
+        Captcha\Module::class,
     ];
 
     /**
@@ -59,6 +65,7 @@ class Minds extends base
         /*
          * Initialise the modules
          */
+        /** @var ModuleInterface $module */
         foreach ($modules as $module) {
             $module->onInit();
         }
@@ -100,7 +107,6 @@ class Minds extends base
         (new Groups\GroupsProvider())->register();
         (new Search\SearchProvider())->register();
         (new Votes\VotesProvider())->register();
-        (new Features\FeaturesProvider())->register();
         (new SMS\SMSProvider())->register();
         (new Blockchain\BlockchainProvider())->register();
         (new Issues\IssuesProvider())->register();
@@ -110,7 +116,6 @@ class Minds extends base
         (new Plus\PlusProvider())->register();
         (new Pro\ProProvider())->register();
         (new Hashtags\HashtagsProvider())->register();
-        (new Feeds\FeedsProvider())->register();
         (new Analytics\AnalyticsProvider())->register();
         (new Channels\ChannelsProvider())->register();
         (new Blogs\BlogsProvider())->register();

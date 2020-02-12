@@ -60,6 +60,8 @@ class User extends \ElggUser
         $this->attributes['onchain_booster'] = null;
         $this->attributes['toaster_notifications'] = 1;
         $this->attributes['mode'] = ChannelMode::OPEN;
+        $this->attributes['email_confirmation_token'] = null;
+        $this->attributes['email_confirmed_at'] = null;
 
         parent::initializeAttributes();
     }
@@ -638,6 +640,50 @@ class User extends \ElggUser
     }
 
     /**
+     * @param string $token
+     * @return User
+     */
+    public function setEmailConfirmationToken(string $token): User
+    {
+        $this->email_confirmation_token = $token;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmailConfirmationToken(): ?string
+    {
+        return ((string) $this->email_confirmation_token) ?: null;
+    }
+
+    /**
+     * @param int $time
+     * @return User
+     */
+    public function setEmailConfirmedAt(?int $time): User
+    {
+        $this->email_confirmed_at = $time;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getEmailConfirmedAt(): ?int
+    {
+        return ((int) $this->email_confirmed_at) ?: null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailConfirmed(): bool
+    {
+        return (bool) $this->email_confirmed_at;
+    }
+
+    /**
      * Subscribes user to another user.
      *
      * @param mixed $guid
@@ -825,7 +871,7 @@ class User extends \ElggUser
         $export['programs'] = $this->getPrograms();
         $export['plus'] = (bool) $this->isPlus();
         $export['pro'] = (bool) $this->isPro();
-        $export['pro_published'] = (bool) $this->isProPublished();
+        $export['pro_published'] = $this->isPro() && $this->isProPublished();
         $export['verified'] = (bool) $this->verified;
         $export['founder'] = (bool) $this->founder;
         $export['disabled_boost'] = (bool) $this->disabled_boost;
@@ -868,6 +914,10 @@ class User extends \ElggUser
             $export['spam'] = $this->getSpam();
             $export['deleted'] = $this->getDeleted();
         }
+
+        $export['email_confirmed'] =
+            (!$this->getEmailConfirmationToken() && !$this->getEmailConfirmedAt()) || // Old users poly-fill
+            $this->isEmailConfirmed();
 
         $export['eth_wallet'] = $this->getEthWallet() ?: '';
         $export['rating'] = $this->getRating();
