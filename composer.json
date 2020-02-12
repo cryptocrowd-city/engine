@@ -38,7 +38,8 @@
         "psr/http-server-middleware": "1.0.1",
         "monolog/monolog": "1.25.2",
         "psr/simple-cache": "1.0.1",
-        "minds/unleash-client-php": "0.1.2"
+        "minds/unleash-client-php": "0.1.2",
+        "icamys/php-sitemap-generator": "^2.0"
     },
     "repositories": [
         {
@@ -69,13 +70,33 @@
             "Spec\\Minds\\": "Spec/"
         }
     },
-    "config": {
-        "bin-dir": "bin"
+    {
+      "type": "vcs",
+      "url": "https://github.com/minds/phpcassa"
     },
-    "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.15",
-        "friends-of-phpspec/phpspec-code-coverage": "^4.3",
-        "phpspec/phpspec": "^5.0",
-        "bossa/phpspec2-expect": "^3.1"
+    {
+      "type": "vcs",
+      "url": "https://github.com/davegardnerisme/cruftflake.git"
+    },
+    {
+      "type": "vcs",
+      "url": "https://gitlab.com/minds/unleash-client-php.git"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Minds\\": ".",
+      "": "classes/",
+      "Spec\\Minds\\": "Spec/"
+    }
+  },
+  "config": {
+    "bin-dir": "bin"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^2.15",
+    "friends-of-phpspec/phpspec-code-coverage": "^4.3",
+    "phpspec/phpspec": "^5.0",
+    "bossa/phpspec2-expect": "^3.1"
+  }
 }

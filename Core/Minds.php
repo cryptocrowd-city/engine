@@ -34,6 +34,7 @@ class Minds extends base
         Feeds\Module::class,
         Front\Module::class,
         Captcha\Module::class,
+        SEO\Sitemaps\Module::class,
     ];
 
     /**
