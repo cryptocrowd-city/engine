@@ -31,8 +31,8 @@ class Defaults
             }
 
             $export = $event->response() ?: [];
-            if ($params['entity']->fullExport && $params['entity']->owner_guid) {
-                $export['ownerObj'] = Entities\Factory::build($params['entity']->owner_guid)->export();
+            if ($params['entity']->fullExport && $params['entity']->ownerObj && is_array($params['entity']->ownerObj)) {
+                $export['ownerObj'] = Entities\Factory::build($params['entity']->ownerObj)->export();
                 //$export['ownerObj'] = \Minds\Helpers\Export::sanitize($params['entity']->ownerObj);
                 //  $export['ownerObj']['guid'] = (string) $params['entity']->ownerObj['guid'];
                 $event->setResponse($export);

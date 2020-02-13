@@ -97,8 +97,6 @@ use Minds\Traits\MagicAttributes;
  * @method bool getAllowComments()
  * @method int getTimeSent()
  * @method Blog setTimeSent(int $time_sent)
- * @method bool getFullExport()
- * @method Blog setFullExport(bool $value)
  */
 class Blog extends RepositoryEntity
 {
@@ -247,9 +245,6 @@ class Blog extends RepositoryEntity
     /** @var int */
     protected $timeSent;
 
-    /** @var bool */
-    protected $fullExport = false;
-
     /**
      * Blog constructor.
      * @param null $eventsDispatcher
@@ -332,7 +327,7 @@ class Blog extends RepositoryEntity
      */
     public function getOwnerObj()
     {
-        if ($this->fullExport || (!$this->ownerObj && $this->ownerGuid)) {
+        if (!$this->ownerObj && $this->ownerGuid) {
             $user = new User($this->ownerGuid);
             $this->setOwnerObj($user->export());
         }
@@ -478,9 +473,9 @@ class Blog extends RepositoryEntity
     }
 
     /**
-      * Get NSFW options
-      * @return array
-      */
+     * Get NSFW options
+     * @return array
+     */
     public function getNsfw()
     {
         $array = [];

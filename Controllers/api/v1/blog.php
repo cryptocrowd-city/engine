@@ -146,8 +146,6 @@ class blog implements Interfaces\Api
                         break;
                     }
 
-                    $blog->setFullExport(true);
-
                     $response['blog'] = $blog;
                 }
                 break;

@@ -43,8 +43,6 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
                 ]);
             }
 
-            $entity->fullExport = true;
-
             switch ($entity->subtype) {
                 case "video":
                     // Helpers\Counters::increment($pages[0], 'plays');
