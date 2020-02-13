@@ -62,6 +62,7 @@ class User extends \ElggUser
         $this->attributes['mode'] = ChannelMode::OPEN;
         $this->attributes['email_confirmation_token'] = null;
         $this->attributes['email_confirmed_at'] = null;
+        $this->attributes['surge_token'] = '';
         $this->attributes['hide_share_buttons'] = 0;
 
         parent::initializeAttributes();
@@ -1248,6 +1249,8 @@ class User extends \ElggUser
             'toaster_notifications',
             'mode',
             'btc_address',
+            'surge_token',
+            'hide_share_buttons',
         ]);
     }
 
