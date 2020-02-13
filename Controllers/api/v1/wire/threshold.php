@@ -45,7 +45,9 @@ class threshold implements Interfaces\Api
 
             // Sign URI so that user can view it.
             $signedUri = new SignedUri();
-            $signed =  $signedUri->sign($entity->custom_data[0]['src']);
+            $signed = $entity->custom_data[0]['src'] ?
+                $signedUri->sign($entity->custom_data[0]['src']) :
+                null;
 
             if ($entity->type == 'activity') {
                 $response['activity'] = $entity->export();
