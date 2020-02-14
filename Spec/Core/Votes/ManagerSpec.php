@@ -98,7 +98,6 @@ class ManagerSpec extends ObjectBehavior
         Activity $entity,
         User $user
     ) {
-
         $vote->getEntity()
             ->shouldBeCalled()
             ->willReturn($entity);

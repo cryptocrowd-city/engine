@@ -100,8 +100,7 @@ class Manager
         $offchainTxs = null,
         $stripeIntentsManager = null,
         $acl = null
-    )
-    {
+    ) {
         $this->repository = $repository ?: Di::_()->get('Wire\Repository');
         $this->txManager = $txManager ?: Di::_()->get('Blockchain\Transactions\Manager');
         $this->txRepo = $txRepo ?: Di::_()->get('Blockchain\Transactions\Repository');
@@ -109,7 +108,7 @@ class Manager
         $this->client = $client ?: Di::_()->get('Blockchain\Services\Ethereum');
         $this->token = $token ?: Di::_()->get('Blockchain\Token');
         $this->cap = $cap ?: Di::_()->get('Blockchain\Wallets\OffChain\Cap');
-        $this->upgradesDelegate = $upgradesDelegate ?? new Delegates\UpgradesDelegate();;
+        $this->upgradesDelegate = $upgradesDelegate ?? new Delegates\UpgradesDelegate();
         $this->recurringDelegate = $recurringDelegate ?: new Delegates\RecurringDelegate();
         $this->notificationDelegate = $notificationDelegate ?: new Delegates\NotificationDelegate();
         $this->cacheDelegate = $cacheDelegate ?: new Delegates\CacheDelegate();

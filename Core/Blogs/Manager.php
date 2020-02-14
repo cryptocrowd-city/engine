@@ -117,7 +117,6 @@ class Manager
      */
     public function add(Blog $blog)
     {
-
         if ($this->spam->check($blog)) {
             return false;
         }

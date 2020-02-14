@@ -193,7 +193,8 @@ class NormalizedEntity
         return $export;
     }
 
-    public function canEdit() {
+    public function canEdit()
+    {
         return Core\Security\ACL::_()->write($this);
     }
 }
