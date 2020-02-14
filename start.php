@@ -26,6 +26,9 @@ Sentry\init([
     'environment' => getenv('MINDS_ENV') ?: 'development',
     'send_default_pii' => false,
 ]);
+//Enable loading of .env files
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 $minds = new Minds\Core\Minds();
 $minds->start();

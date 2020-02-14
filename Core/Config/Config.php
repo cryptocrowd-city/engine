@@ -10,6 +10,7 @@ namespace Minds\Core\Config;
  */
 class Config
 {
+    public const ENV_PREFIX = "MINDS_ENV_";
     public static $_;
     private $config = [];
 
@@ -44,10 +45,7 @@ class Config
      */
     public function get($key)
     {
-        if (isset($this->config[$key])) {
-            return $this->config[$key];
-        }
-        return null;
+        return getenv(Config::ENV_PREFIX . $key, true) ?: $this->config[$key];
     }
 
     /**
