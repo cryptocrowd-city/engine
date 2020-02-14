@@ -36,9 +36,6 @@ class ManagerSpec extends ObjectBehavior
     /** @var PropagateProperties */
     protected $propagateProperties;
 
-    /** @var ACL */
-    protected $acl;
-
     public function let(
         Repository $repository,
         Delegates\PaywallReview $paywallReview,
@@ -46,8 +43,7 @@ class ManagerSpec extends ObjectBehavior
         Delegates\Feeds $feeds,
         Spam $spam,
         Delegates\Search $search,
-        PropagateProperties $propagateProperties,
-        ACL $acl
+        PropagateProperties $propagateProperties
     ) {
         $this->beConstructedWith(
             $repository,
@@ -56,8 +52,7 @@ class ManagerSpec extends ObjectBehavior
             $feeds,
             $spam,
             $search,
-            $propagateProperties,
-            $acl
+            $propagateProperties
         );
 
         $this->repository = $repository;
@@ -67,7 +62,6 @@ class ManagerSpec extends ObjectBehavior
         $this->spam = $spam;
         $this->search = $search;
         $this->propagateProperties = $propagateProperties;
-        $this->acl = $acl;
     }
 
     public function it_is_initializable()
@@ -157,21 +151,8 @@ class ManagerSpec extends ObjectBehavior
             ->duringGetNext($blog, 'notimplemented');
     }
 
-    public function it_should_fail_to_add_if_the_user_hasnt_verified_its_email(Blog $blog)
-    {
-        $this->acl->write($blog)
-            ->shouldBeCalled()
-            ->willThrow(UnverifiedEmailException::class);
-        
-        $this->shouldThrow(UnverifiedEmailException::class)->during('add', [$blog]);
-    }
-
     public function it_should_add(Blog $blog)
     {
-        $this->acl->write($blog)
-            ->shouldBeCalled()
-            ->willReturn(true);
-
         $this->spam->check($blog)
             ->shouldBeCalled();
 
@@ -299,9 +280,6 @@ class ManagerSpec extends ObjectBehavior
 
     public function it_should_check_for_spam(Blog $blog, Spam $spam)
     {
-        $this->acl->write($blog)
-            ->shouldBeCalled()
-            ->willReturn(true);
         $spamUrl = 'movieblog.tumblr.com';
 
         $blog->getType()
