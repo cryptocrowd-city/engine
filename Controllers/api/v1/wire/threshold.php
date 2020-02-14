@@ -43,16 +43,15 @@ class threshold implements Interfaces\Api
         if ($isAllowed) {
             $entity->setPaywall(false);
 
-            // Sign URI so that user can view it.
-            $signedUri = new SignedUri();
-            $signed = $entity->custom_data[0]['src'] ?
-                $signedUri->sign($entity->custom_data[0]['src']) :
-                null;
-
             if ($entity->type == 'activity') {
                 $response['activity'] = $entity->export();
                 $response['activity']['paywall_unlocked'] = true;
-                $response['activity']['custom_data'][0]['src'] = $signed;
+                
+                if (isset($entity->custom_type) && $entity->custom_type === 'batch') {
+                    $signedUri = new SignedUri(); // Sign URI so that user can view it.
+                    $signed = $signedUri->sign($entity->custom_data[0]['src']);
+                    $response['activity']['custom_data'][0]['src'] = $signed;
+                }
             } else {
                 $response['entity'] = $entity->export();
                 $response['entity']['paywall_unlocked'] = true;
