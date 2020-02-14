@@ -5,13 +5,10 @@ namespace Spec\Minds\Core\Entities\Actions;
 use Minds\Core\Blogs\Blog;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Events\EventsDispatcher;
-use Minds\Core\Router\Exceptions\UnverifiedEmailException;
-use Minds\Core\Security\ACL;
-use Minds\Entities\User;
 use Minds\Entities\Activity;
 use Minds\Entities\Group;
+use Minds\Entities\User;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class SaveSpec extends ObjectBehavior
 {
@@ -54,19 +51,9 @@ class SaveSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
-        $this->acl->write($user)
-            ->willReturn(true);
-
         $this->setEntity($user);
 
         $this->save()->shouldReturn(true);
-    }
-
-    public function it_should_fail_to_save_an_entity_if_the_user_is_not_trusted(User $user)
-    {
-        $this->setEntity($user);
-
-        $this->shouldThrow(UnverifiedEmailException::class)->during('save');
     }
 
     public function it_should_saev_an_entity_via_the_entity_save_event(Blog $blog)
@@ -87,9 +74,6 @@ class SaveSpec extends ObjectBehavior
 
         $this->dispatcher->trigger('entity:save', 'object:blog', ['entity' => $blog], false)
             ->shouldBeCalled()
-            ->willReturn(true);
-
-        $this->acl->write($blog, Argument::any())
             ->willReturn(true);
 
         $this->setEntity($blog);
@@ -131,9 +115,6 @@ class SaveSpec extends ObjectBehavior
 
         $activity->save()
             ->shouldBeCalled()
-            ->willReturn(true);
-
-        $this->acl->write($activity, Argument::any())
             ->willReturn(true);
 
         $this->setEntity($activity);
