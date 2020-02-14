@@ -23,9 +23,6 @@ class Save
     /** @var Dispatcher */
     protected $eventsDispatcher;
 
-    /** @var ACL */
-    protected $acl;
-
     /** @var mixed */
     protected $entity;
 
@@ -35,12 +32,9 @@ class Save
      * @param null $eventsDispatcher
      */
     public function __construct(
-        $eventsDispatcher = null,
-        $acl = null,
-        $manager = null
+        $eventsDispatcher = null
     ) {
         $this->eventsDispatcher = $eventsDispatcher ?: Di::_()->get('EventsDispatcher');
-        $this->acl = $acl ?: ACL::_();
     }
 
     /**
@@ -67,10 +61,6 @@ class Save
     public function save(...$args)
     {
         if (!$this->entity) {
-            return false;
-        }
-
-        if (!$this->acl->write($this->entity)) {
             return false;
         }
 

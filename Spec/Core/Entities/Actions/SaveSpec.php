@@ -18,14 +18,10 @@ class SaveSpec extends ObjectBehavior
     /** @var EventsDispatcher */
     protected $dispatcher;
 
-    /** @var ACL */
-    protected $acl;
-
-    public function let(EventsDispatcher $dispatcher, ACL $acl)
+    public function let(EventsDispatcher $dispatcher)
     {
-        $this->beConstructedWith($dispatcher, $acl);
+        $this->beConstructedWith($dispatcher);
         $this->dispatcher = $dispatcher;
-        $this->acl = $acl;
     }
 
     public function it_is_initializable()
@@ -68,9 +64,6 @@ class SaveSpec extends ObjectBehavior
 
     public function it_should_fail_to_save_an_entity_if_the_user_is_not_trusted(User $user)
     {
-        $this->acl->write($user, Argument::any())
-            ->willThrow(UnverifiedEmailException::class);
-
         $this->setEntity($user);
 
         $this->shouldThrow(UnverifiedEmailException::class)->during('save');
@@ -185,15 +178,12 @@ class SaveSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
-        $this->acl->write($activity, Argument::any())
-            ->willReturn(true);
-
         $this->setEntity($activity);
 
         $this->save()->shouldReturn(true);
     }
 
-    public function it_should_save_an_entity_using_its_save_method_with_NSFW_from_container(Activity $activity, Group $container, User $user)
+    public function it_should_save_an_entity_using_its_save_method_with_NSFW_from_container(Activity $activity, Group $container)
     {
         $nsfw = [1, 2, 3, 4, 5, 6];
         $container->getNsfw()
@@ -225,16 +215,12 @@ class SaveSpec extends ObjectBehavior
         $activity->save()
             ->shouldBeCalled()
             ->willReturn(true);
-
-        $this->acl->write($activity, Argument::any())
-            ->willReturn(true);
-
         $this->setEntity($activity);
 
         $this->save()->shouldReturn(true);
     }
 
-    public function it_should_save_an_entity_using_its_save_method_with_NSFW_from_group(Activity $activity, Group $container, User $user)
+    public function it_should_save_an_entity_using_its_save_method_with_NSFW_from_group(Activity $activity, Group $container)
     {
         $nsfw = [1, 2, 3, 4, 5, 6];
         $container->getNsfw()
@@ -265,9 +251,6 @@ class SaveSpec extends ObjectBehavior
 
         $activity->save()
             ->shouldBeCalled()
-            ->willReturn(true);
-
-        $this->acl->write($activity, Argument::any())
             ->willReturn(true);
 
         $this->setEntity($activity);
@@ -309,9 +292,6 @@ class SaveSpec extends ObjectBehavior
 
         $activity->save()
             ->shouldBeCalled()
-            ->willReturn(true);
-
-        $this->acl->write($activity, Argument::any())
             ->willReturn(true);
 
         $this->setEntity($activity);
