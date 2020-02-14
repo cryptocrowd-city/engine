@@ -52,10 +52,6 @@ class ManagerSpec extends ObjectBehavior
         $vote->getActor()->willReturn($user);
         $vote->getDirection()->willReturn('up');
 
-        $this->acl->write($vote)
-            ->shouldBeCalled()
-            ->willReturn(true);
-
         $this->acl->interact($entity, $user, 'voteup')
             ->shouldBeCalled()
             ->willReturn(true);
@@ -81,10 +77,6 @@ class ManagerSpec extends ObjectBehavior
         $vote->getActor()->willReturn($user);
         $vote->getDirection()->willReturn('up');
 
-        $this->acl->write($vote)
-            ->shouldBeCalled()
-            ->willReturn(true);
-
         $this->acl->interact($entity, $user, 'voteup')
             ->shouldBeCalled()
             ->willReturn(true);
@@ -106,7 +98,20 @@ class ManagerSpec extends ObjectBehavior
         Activity $entity,
         User $user
     ) {
-        $this->acl->write($vote)
+
+        $vote->getEntity()
+            ->shouldBeCalled()
+            ->willReturn($entity);
+
+        $vote->getActor()
+            ->shouldBeCalled()
+            ->willReturn($user);
+
+        $vote->getDirection()
+            ->shouldBeCalled()
+            ->willReturn('up');
+
+        $this->acl->interact($entity, $user, 'voteup')
             ->shouldBeCalled()
             ->willThrow(UnverifiedEmailException::class);
 
@@ -121,10 +126,6 @@ class ManagerSpec extends ObjectBehavior
         $vote->getEntity()->willReturn($entity);
         $vote->getActor()->willReturn($user);
         $vote->getDirection()->willReturn('up');
-
-        $this->acl->write($vote)
-            ->shouldBeCalled()
-            ->willReturn(true);
 
         $this->acl->interact($entity, $user, 'voteup')
             ->shouldBeCalled()
@@ -148,10 +149,6 @@ class ManagerSpec extends ObjectBehavior
         $vote->getEntity()->willReturn($entity);
         $vote->getActor()->willReturn($user);
 
-        $this->acl->write($vote)
-            ->shouldBeCalled()
-            ->willReturn(true);
-
         $this->counters->update($vote, -1)
             ->shouldBeCalled()
             ->willReturn(true);
@@ -172,10 +169,6 @@ class ManagerSpec extends ObjectBehavior
         $vote->getEntity()->willReturn($entity);
         $vote->getActor()->willReturn($user);
         $vote->getDirection()->willReturn('up');
-
-        $this->acl->write($vote)
-            ->shouldBeCalled()
-            ->willReturn(true);
 
         $this->dispatcher->trigger('vote:action:cancel', Argument::any(), ['vote' => $vote], null)
             ->shouldBeCalled()
@@ -230,10 +223,6 @@ class ManagerSpec extends ObjectBehavior
         $vote->getActor()->willReturn($user);
         $vote->getDirection()->willReturn('up');
 
-        $this->acl->write($vote)
-            ->shouldBeCalled()
-            ->willReturn(true);
-
         $this->acl->interact($entity, $user, 'voteup')
             ->shouldBeCalled()
             ->willReturn(true);
@@ -261,10 +250,6 @@ class ManagerSpec extends ObjectBehavior
     ) {
         $vote->getEntity()->willReturn($entity);
         $vote->getActor()->willReturn($user);
-
-        $this->acl->write($vote)
-            ->shouldBeCalled()
-            ->willReturn(true);
 
         $this->indexes->exists($vote)
             ->shouldBeCalled()

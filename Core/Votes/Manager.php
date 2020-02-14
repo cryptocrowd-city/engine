@@ -53,10 +53,6 @@ class Manager
             'events' => true
         ], $options);
 
-        if (!$this->acl->write($vote)) {
-            return false;
-        }
-
         if (!$this->acl->interact($vote->getEntity(), $vote->getActor(), "vote{$vote->getDirection()}")) {
             throw new \Exception('Actor cannot interact with entity');
         }
@@ -95,10 +91,6 @@ class Manager
         $options = array_merge([
             'events' => true
         ], $options);
-
-        if (!$this->acl->write($vote)) {
-            return false;
-        }
 
         $done = $this->eventsDispatcher->trigger('vote:action:cancel', $vote->getEntity()->type, [
             'vote' => $vote

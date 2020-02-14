@@ -173,6 +173,9 @@ class ACL
             return false;
         }
 
+        /**
+         * If the user hasn't verified the email
+         */
         if (!$user->isTrusted()) {
             throw new UnverifiedEmailException();
         }
@@ -262,6 +265,13 @@ class ACL
          */
         if ($user->isBanned() || !$user->isEnabled()) {
             return false;
+        }
+
+        /**
+         * If the user hasn't verified the email
+         */
+        if (!$user->isTrusted()) {
+            throw new UnverifiedEmailException();
         }
 
         /**
