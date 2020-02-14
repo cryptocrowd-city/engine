@@ -266,10 +266,6 @@ class media implements Interfaces\Api, Interfaces\ApiIgnorePam
 
         $entity = Core\Media\Factory::build($clientType);
 
-        if (!Security\ACL::_()->write($entity)) {
-            return false;
-        }
-
         $container_guid = isset($data['container_guid']) && is_numeric($data['container_guid']) ? $data['container_guid'] : null;
         $entity->patch([
             'title' => isset($data['name']) ? $data['name'] : '',
