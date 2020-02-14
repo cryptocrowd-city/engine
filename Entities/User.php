@@ -1216,7 +1216,6 @@ class User extends \ElggUser
         return array_merge(parent::getExportableValues(), [
             'website',
             'briefdescription',
-            'dob',
             'gender',
             'city',
             'merchant',
@@ -1416,6 +1415,28 @@ class User extends \ElggUser
     {
         $this->btc_address = (string) $btc_address;
 
+        return $this;
+    }
+
+    /**
+     * Gets the Surge Token of the user for push notifications.
+     *
+     * @return string Token.
+     */
+    public function getSurgeToken(): string
+    {
+        return (string) $this->surge_token ?? '';
+    }
+
+    /**
+     * Sets the Surge Token of the user for push notifications.
+     *
+     * @param string $token - the token string.
+     * @return User instance of $this for chaining.
+     */
+    public function setSurgeToken(string $token = ''): User
+    {
+        $this->surge_token = $token;
         return $this;
     }
 }
