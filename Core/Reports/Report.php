@@ -76,26 +76,19 @@ class Report
     private $userHashes;
 
     /** @var array $stateChanges */
-    private $stateChanges = ['reported'];
+    private $stateChanges;
     
-    /**
-     * @param string $state pushes a state into our state change array
-     * @return Report this
-     */
-    public function setState(string $state) : Report
-    {
-        $this->stateChanges[] = $state;
-    }
-    
-
     /**
      * Return the state of the report from the state changes
      */
-    public function getState() : string
+    public function getState()
     {
+        if (!$this->stateChanges) {
+            return 'reported';
+        }
         $sortedStates = $this->stateChanges;
         arsort($sortedStates);
-        return $sortedStates[0];
+        return key($sortedStates);
     }
 
     /**
