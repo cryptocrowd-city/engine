@@ -46,6 +46,9 @@ class Provider extends DiProvider
                 'post-scheduler',
                 'ckeditor5',
                 'navigation',
+                'activity-v2--single-page',
+                'activity-v2--feeds',
+                'activity-v2--boosts',
             ];
         });
 
