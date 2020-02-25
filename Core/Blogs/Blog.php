@@ -475,9 +475,9 @@ class Blog extends RepositoryEntity
     }
 
     /**
-      * Get NSFW options
-      * @return array
-      */
+     * Get NSFW options
+     * @return array
+     */
     public function getNsfw()
     {
         $array = [];
