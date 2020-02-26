@@ -15,15 +15,32 @@ abstract class AbstractEntitiesResolver
     /** @var Scroll */
     private $scroll;
 
+    /** @var EntitiesBuilder */
+    protected $entitiesBuilder;
+
     /** @var string */
     protected $type;
 
     /** @var array */
+    protected $query = [
+        "bool" => [
+            "must" => [
+                [
+                    "exists" => [
+                        "field" => "guid",
+                    ],
+                ]
+            ]
+        ]
+    ];
+
+    /** @var array */
     protected $sort = [ '@timestamp' => 'desc' ];
 
-    public function __construct($scroll = null)
+    public function __construct($scroll = null, $entitiesBuilder = null)
     {
         $this->scroll = $scroll ?? Di::_()->get('Database\ElasticSearch\Scroll');
+        $this->entitiesBuilder = $entitiesBuilder ??  Di::_()->get('EntitiesBuilder');
     }
 
     /**
@@ -36,10 +53,9 @@ abstract class AbstractEntitiesResolver
         $prepared->query([
             "index" => "minds_badger",
             "type" => $this->type,
+            "size" => 5000,
             "body" => [
-                "query" => [
-                    "match_all" => new \stdClass()
-                ],
+                "query" => $this->query,
                 'sort' => $this->sort,
             ],
         ]);

@@ -3,15 +3,14 @@
  */
 namespace Minds\Core\SEO\Sitemaps\Resolvers;
 
-use Minds\Entities\Activity;
-use Minds\Core\Entities\Manager as EntitiesManager;
+use Minds\Core\Blogs\Legacy;
 use Minds\Core\SEO\Sitemaps\SitemapUrl;
 use Minds\Core\SEO\Manager;
 
-class ActivityResolver extends AbstractEntitiesResolver
+class BlogsResolver extends AbstractEntitiesResolver
 {
     /** @var string */
-    protected $type = 'activity';
+    protected $type = 'object:blog';
 
     /** @var array */
     protected $query = [
@@ -42,19 +41,6 @@ class ActivityResolver extends AbstractEntitiesResolver
                                 ]
                             ]
                         ],
-                        "should" => [
-                            [
-                                "regexp" => [
-                                  "message" => ".+"
-                                ],
-                            ],
-                            [
-                                "regexp" => [
-                                  "title" => ".+"
-                                ],
-                            ]
-                        ],
-                        "minimum_should_match" => 1,
                     ]
                 ];
 
@@ -65,12 +51,14 @@ class ActivityResolver extends AbstractEntitiesResolver
     {
         $i = 0;
         foreach ($this->getRawData() as $raw) {
-            $entity = new Activity($raw);
-
+            $entity = $this->entitiesBuilder->single($raw['guid']);
+            if (!$entity) {
+                continue;
+            }
             ++$i;
             $lastModified = (new \DateTime)->setTimestamp($entity->time_created);
             $sitemapUrl = new SitemapUrl();
-            $sitemapUrl->setLoc("/newsfeed/{$entity->guid}")
+            $sitemapUrl->setLoc("/" . $entity->getUrl(true))
                 ->setChangeFreq('never')
                 ->setLastModified($lastModified);
             error_log("$i: {$entity->getUrl()}");
