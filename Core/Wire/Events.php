@@ -63,7 +63,7 @@ class Events
                 return;
             }
 
-            $event->setResponse($entity->getSender() === $user->guid);
+            $event->setResponse($entity->getSender()->guid === $user->guid);
         });
     }
 }
