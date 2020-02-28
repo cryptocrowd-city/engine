@@ -10,7 +10,6 @@ use Minds\Core\Config;
 use Minds\Core\Di\Di;
 use Minds\Core\EntitiesBuilder;
 use Minds\Core\Pro\Settings;
-use Minds\Entities\Object\Carousel;
 use Minds\Entities\User;
 use Minds\Helpers\Text;
 
