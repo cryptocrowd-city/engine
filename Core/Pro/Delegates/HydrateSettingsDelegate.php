@@ -68,20 +68,7 @@ class HydrateSettingsDelegate
                     $settings->getUserGuid(),
                     $settings->getTimeUpdated()
                 );
-            } else {
-                $carousels = $this->entitiesBuilder->get(['subtype' => 'carousel', 'owner_guid' => (string) $user->guid]);
-                $carousel = $carousels[0] ?? null;
-
-                if ($carousel) {
-                    $backgroundImage = sprintf(
-                        '%sfs/v1/banners/%s/fat/%s',
-                        $this->config->get('cdn_url'),
-                        $carousel->guid,
-                        $carousel->last_updated
-                    );
-                }
             }
-
             if ($backgroundImage) {
                 $settings
                     ->setBackgroundImage($backgroundImage);
