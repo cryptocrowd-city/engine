@@ -155,7 +155,6 @@ class ACL
      */
     public function write($entity, $user = null)
     {
-        $class = get_class($entity);
         if (!$user) {
             $user = Core\Session::getLoggedinUser();
         }
@@ -165,7 +164,6 @@ class ACL
         }
 
         if (!$user) {
-            error_log("[ACL] user doesn't exist - {$class}");
             return false;
         }
 
@@ -173,7 +171,6 @@ class ACL
          * If the user is banned or in a limited state
          */
         if ($user->isBanned() || !$user->isEnabled()) {
-            error_log("[ACL] user is banned or not enabled - {$class}");
             return false;
         }
 
@@ -181,7 +178,6 @@ class ACL
          * If the user hasn't verified the email
          */
         if (!$user->isTrusted()) {
-            error_log("[ACL] user is not trusted - {$class}");
             throw new UnverifiedEmailException();
         }
 
@@ -195,7 +191,6 @@ class ACL
                 || ($entity->container_guid == $user->guid) // or it is the same as owner
             )
         ) {
-            error_log("[ACL] we are either the owner, or owner of the group (container_guid) - {$class}");
             return true;
         }
 
@@ -204,7 +199,6 @@ class ACL
          */
         if ((isset($entity->guid) && $entity->guid == $user->guid) ||
             MagicAttributes::getterExists($entity, 'getGuid') && $entity->getGuid() == $user->guid) {
-            error_log("[ACL] user is the same as the entity - {$class}");
             return true;
         }
 
@@ -212,7 +206,6 @@ class ACL
          * Is this user an admin?
          */
         if ($user->isAdmin()) {
-            error_log("[ACL] user is an admin - {$class}");
             return true;
         }
 
@@ -221,7 +214,6 @@ class ACL
          */
         $type = property_exists($entity, 'type') ? $entity->type : 'all';
         if (Core\Events\Dispatcher::trigger('acl:write', $entity->type, ['entity'=>$entity, 'user'=>$user], false) === true) {
-            error_log("[ACL] 'acl:write' returned true - {$class}");
             return true;
         }
 
@@ -245,11 +237,9 @@ class ACL
             ], false);
 
             if ($check === true) {
-                error_log("[ACL] 'acl:write:container' returned true - {$class}");
                 return true;
             }
         }
-        error_log("[ACL] no checks passed - {$class}");
 
         return false;
     }
