@@ -13,6 +13,7 @@ use Minds\Entities\RepositoryEntity;
 use Minds\Entities\User;
 use Minds\Exceptions\StopEventException;
 use Minds\Helpers\Flags;
+use Minds\Helpers\MagicAttributes;
 
 class ACL
 {
@@ -196,7 +197,8 @@ class ACL
         /**
          * Check if its the same entity (is user)
          */
-        if ($entity->guid == $user->guid) {
+        if ((isset($entity->guid) && $entity->guid == $user->guid) ||
+            MagicAttributes::getterExists($entity, 'getGuid') && $entity->getGuid() == $user->guid) {
             return true;
         }
 
