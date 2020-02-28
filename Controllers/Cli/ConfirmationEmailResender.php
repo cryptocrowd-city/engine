@@ -2,9 +2,9 @@
 declare(ticks = 1);
 
 /**
- * Blockchain CLI
+ * ConfirmationEmailResender CLI
  *
- * @author emi
+ * @author eiennohi
  */
 
 namespace Minds\Controllers\Cli;
@@ -59,11 +59,6 @@ class ConfirmationEmailResender extends Cli\Controller implements Interfaces\Cli
                 'next_attempt' => ['lte' => time()],
             ]);
 
-            if (!$ops) {
-                sleep(1);
-                continue;
-            }
-
             foreach ($ops as $op) {
                 $resolver->setUrns($op->getEntityUrn());
 
@@ -95,7 +90,8 @@ class ConfirmationEmailResender extends Cli\Controller implements Interfaces\Cli
 
                 // if we've reached the max number of tries, delete the entry
                 if ($op->getTries() < $op->getMaxTries()) {
-                    // update with 1 more try
+                    // update with 1 more try and an updated next_attempt
+                    $op->setNextAttempt(strtotime('midnight tomorrow'));
                     $opsManager->add($op);
                 } else {
                     $opsManager->delete($op);
@@ -104,7 +100,5 @@ class ConfirmationEmailResender extends Cli\Controller implements Interfaces\Cli
 
             sleep(3600); // 1 hour
         }
-
-        $this->filterCleanup();
     }
 }
