@@ -219,6 +219,7 @@ class ACL
         /**
          * Allow plugins to extend the ACL check
          */
+        $type = property_exists($entity, 'type') ? $entity->type : 'all';
         if (Core\Events\Dispatcher::trigger('acl:write', $entity->type, ['entity'=>$entity, 'user'=>$user], false) === true) {
             error_log("[ACL] 'acl:write' returned true - {$class}");
             return true;
