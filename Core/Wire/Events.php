@@ -54,14 +54,14 @@ class Events
             return $event->setResponse(true);
         });
 
-        Dispatcher::register('acl:write', 'all', function(Core\Events\Event $event) {
-           $params = $event->getParameters();
-           $entity = $params['entity'];
-           $user = $params['user'];
+        Dispatcher::register('acl:write', 'all', function (Core\Events\Event $event) {
+            $params = $event->getParameters();
+            $entity = $params['entity'];
+            $user = $params['user'];
 
-           if(!$entity instanceof Wire) {
-               return;
-           }
+            if (!$entity instanceof Wire) {
+                return;
+            }
 
             $event->setResponse($entity->getSender() === $user->guid);
         });
