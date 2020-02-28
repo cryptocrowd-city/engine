@@ -69,6 +69,7 @@ class HydrateSettingsDelegate
                     $settings->getTimeUpdated()
                 );
             }
+
             if ($backgroundImage) {
                 $settings
                     ->setBackgroundImage($backgroundImage);
