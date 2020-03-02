@@ -4,13 +4,22 @@
 namespace Minds\Core\SEO\Sitemaps\Resolvers;
 
 use Minds\Core\Di\Di;
+use Minds\Core\Log\Logger;
+use Minds\Core\Helpdesk\Question\Manager;
 use Minds\Core\SEO\Sitemaps\SitemapUrl;
 
 class HelpdeskResolver
 {
-    public function __construct()
+    /** @var Manager */
+    protected $helpdeskQuestionManager;
+
+    /** @var Logger */
+    protected $logger;
+
+    public function __construct($helpdeskQuestionManager = null, $logger = null)
     {
-        $this->helpdeskQuestionManager = Di::_()->get('Helpdesk\Question\Manager');
+        $this->helpdeskQuestionManager = $helpdeskQuestionManager ?? Di::_()->get('Helpdesk\Question\Manager');
+        $this->logger = $logger ?? Di::_()->get('Logger');
     }
 
     public function getUrls(): iterable
@@ -21,7 +30,7 @@ class HelpdeskResolver
             ++$i;
             $sitemapUrl = new SitemapUrl();
             $sitemapUrl->setLoc("/help/question/{$question->getUuid()}");
-            error_log("$i: {$sitemapUrl->getLoc()}");
+            $this->logger->info("$i: {$sitemapUrl->getLoc()}");
             yield $sitemapUrl;
         }
     }

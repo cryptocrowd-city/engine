@@ -29,10 +29,21 @@ class UsersResolverSpec extends ObjectBehavior
             ->willReturn([
                 [
                     '_source' => [
-                        'username' => 'mark'
+                        'username' => 'mark',
+                        'guid' => 123
                     ]
-                ]
+                    ],
+                    [
+                        '_source' => [
+                            'username' => 'marklowsubs',
+                            'guid' => 456
+                        ]
+                    ]
             ]);
+        // Nasty work around because User entities aren't injectable
+        $cacher = \Minds\Core\Data\cache\factory::build();
+        $cacher->set("123:friendsofcount", 10);
+        $cacher->set("456:friendsofcount", 2);
         $this->getUrls()->shouldHaveCount(1);
     }
 }

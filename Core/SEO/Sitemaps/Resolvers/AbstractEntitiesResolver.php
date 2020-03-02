@@ -8,6 +8,7 @@ namespace Minds\Core\SEO\Sitemaps\Resolvers;
 use Minds\Core\Data\ElasticSearch\Scroll;
 use Minds\Core\Data\ElasticSearch\Prepared\Search;
 use Minds\Core\Di\Di;
+use Minds\Core\Log\Logger;
 use Minds\Core\SEO\Sitemaps\SitemapUrl;
 
 abstract class AbstractEntitiesResolver
@@ -17,6 +18,9 @@ abstract class AbstractEntitiesResolver
 
     /** @var EntitiesBuilder */
     protected $entitiesBuilder;
+
+    /** @var Logger */
+    protected $logger;
 
     /** @var string */
     protected $type;
@@ -37,10 +41,11 @@ abstract class AbstractEntitiesResolver
     /** @var array */
     protected $sort = [ '@timestamp' => 'desc' ];
 
-    public function __construct($scroll = null, $entitiesBuilder = null)
+    public function __construct($scroll = null, $entitiesBuilder = null, $logger = null)
     {
         $this->scroll = $scroll ?? Di::_()->get('Database\ElasticSearch\Scroll');
         $this->entitiesBuilder = $entitiesBuilder ??  Di::_()->get('EntitiesBuilder');
+        $this->logger = $logger ?? Di::_()->get('Logger');
     }
 
     /**

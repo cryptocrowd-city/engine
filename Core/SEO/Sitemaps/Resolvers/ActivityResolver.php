@@ -73,7 +73,7 @@ class ActivityResolver extends AbstractEntitiesResolver
             $sitemapUrl->setLoc("/newsfeed/{$entity->guid}")
                 ->setChangeFreq('never')
                 ->setLastModified($lastModified);
-            error_log("$i: {$entity->getUrl()}");
+            $this->logger->info("$i: {$entity->getUrl()}");
             yield $sitemapUrl;
         }
     }

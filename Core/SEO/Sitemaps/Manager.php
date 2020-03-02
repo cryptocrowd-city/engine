@@ -38,6 +38,17 @@ class Manager
     }
 
     /**
+     * Set the resolvers to user
+     * @param array $resolvers
+     * @return self
+     */
+    public function setResolvers(array $resolvers): self
+    {
+        $this->resolvers = $resolvers;
+        return $this;
+    }
+
+    /**
      * Build the sitemap
      * @return void
      */
@@ -48,7 +59,7 @@ class Manager
         $this->generator->setMaxURLsPerSitemap(50000);
 
         foreach ($this->resolvers as $resolver) {
-            $resolver = new $resolver;
+            $resolver = is_object($resolver) ? $resolver : new $resolver;
             foreach ($resolver->getUrls() as $sitemapUrl) {
                 $this->generator->addURL(
                     $sitemapUrl->getLoc(),
@@ -79,6 +90,10 @@ class Manager
         return $outputDir;
     }
 
+    /**
+     * Uploads to S3
+     * @return void
+     */
     protected function uploadToS3(): void
     {
         $dir = $this->tmpOutputDirPath . '/sitemaps/';
@@ -88,11 +103,12 @@ class Manager
                 continue;
             }
             $this->s3->putObject([
-                  // 'ACL' => 'public-read',
+                  'ACL' => 'public-read',
                   'Bucket' => 'minds-sitemaps',
                   'Key' => "minds.com/$file",
                   'Body' => fopen($dir.$file, 'r'),
               ]);
+            unlink($dir.$file);
         }
         rmdir($dir);
     }
