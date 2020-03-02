@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "33919e523b3cdb8775fbe49cf1a7ddd6",
+    "content-hash": "8bb924fd1f021f2f3f546f6623898ffa",
     "packages": [
         {
             "name": "Minds/Surge",
