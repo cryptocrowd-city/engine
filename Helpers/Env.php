@@ -22,7 +22,7 @@ class Env
                 continue;
             }
             $keyPieces = explode(ENV::ENV_ARRAY_DELIMITER, substr($envKey, strlen(Env::ENV_PREFIX)));
-            $config = array_merge($config, Env::nestArray($keyPieces, $value));
+            $config = array_merge_recursive($config, Env::nestArray($keyPieces, $value));
         }
         return $config;
     }
