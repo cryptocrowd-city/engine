@@ -16,7 +16,6 @@ use Minds\Core\Data\ElasticSearch\Prepared\Search;
 use Minds\Core\Di\Di;
 use Minds\Core\Email\Confirmation\Manager;
 use Minds\Core\Entities\Resolver;
-use Minds\Entities\User;
 use Minds\Interfaces;
 
 class ConfirmationEmailResender extends Cli\Controller implements Interfaces\CliControllerInterface
@@ -85,7 +84,6 @@ class ConfirmationEmailResender extends Cli\Controller implements Interfaces\Cli
 
         $result = $client->request($prepared);
 
-        //        var_dump($result); die();
         $urns = [];
 
         if (!isset($result) || !isset($result['hits']) || !isset($result['hits']['hits'])) {
