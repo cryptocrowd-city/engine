@@ -38,6 +38,8 @@ Prefix the environment variables with MINDS_ENV_. All others are ignored
 Suffix the environment variables with the key in Config.php
 Nest arrays with {prefix}{key}__subkey__{...}_{Config Key}
 
+You can then manage these ENVs out on the review sites with the [Deployment Guide](https://developers.minds.com/docs/guides/deployment/)
+
 ### Running php tests
 
 * Have a fully setup development environment so all the composer dependencies are installed.
