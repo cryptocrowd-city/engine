@@ -1,5 +1,5 @@
 <?php
-declare(ticks = 1);
+declare(ticks=1);
 
 /**
  * ConfirmationEmailResender CLI
@@ -10,30 +10,25 @@ declare(ticks = 1);
 namespace Minds\Controllers\Cli;
 
 use Minds\Cli;
-use Minds\Core\Blockchain\EthPrice;
-use Minds\Core\Blockchain\Services\Ethereum;
-use Minds\Core\Blockchain\Purchase\Delegates\EthRate;
-use Minds\Core\DeferredOps\Manager;
+use Minds\Common\Urn;
+use Minds\Core\Data\ElasticSearch\Client;
+use Minds\Core\Data\ElasticSearch\Prepared\Search;
 use Minds\Core\Di\Di;
-use Minds\Core\Email\Confirmation\Manager as EmailConfirmation;
+use Minds\Core\Email\Confirmation\Manager;
 use Minds\Core\Entities\Resolver;
-use Minds\Core\Events\Dispatcher;
 use Minds\Entities\User;
 use Minds\Interfaces;
-use Minds\Core\Util\BigNumber;
 
 class ConfirmationEmailResender extends Cli\Controller implements Interfaces\CliControllerInterface
 {
-    protected $ethActiveFilter;
-
     /**
      * Echoes $commands (or overall) help text to standard output.
-     * @param  string|null $command - the command to be executed. If null, it corresponds to exec()
+     * @param string|null $command - the command to be executed. If null, it corresponds to exec()
      * @return null
      */
     public function help($command = null)
     {
-        $this->out('Usage: cli confirmationemailresender');
+        $this->out('Usage: cli ConfirmationEmailResender');
     }
 
     /**
@@ -44,61 +39,87 @@ class ConfirmationEmailResender extends Cli\Controller implements Interfaces\Cli
     {
         \Minds\Core\Events\Defaults::_();
 
-        /** @var Manager $deferredOpsManager */
-        $opsManager = Di::_()->get('DeferredOps\Manager');
-
-        /** @var EmailConfirmation $emailConfirmation */
-        $emailConfirmationManager = Di::_()->get('Email\Confirmation');
-
         $resolver = new Resolver();
 
-        while (true) {
-            // get jobs
-            $ops = $opsManager->getList([
-                'job' => 'ConfirmationEmailResender',
-                'next_attempt' => ['lte' => time()],
-            ]);
+        /** @var Client */
+        $client = Di::_()->get('Database\ElasticSearch');
 
-            foreach ($ops as $op) {
-                $resolver->setUrns($op->getEntityUrn());
+        /** @var Manager $manager */
+        $manager = Di::_()->get('Email\Confirmation');
 
-                $result = $resolver->fetch();
+        $must = [
+            [
+                'range' => [
+                    'time_created' => [
+                        'lt' => strtotime('midnight today'),
+                        'gte' => strtotime('midnight yesterday'),
+                    ],
+                ],
 
-                /** @var User $user */
-                $user = null;
-                if (isset($result[0])) {
-                    $user = $result[0];
-                }
+            ],
+        ];
 
-                if (!$user) {
-                    $this->out("User {$op->getEntityUrn()->getUrn()} could not be found");
-                }
+        $must_not = [
+            [
+                'exists' => [
+                    'field' => 'email_confirmed_at',
+                ],
+            ],
+        ];
 
-                // if the email is confirmed, delete the entry and continue with the next iteration
-                if ($user->isEmailConfirmed()) {
-                    echo "[ConfirmationEmailResender]: User email already confirmed ({$user->guid}";
-                    $opsManager->delete($op);
-                    continue;
-                } else {
-                    // try to resend the email
-                    $emailConfirmationManager
-                        ->setUser($user)
-                        ->sendEmail();
-                }
+        $query = [
+            'index' => 'minds_badger',
+            'type' => 'user',
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => $must,
+                        'must_not' => $must_not,
+                    ],
+                ],
+            ],
+        ];
 
-                $op->setTries($op->getTries() + 1);
+        $prepared = new Search();
+        $prepared->query($query);
 
-                // if we've reached the max number of tries, delete the entry
-                if ($op->getTries() < $op->getMaxTries()) {
-                    // update with 1 more try and an updated next_attempt
-                    $op->setNextAttempt(strtotime('midnight tomorrow'));
-                    $opsManager->add($op);
-                } else {
-                    $opsManager->delete($op);
-                }
+        $result = $client->request($prepared);
+
+        //        var_dump($result); die();
+        $urns = [];
+
+        if (!isset($result) || !isset($result['hits']) || !isset($result['hits']['hits'])) {
+            $this->out("[ConfirmationEmailResender]: No newly registered users found");
+            return;
+        }
+
+        foreach ($result['hits']['hits'] as $r) {
+            try {
+                $urns[] = new Urn('urn:user:' . $r['_source']['guid']);
+            } catch (\Exception $e) {
+                $this->out("[ConfirmationEmailResender] Exception: {$e->getMessage()}");
             }
+        }
 
-            sleep(3600); // 1 hour
+        $resolver->setUrns($urns);
+        $users = $resolver->fetch();
+
+        if (!isset($users) || count($users) === 0) {
+            $this->out("[ConfirmationEmailResender]: Resolver returned no users");
+            return;
+        }
+
+        foreach ($users as $user) {
+            if ($user->isEmailConfirmed()) {
+                $this->out("[ConfirmationEmailResender]: User email already confirmed ({$user->guid}))");
+                continue;
+            }
+            // try to resend the email
+            $manager
+                ->setUser($user)
+                ->sendEmail();
+
+            $this->out("[COnfirmationEmailResender]: Email sent to {$user->guid}");
         }
     }
 }

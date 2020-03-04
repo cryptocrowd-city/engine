@@ -3,7 +3,6 @@
 namespace Minds\Core\Queue\Runners;
 
 use Minds\Common\Urn;
-use Minds\Core\DeferredOps\DeferredOp;
 use Minds\Core\Di\Di;
 use Minds\Core\Email\EmailSubscription;
 use Minds\Core\Email\Repository;
@@ -38,24 +37,6 @@ class Registered implements QueueRunner
                 }
 
                 echo "[registered]: subscribed {$user_guid} to default email notifications \n";
-
-                // save deferred email confirmation send job
-                try{
-                    $op = (new DeferredOp())
-                        ->setJob('ConfirmationEmailResender')
-                        ->setNextAttempt(strtotime('midnight tomorrow'))
-                        ->setEntityUrn(new Urn($user_guid));
-
-                    /** @var Core\DeferredOps\Manager $deferredOpsManager */
-                    $deferredOpsManager = Di::_()->get('DeferredOps\Manager');
-
-                    $deferredOpsManager
-                        ->add($op);
-
-                    echo "[registered]: saved deferred confirmation email resend for {$user_guid}\n";
-                }catch(\Exception $e) {
-                    error_log((string) $e);
-                }
             });
         $this->run();
     }

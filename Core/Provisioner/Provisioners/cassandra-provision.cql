@@ -1578,11 +1578,3 @@ CREATE TABLE minds.feature_toggles_cache_ns (
     stale_at timestamp,
     PRIMARY KEY (environment, feature_name)
 );
-
-CREATE TABLE minds.deferred_ops (
-    job text,
-    next_attempt timeuuid,
-    retries int,
-    max_retries int,
-    PRIMARY KEY((job), next_attempt)
-);

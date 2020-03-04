@@ -34,7 +34,6 @@ class Minds extends base
         Feeds\Module::class,
         Front\Module::class,
         Captcha\Module::class,
-        DeferredOps\Module::class,
     ];
 
     /**
