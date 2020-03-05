@@ -8,6 +8,7 @@ use Minds\Common\Repository\Response;
 use Minds\Core;
 use Minds\Core\Di\Di;
 use Minds\Entities\Factory as EntitiesFactory;
+use Minds\Entities\Group;
 use Minds\Entities\User;
 use Minds\Interfaces;
 
@@ -17,7 +18,8 @@ class feeds implements Interfaces\Api
         '12h' => '7d',
         '24h' => '7d',
         '7d' => '30d',
-        '30d' => '1y'
+        '30d' => '1y',
+        '1y' => 'all',
     ];
 
     /**
@@ -40,7 +42,7 @@ class feeds implements Interfaces\Api
         if (!$filter) {
             return Factory::response([
                 'status' => 'error',
-                'message' => 'Invalid filter'
+                'message' => 'Invalid filter',
             ]);
         }
 
@@ -49,7 +51,7 @@ class feeds implements Interfaces\Api
         if (!$algorithm) {
             return Factory::response([
                 'status' => 'error',
-                'message' => 'Invalid algorithm'
+                'message' => 'Invalid algorithm',
             ]);
         }
 
@@ -81,6 +83,12 @@ class feeds implements Interfaces\Api
             $period = '12h';
         } elseif ($algorithm === 'latest') {
             $period = '1y';
+        }
+
+        $exportCounts = false;
+
+        if (isset($_GET['export_user_counts'])) {
+            $exportCounts = true;
         }
 
         //
@@ -145,7 +153,7 @@ class feeds implements Interfaces\Api
             if (!$container || !Core\Security\ACL::_()->read($container)) {
                 return Factory::response([
                     'status' => 'error',
-                    'message' => 'Forbidden'
+                    'message' => 'Forbidden',
                 ]);
             }
         }
@@ -212,6 +220,7 @@ class feeds implements Interfaces\Api
                     !$periodFallback ||
                     $opts['algorithm'] !== 'top' ||
                     !isset(static::PERIOD_FALLBACK[$opts['period']]) ||
+                    in_array($opts['type'], ['user', 'group'], true) ||
                     ++$i > 2 // Stop at 2nd fallback (i.e. 12h > 7d > 30d)
                 ) {
                     break;
@@ -221,6 +230,7 @@ class feeds implements Interfaces\Api
                 $from = $now - $periodsInSecs[$period];
                 $opts['from_timestamp'] = $from * 1000;
                 $opts['period'] = static::PERIOD_FALLBACK[$period];
+                $opts['limit'] = $limit - $entities->count();
 
                 if (!$fallbackAt) {
                     $fallbackAt = $from;
@@ -235,6 +245,11 @@ class feeds implements Interfaces\Api
                 if ($asActivities) {
                     // Cast to ephemeral Activity entities, if another type
                     $entities = $entities->map([$elasticEntities, 'cast']);
+                }
+            }
+            if ($type === 'user' && $exportCounts) {
+                foreach ($entities as $entity) {
+                    $entity->getEntity()->exportCounts = true;
                 }
             }
 

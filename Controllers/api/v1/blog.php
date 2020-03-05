@@ -12,6 +12,7 @@ use Minds\Api\Exportable;
 use Minds\Api\Factory;
 use Minds\Common\Access;
 use Minds\Core;
+use Minds\Core\Router\Exceptions\UnverifiedEmailException;
 use Minds\Helpers;
 use Minds\Interfaces;
 use Minds\Core\Blogs\Delegates\CreateActivity;
@@ -91,7 +92,7 @@ class blog implements Interfaces\Api
                 }
 
                 $blogs = $repository->getList($opts);
-                
+
                 $export = [];
                 foreach ($blogs as $blog) {
                     if ($blog->getOwnerGuid() != Core\Session::getLoggedInUserGuid() && $blog->getAccessId() != Access::PUBLIC) {
@@ -100,7 +101,7 @@ class blog implements Interfaces\Api
                     $export[] = $blog;
                 }
                 //$export = array_slice($export, 0, $limit);
-                
+
                 $response['entities'] = new Exportable($export);
                 $response['load-next'] = $blogs->getPagingToken();
                 break;
@@ -177,7 +178,7 @@ class blog implements Interfaces\Api
             $blog
                 ->setOwnerObj(Core\Session::getLoggedinUser())
                 ->setContainerGuid(Core\Session::getLoggedInUserGuid());
-        
+
             $owner = Core\Session::getLoggedinUser();
             if ($owner->icontime == $owner->time_created) {
                 return Factory::response([
@@ -298,7 +299,7 @@ class blog implements Interfaces\Api
             }
         }
 
-        
+
         if (isset($_POST['time_created'])) {
             try {
                 $timeCreatedDelegate = new Core\Blogs\Delegates\TimeCreatedDelegate();
@@ -337,12 +338,23 @@ class blog implements Interfaces\Api
             ]);
         }
 
+        // This is a first create blog that should have a banner
+        // We are trying to stop spam with this check
+        if ($blog->isPublished() && !$editing && !is_uploaded_file($_FILES['file']['tmp_name'])) {
+            return Factory::response([
+                'status' => 'error',
+                'message' => 'You must upload a banner'
+            ]);
+        }
+
         try {
             if ($editing) {
                 $saved = $manager->update($blog);
             } else {
                 $saved = $manager->add($blog);
             }
+        } catch (UnverifiedEmailException $e) {
+            throw $e;
         } catch (\Exception $e) {
             return Factory::response([
                 'status' => 'error',
