@@ -18,11 +18,11 @@ class Env
     {
         $config = [];
         foreach (getenv() as $envKey => $value) {
-            if (empty($value) || !Env::isMindsEnv($envKey)) {
+            if (empty($value) || !static::isMindsEnv($envKey)) {
                 continue;
             }
-            $keyPieces = explode(ENV::ENV_ARRAY_DELIMITER, substr($envKey, strlen(Env::ENV_PREFIX)));
-            $config = array_merge_recursive($config, Env::nestArray($keyPieces, $value));
+            $keyPieces = explode(static::ENV_ARRAY_DELIMITER, substr($envKey, strlen(static::ENV_PREFIX)));
+            $config = array_merge_recursive($config, static::nestArray($keyPieces, $value));
         }
         return $config;
     }
@@ -34,7 +34,7 @@ class Env
      */
     public static function isMindsEnv($key) : bool
     {
-        return (substr($key, 0, strlen(ENV::ENV_PREFIX)) === ENV::ENV_PREFIX);
+        return (substr($key, 0, strlen(static::ENV_PREFIX)) === static::ENV_PREFIX);
     }
 
     /**
@@ -48,11 +48,11 @@ class Env
     {
         //Recursion check, if we have no more keys, set the value
         if (empty($keys)) {
-            return Env::cast($value);
+            return static::cast($value);
         }
         //Anything that isn't the last is the next level of the tree
         $firstValue = array_shift($keys);
-        return [$firstValue => Env::nestArray($keys, $value)];
+        return [$firstValue => static::nestArray($keys, $value)];
     }
 
     /**
