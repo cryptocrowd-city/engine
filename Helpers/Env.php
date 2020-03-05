@@ -14,7 +14,7 @@ class Env
      * Set key value pairs for simple envs
      * Create nested arrays for keys with delimiters
      */
-    public static function getMindsEnv()
+    public static function getMindsEnv() : array
     {
         $config = [];
         foreach (getenv() as $envKey => $value) {
