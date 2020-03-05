@@ -63,4 +63,16 @@ class EnvSpec extends ObjectBehavior
         $this->shouldThrow(\Exception::class)
             ->during('cast', [(object)[]]);
     }
+
+    public function it_should_nest_arrays()
+    {
+        $testPieces = [0, 1, 2, 3, 4];
+        $nestedArray = Env::nestArray($testPieces, 'value');
+        expect($nestedArray)->shouldBeArray();
+        expect($nestedArray[0][1][2][3][4])->shouldBe('value');
+        $testPieces = ['a', 'b', 'c', 'd', 'e'];
+        expect($nestedArray)->shouldBeArray();
+        $nestedArray = Env::nestArray($testPieces, 'value');
+        expect($nestedArray['a']['b']['c']['d']['e'])->shouldBe('value');
+    }
 }

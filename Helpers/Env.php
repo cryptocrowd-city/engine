@@ -47,7 +47,7 @@ class Env
     public static function nestArray(array $keys, $value)
     {
         //Recursion check, if we have no more keys, set the value
-        if (empty($keys)) {
+        if (count($keys) === 0) {
             return static::cast($value);
         }
         //Anything that isn't the last is the next level of the tree
