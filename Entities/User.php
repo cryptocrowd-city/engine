@@ -64,6 +64,8 @@ class User extends \ElggUser
         $this->attributes['email_confirmed_at'] = null;
         $this->attributes['surge_token'] = '';
         $this->attributes['hide_share_buttons'] = 0;
+        $this->attributes['kite_ref_ts'] = 0;
+        $this->attributes['kite_state'] = 'unknown';
         $this->attributes['autoplay_videos'] = 0;
 
         parent::initializeAttributes();
@@ -1379,7 +1381,7 @@ class User extends \ElggUser
     /**
      * Returns toaster notifications state.
      *
-     * @return bool true if toaster notifications is enabled
+     * @return bool true if autoplay videos is enabled
      */
     public function getAutoplayVideos()
     {
@@ -1387,7 +1389,7 @@ class User extends \ElggUser
     }
 
     /**
-     * Set on/off toaster notifications.
+     * Set on/off autoplay videos.
      *
      * @return User
      */
