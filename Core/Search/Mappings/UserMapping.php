@@ -21,7 +21,7 @@ class UserMapping extends EntityMapping implements MappingInterface
             'username' => [ 'type' => 'text', '$exportField' => 'username' ],
             'briefdescription' => [ 'type' => 'text', '$exportField' => 'briefdescription' ],
             'group_membership' => [ 'type' => 'text' ],
-            'email_confirmed_at' => [ 'type' => 'integer', '$exportField' => 'email_confirmed_at' ],
+            'email_confirmed_at' => [ 'type' => 'date', '$exportField' => 'email_confirmed_at' ],
             'suggest' => [ 'type' => 'completion' ]
         ]);
     }
@@ -52,6 +52,10 @@ class UserMapping extends EntityMapping implements MappingInterface
             $map['group_membership'] = array_values($this->entity->getGroupMembership());
         } else {
             $map['group_membership'] = [];
+        }
+
+        if (method_exists($this->entity, 'getEmailConfirmedAt')) {
+            $map['email_confirmed_at'] = $this->entity->getEmailConfirmedAt() * 1000;
         }
 
         $map['tags'] = array_values(array_unique($this->entity->getTags()));
