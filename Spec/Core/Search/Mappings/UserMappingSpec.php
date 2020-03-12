@@ -94,6 +94,7 @@ class UserMappingSpec extends ObjectBehavior
         $user->get('type')->willReturn('user');
         $user->get('subtype')->willReturn('');
         $user->get('time_created')->willReturn($now);
+        $user->get('email_confirmed_at')->willReturn($now);
         $user->get('access_id')->willReturn(2);
         $user->get('owner_guid')->willReturn(false);
         $user->get('container_guid')->willReturn(1000);
