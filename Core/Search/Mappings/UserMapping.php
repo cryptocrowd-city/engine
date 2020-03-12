@@ -21,7 +21,7 @@ class UserMapping extends EntityMapping implements MappingInterface
             'username' => [ 'type' => 'text', '$exportField' => 'username' ],
             'briefdescription' => [ 'type' => 'text', '$exportField' => 'briefdescription' ],
             'group_membership' => [ 'type' => 'text' ],
-            'email_confirmed_at' => [ 'type' => 'integer', '$exportField' => 'time_created' ],
+            'email_confirmed_at' => [ 'type' => 'integer', '$exportField' => 'email_confirmed_at' ],
             'suggest' => [ 'type' => 'completion' ]
         ]);
     }
