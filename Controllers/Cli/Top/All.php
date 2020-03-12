@@ -3,7 +3,7 @@
 namespace Minds\Controllers\Cli\Top;
 
 use Exception;
-use Minds\Core\Feeds\Elastic\Sync;
+use Minds\Core\Search\MetricsSync\Manager;
 use Minds\Core\Minds;
 use Minds\Cli;
 use Minds\Exceptions\CliException;
@@ -22,7 +22,7 @@ class All extends Cli\Controller implements Interfaces\CliControllerInterface
         $minds = new Minds();
         $minds->start();
 
-        $this->sync = new Sync();
+        $this->sync = new Manager();
     }
 
     /**
