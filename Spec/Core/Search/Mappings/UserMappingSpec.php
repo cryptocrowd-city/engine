@@ -40,6 +40,9 @@ class UserMappingSpec extends ObjectBehavior
         $user->get('moderator_guid')->willReturn('123');
         $user->get('time_moderated')->willReturn($now);
         $user->isBanned()->willReturn(false);
+        $user->getEmailConfirmedAt()
+            ->shouldBeCalled()
+            ->willReturn($now);
 
         $user->isMature()->willReturn(false);
         $user->getMatureContent()->willReturn(false);
@@ -73,7 +76,7 @@ class UserMappingSpec extends ObjectBehavior
                 'rating' => 1,
                 'username' => 'phpspec',
                 'briefdescription' => 'PHPSpec Brief Description #invalidhashtag',
-                'email_confirmed_at' =>  $now,
+                'email_confirmed_at' =>  $now * 1000,
                 '@timestamp' => $now * 1000,
                 'taxonomy' => 'user',
                 'public' => true,
