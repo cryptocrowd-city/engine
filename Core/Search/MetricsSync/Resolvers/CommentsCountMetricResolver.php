@@ -1,7 +1,7 @@
 <?php
 namespace Minds\Core\Search\MetricsSync\Resolvers;
 
-use Minds\Core\Di\Di;
+use Minds\Core\Comments\Manager;
 use Minds\Core\Trending\Aggregates;
 
 class CommentsCountMetricResolver extends AbstractMetricResolver
@@ -12,9 +12,12 @@ class CommentsCountMetricResolver extends AbstractMetricResolver
     /** @var Aggegates\Aggregate */
     protected $aggregator;
 
+    /** @var string */
+    protected $metricId = 'comments:count';
+
     public function __construct($commentsManager = null, $aggregator = null)
     {
-        $this->commentsManager = $commentsManager ?? Di::_()->get('Comments\Manager');
+        $this->commentsManager = $commentsManager ?? new Manager;
         $this->aggregator = $aggregator ?? new Aggregates\Comments;
     }
 

@@ -95,7 +95,7 @@ abstract class AbstractMetricResolver implements MetricResolverInterface
                 ->setType($type)
                 ->setMetric($this->metricId)
                 ->setCount($count)
-                ->setSynced(time());
+                ->setSynced(time() * 1000);
 
             yield $metricsSync;
         }
