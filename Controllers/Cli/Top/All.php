@@ -154,7 +154,9 @@ class All extends Cli\Controller implements Interfaces\CliControllerInterface
                 break;
             case 'comments':
                 $resolvers[] = Resolvers\CommentsCountMetricResolver::class;
-                    break;
+                break;
+            case '':
+                break;
             default:
                  throw new CliException('Metric not supported');
         }
