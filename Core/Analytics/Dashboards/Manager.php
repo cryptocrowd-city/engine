@@ -4,9 +4,12 @@ namespace Minds\Core\Analytics\Dashboards;
 class Manager
 {
     const DASHBOARDS = [
+        'summary' => SummaryDashboard::class,
         'traffic' => TrafficDashboard::class,
         'trending' => TrendingDashboard::class,
         'earnings' => EarningsDashboard::class,
+        'engagement' => EngagementDashboard::class,
+        'token' => TokenDashboard::class,
     ];
 
     /**

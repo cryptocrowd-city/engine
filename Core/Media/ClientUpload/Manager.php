@@ -4,7 +4,7 @@
  */
 namespace Minds\Core\Media\ClientUpload;
 
-use Minds\Core\Media\Services\FFMpeg;
+use Minds\Core\Media\Video\Transcoder\Manager as TranscoderManager;
 use Minds\Core\GuidBuilder;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Di\Di;
@@ -12,8 +12,8 @@ use Minds\Entities\Video;
 
 class Manager
 {
-    /** @var FFMepg */
-    private $ffmpeg;
+    /** @var TranscoderManager */
+    private $transcoderManager;
 
     /** @var Guid $guid */
     private $guid;
@@ -21,12 +21,13 @@ class Manager
     /** @var Save $save */
     private $save;
 
+
     public function __construct(
-        FFMpeg $FFMpeg = null,
+        TranscoderManager $transcoderManager = null,
         GuidBuilder $guid = null,
         Save $save = null
     ) {
-        $this->ffmpeg = $FFMpeg ?: Di::_()->get('Media\Services\FFMpeg');
+        $this->transcoderManager = $transcoderManager ?: Di::_()->get('Media\Video\Transcoder\Manager');
         $this->guid = $guid ?: new GuidBuilder();
         $this->save = $save ?: new Save();
     }
@@ -42,13 +43,13 @@ class Manager
             throw new \Exception("$type is not currently supported for client based uploads");
         }
 
-        $guid = $this->guid->build();
+        $video = new Video();
+        $video->set('guid', $this->guid->build());
 
-        $this->ffmpeg->setKey($guid);
-        $preSignedUrl = $this->ffmpeg->getPresignedUrl();
+        $preSignedUrl = $this->transcoderManager->getClientSideUploadUrl($video);
 
         $lease = new ClientUploadLease();
-        $lease->setGuid($guid)
+        $lease->setGuid($video->getGuid())
             ->setMediaType($type)
             ->setPresignedUrl($preSignedUrl);
 
@@ -74,10 +75,8 @@ class Manager
         // Save the video
         $this->save->setEntity($video)->save();
 
-        $this->ffmpeg->setKey($lease->getGuid());
-
-        // Start the transcoding process
-        $this->ffmpeg->transcode();
+        // Kick off the transcoder
+        $this->transcoderManager->createTranscodes($video);
 
         return true;
     }

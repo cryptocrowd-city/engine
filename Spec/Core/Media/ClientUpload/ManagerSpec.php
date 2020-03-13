@@ -4,23 +4,24 @@ namespace Spec\Minds\Core\Media\ClientUpload;
 
 use Minds\Core\Media\ClientUpload\Manager;
 use Minds\Core\Media\ClientUpload\ClientUploadLease;
-use Minds\Core\Media\Services\FFMpeg;
+use Minds\Core\Media\Video\Transcoder;
 use Minds\Core\GuidBuilder;
 use Minds\Core\Entities\Actions\Save;
+use Minds\Entities\Video;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class ManagerSpec extends ObjectBehavior
 {
-    private $ffmpeg;
+    private $transcoderManager;
     private $guid;
     private $save;
 
-    public function let(FFMpeg $FFMpeg, GuidBuilder $guid, Save $save)
+    public function let(Transcoder\Manager $transcoderManager, GuidBuilder $guid, Save $save)
     {
-        $this->beConstructedWith($FFMpeg, $guid, $save);
-        $this->ffmpeg = $FFMpeg;
+        $this->beConstructedWith($transcoderManager, $guid, $save);
+        $this->transcoderManager = $transcoderManager;
         $this->guid = $guid;
         $this->save = $save;
     }
@@ -35,10 +36,8 @@ class ManagerSpec extends ObjectBehavior
         $this->guid->build()
             ->willReturn(123);
 
-        $this->ffmpeg->setKey(123)
-            ->shouldBeCalled();
-
-        $this->ffmpeg->getPresignedUrl()
+        $this->transcoderManager->getClientSideUploadUrl(Argument::type(Video::class))
+            ->shouldBeCalled()
             ->willReturn('s3-url-here');
 
         $lease = $this->prepare('video');
@@ -58,7 +57,7 @@ class ManagerSpec extends ObjectBehavior
 
         $lease->getGuid()
             ->willReturn(456);
-        
+
         $this->save->setEntity(Argument::that(function ($video) {
             return $video->guid == 456
                 && $video->access_id == 0;
@@ -69,10 +68,7 @@ class ManagerSpec extends ObjectBehavior
         $this->save->save()
             ->shouldBeCalled();
 
-        $this->ffmpeg->setKey(456)
-            ->shouldBeCalled();
-
-        $this->ffmpeg->transcode()
+        $this->transcoderManager->createTranscodes(Argument::type(Video::class))
             ->shouldBeCalled();
 
         $this->complete($lease)

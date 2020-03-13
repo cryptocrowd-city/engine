@@ -65,7 +65,11 @@ class scheduled implements Interfaces\Api
 
                 return Factory::response([
                     'status' => 'success',
-                    'count' => $manager->getScheduledCount(['container_guid' => $container_guid, 'type' => $type])
+                    'count' => $manager->getScheduledCount([
+                        'container_guid' => $container_guid,
+                        'type' => $type,
+                        'owner_guid' => $currentUser->guid,
+                    ])
                 ]);
             default:
                 return Factory::response([
@@ -119,11 +123,11 @@ class scheduled implements Interfaces\Api
 
         $custom_type = isset($_GET['custom_type']) && $_GET['custom_type'] ? [$_GET['custom_type']] : null;
 
-        /** @var Core\Feeds\Top\Manager $manager */
-        $manager = Di::_()->get('Feeds\Top\Manager');
+        /** @var Core\Feeds\Elastic\Manager $manager */
+        $manager = Di::_()->get('Feeds\Elastic\Manager');
 
-        /** @var Core\Feeds\Top\Entities $entities */
-        $entities = new Core\Feeds\Top\Entities();
+        /** @var Core\Feeds\Elastic\Entities $entities */
+        $entities = new Core\Feeds\Elastic\Entities();
         $entities->setActor($currentUser);
 
         $isOwner = false;
@@ -147,7 +151,8 @@ class scheduled implements Interfaces\Api
             'query' => $query,
             'single_owner_threshold' => 0,
             'pinned_guids' => $type === 'activity' ? array_reverse($container->getPinnedPosts()) : null,
-            'time_created_upper' => false,
+            'future' => true,
+            'owner_guid' => $currentUser->guid,
         ];
 
         if (isset($_GET['nsfw'])) {
