@@ -28,8 +28,6 @@ use Minds\Traits\MagicAttributes;
  * @method Settings setPlainBackgroundColor(string $plainBackgroundColor)
  * @method string getTileRatio()
  * @method Settings setTileRatio(string $tileRatio)
- * @method int|string getLogoGuid()
- * @method Settings setLogoGuid(int|string $logoGuid)
  * @method string getFooterText()
  * @method Settings setFooterText(string $footerText)
  * @method array getFooterLinks()
@@ -48,6 +46,14 @@ use Minds\Traits\MagicAttributes;
  * @method Settings setCustomHead(string $customHead)
  * @method bool isPublished()
  * @method Settings setPublished(bool $published)
+ * @method bool hasCustomLogo()
+ * @method Settings setHasCustomLogo(bool $customLogo)
+ * @method bool hasCustomBackground()
+ * @method Settings setHasCustomBackground(bool $customBackground)
+ * @method int getTimeUpdated()
+ * @method Settings setTimeUpdated(int $timeUpdated)
+ * @method string getPayoutMethod()
+ * @method Settings setPayoutMethod(string $method)
  */
 class Settings implements JsonSerializable
 {
@@ -92,14 +98,17 @@ class Settings implements JsonSerializable
     /** @var string */
     protected $plainBackgroundColor;
 
-    /** @var int */
-    protected $logoGuid;
+    /** @var string */
+    protected $tileRatio = '16:9';
+
+    /** @var bool */
+    protected $hasCustomBackground;
 
     /** @var string */
     protected $backgroundImage;
 
-    /** @var string */
-    protected $tileRatio = '16:9';
+    /** @var bool */
+    protected $hasCustomLogo;
 
     /** @var string */
     protected $logoImage;
@@ -124,6 +133,12 @@ class Settings implements JsonSerializable
 
     /** @var bool */
     protected $published;
+
+    /** @var int */
+    protected $timeUpdated;
+
+    /** @var string */
+    protected $payoutMethod = 'usd';
 
     /**
      * @return string
@@ -155,15 +170,18 @@ class Settings implements JsonSerializable
             'footer_text' => $this->footerText,
             'footer_links' => $this->footerLinks,
             'tag_list' => $this->tagList,
-            'logo_guid' => (string) $this->logoGuid,
-            'background_image' => $this->backgroundImage,
+            'has_custom_logo' => $this->hasCustomLogo,
             'logo_image' => $this->logoImage,
+            'has_custom_background' => $this->hasCustomBackground,
+            'background_image' => $this->backgroundImage,
             'featured_content' => $this->featuredContent,
             'scheme' => $this->scheme,
             'custom_head' => $this->customHead,
             'one_line_headline' => $this->getOneLineHeadline(),
             'styles' => $this->buildStyles(),
             'published' => $this->published,
+            'time_updated' => $this->timeUpdated,
+            'payout_method' => $this->payoutMethod,
         ];
     }
 

@@ -12,7 +12,7 @@ use Minds\Core\Di\Di;
 use cinemr;
 use Minds\Helpers;
 
-class Video extends Object
+class Video extends MindsObject
 {
     private $cinemr;
 
@@ -51,13 +51,15 @@ class Video extends Object
 
     public function upload($filepath)
     {
+        // TODO: Confirm why this is still here
         $this->generateGuid();
 
-        $transcoder = ServiceFactory::build('FFMpeg');
-        $transcoder->setKey($this->getGuid())
-          ->saveToFilestore($filepath)
-          ->transcode();
+        // Upload the source and start the transcoder pipeline
+        $transcoderManager = Di::_()->get('Media\Video\Transcoder\Manager');
+        $transcoderManager->uploadSource($this, $filepath)
+            ->createTranscodes($this);
 
+        // Legacy support
         $this->cinemr_guid = $this->getGuid();
     }
 
@@ -187,12 +189,14 @@ class Video extends Object
             'description' => null,
             'license' => null,
             'mature' => null,
+            'nsfw' => null,
             'boost_rejection_reason' => null,
             'hidden' => null,
             'access_id' => null,
             'container_guid' => null,
             'rating' => 2, //open by default
             'time_sent' => time(),
+            'full_hd' => false,
         ], $data);
 
         $allowed = [
@@ -203,9 +207,11 @@ class Video extends Object
             'access_id',
             'container_guid',
             'mature',
+            'nsfw',
             'boost_rejection_reason',
             'rating',
-            'time_sent'
+            'time_sent',
+            'full_hd',
         ];
 
         foreach ($allowed as $field) {
@@ -215,8 +221,8 @@ class Video extends Object
 
             if ($field == 'access_id') {
                 $data[$field] = (int) $data[$field];
-            } elseif ($field == 'mature') {
-                $this->setFlag('mature', !!$data['mature']);
+            } elseif (in_array($field, ['mature', 'full_hd'], true)) {
+                $this->setFlag($field, !!$data[$field]);
                 continue;
             }
 
@@ -253,6 +259,7 @@ class Video extends Object
                 'thumbnail_src' => $this->getIconUrl(),
                 'guid' => $this->guid,
                 'mature' => $this->getFlag('mature'),
+                'full_hd' => $this->getFlag('full_hd'),
                 'license' => $this->license ?? '',
             ]
         ];
@@ -290,6 +297,27 @@ class Video extends Object
     public function setTimeSent($time_sent)
     {
         $this->time_sent = $time_sent;
+        return $this;
+    }
+
+    /**
+     * Return description
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description  ?: '';
+    }
+
+    /**
+    * Set description
+    *
+    * @param string $description - description to be set.
+    * @return Video
+    */
+    public function setDescription($description): Video
+    {
+        $this->description = $description;
         return $this;
     }
 }

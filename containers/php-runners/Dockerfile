@@ -1,4 +1,4 @@
-FROM minds/php:latest
+FROM minds/php:7.3
 
 # Copy our built the code
 
@@ -6,7 +6,7 @@ ADD --chown=www-data . /var/www/Minds/engine
 
 # Remove the local settings file (if it exists)
 
-RUN rm -f /var/www/Minds/engine/settings.php
+# RUN rm -f /var/www/Minds/engine/settings.php
 
 # Setup our supervisor service
 

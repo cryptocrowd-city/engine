@@ -32,6 +32,9 @@ class Manager
 
     /** @var Delegates\SetupRoutingDelegate */
     protected $setupRoutingDelegate;
+    
+    /** @var Delegates\SubscriptionDelegate */
+    protected $subscriptionDelegate;
 
     /** @var User */
     protected $user;
@@ -47,6 +50,7 @@ class Manager
      * @param Delegates\InitializeSettingsDelegate $initializeSettingsDelegate
      * @param Delegates\HydrateSettingsDelegate $hydrateSettingsDelegate
      * @param Delegates\SetupRoutingDelegate $setupRoutingDelegate
+     * @param Delegates\SubscriptionDelegate $subscriptionDelegate
      */
     public function __construct(
         $repository = null,
@@ -54,7 +58,8 @@ class Manager
         $entitiesBuilder = null,
         $initializeSettingsDelegate = null,
         $hydrateSettingsDelegate = null,
-        $setupRoutingDelegate = null
+        $setupRoutingDelegate = null,
+        $subscriptionDelegate = null
     ) {
         $this->repository = $repository ?: new Repository();
         $this->saveAction = $saveAction ?: new Save();
@@ -62,6 +67,7 @@ class Manager
         $this->initializeSettingsDelegate = $initializeSettingsDelegate ?: new Delegates\InitializeSettingsDelegate();
         $this->hydrateSettingsDelegate = $hydrateSettingsDelegate ?: new Delegates\HydrateSettingsDelegate();
         $this->setupRoutingDelegate = $setupRoutingDelegate ?: new Delegates\SetupRoutingDelegate();
+        $this->subscriptionDelegate = $subscriptionDelegate ?: new Delegates\SubscriptionDelegate();
     }
 
     /**
@@ -131,7 +137,8 @@ class Manager
             throw new Exception('Invalid user');
         }
 
-        // TODO: Disable subscription instead, let Pro expire itself at the end of the sub
+        $this->subscriptionDelegate
+            ->onDisable($this->user);
 
         $this->user
             ->setProExpires(0);
@@ -156,6 +163,13 @@ class Manager
         $settings = $this->repository->getList([
             'user_guid' => $this->user->guid,
         ])->first();
+
+        // If requested by an inactive user, this is preview mode
+        if (!$settings && !$this->isActive()) {
+            $settings = new Settings();
+            $settings->setUserGuid($this->user->guid);
+            $settings->setTitle($this->user->name ?: $this->user->username);
+        }
 
         if (!$settings) {
             return null;
@@ -258,18 +272,6 @@ class Manager
                 ->setTileRatio($values['tile_ratio']);
         }
 
-        if (isset($values['logo_guid']) && $values['logo_guid'] !== '') {
-            $image = $this->entitiesBuilder->single($values['logo_guid']);
-
-            // if the image doesn't exist or the guid doesn't correspond to an image
-            if (!$image || ($image->type !== 'object' || $image->subtype !== 'image')) {
-                throw new \Exception('logo_guid must be a valid image guid');
-            }
-
-            $settings
-                ->setLogoGuid(trim($values['logo_guid']));
-        }
-
         if (isset($values['footer_text'])) {
             $footer_text = trim($values['footer_text']);
 
@@ -322,6 +324,16 @@ class Manager
                 ->setCustomHead($values['custom_head']);
         }
 
+        if (isset($values['has_custom_logo'])) {
+            $settings
+                ->setHasCustomLogo((bool) $values['has_custom_logo']);
+        }
+
+        if (isset($values['has_custom_background'])) {
+            $settings
+                ->setHasCustomBackground((bool) $values['has_custom_background']);
+        }
+
         if (isset($values['published'])) {
             $this->user->setProPublished($values['published']);
             $this->saveAction
@@ -329,8 +341,17 @@ class Manager
                 ->save();
         }
 
-        $this->setupRoutingDelegate
-            ->onUpdate($settings);
+        if (isset($values['payout_method'])) {
+            $settings->setPayoutMethod($values['payout_method']);
+        }
+
+        $settings->setTimeUpdated(time());
+
+        // Only update routing if we are active
+        if ($this->isActive()) {
+            $this->setupRoutingDelegate
+                ->onUpdate($settings);
+        }
 
         return $this->repository->update($settings);
     }

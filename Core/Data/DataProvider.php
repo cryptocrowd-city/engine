@@ -25,6 +25,9 @@ class DataProvider extends Provider
         $this->di->bind('Cache\Apcu', function ($di) {
             return new cache\apcu();
         }, ['useFactory'=>true]);
+        $this->di->bind('Cache\PsrWrapper', function ($di) {
+            return new cache\PsrWrapper();
+        }, ['useFactory'=>true]);
         /**
          * Database bindings
          */
@@ -67,6 +70,9 @@ class DataProvider extends Provider
         $this->di->bind('Database\ElasticSearch', function ($di) {
             return new ElasticSearch\Client();
         }, ['useFactory'=>true]);
+        $this->di->bind('Database\ElasticSearch\Scroll', function ($di) {
+            return new ElasticSearch\Scroll();
+        }, ['useFactory'=>true]);
         $this->di->bind('Database\PDO', function ($di) {
             $config = $di->get('Config')->get('database');
             $host = isset($config['host']) ? $config['host'] : 'cockroachdb';
@@ -75,14 +81,16 @@ class DataProvider extends Provider
             $sslmode = isset($config['sslmode']) ? $config['sslmode'] : 'disable';
             $username = isset($config['username']) ? $config['username'] : 'php';
             // This is a generic data object using the postgres driver to connect to cockroachdb.
-            return new PDO("pgsql:host=$host;port=$port;dbname=$name;sslmode=$sslmode",
+            return new PDO(
+                "pgsql:host=$host;port=$port;dbname=$name;sslmode=$sslmode",
                 $username,
                 null,
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_EMULATE_PREPARES => true,
                     PDO::ATTR_PERSISTENT => isset($config['persistent']) ? $config['persistent'] : false,
-                ]);
+                ]
+            );
         }, ['useFactory'=>true]);
         /**
          * Locks

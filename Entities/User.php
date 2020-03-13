@@ -60,6 +60,13 @@ class User extends \ElggUser
         $this->attributes['onchain_booster'] = null;
         $this->attributes['toaster_notifications'] = 1;
         $this->attributes['mode'] = ChannelMode::OPEN;
+        $this->attributes['email_confirmation_token'] = null;
+        $this->attributes['email_confirmed_at'] = null;
+        $this->attributes['surge_token'] = '';
+        $this->attributes['hide_share_buttons'] = 0;
+        $this->attributes['kite_ref_ts'] = 0;
+        $this->attributes['kite_state'] = 'unknown';
+        $this->attributes['autoplay_videos'] = 0;
 
         parent::initializeAttributes();
     }
@@ -638,6 +645,68 @@ class User extends \ElggUser
     }
 
     /**
+     * @param string $token
+     * @return User
+     */
+    public function setEmailConfirmationToken(string $token): User
+    {
+        $this->email_confirmation_token = $token;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmailConfirmationToken(): ?string
+    {
+        return ((string) $this->email_confirmation_token) ?: null;
+    }
+
+    /**
+     * @param int $time
+     * @return User
+     */
+    public function setEmailConfirmedAt(?int $time): User
+    {
+        $this->email_confirmed_at = $time;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getEmailConfirmedAt(): ?int
+    {
+        return ((int) $this->email_confirmed_at) ?: null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailConfirmed(): bool
+    {
+        return (bool) $this->email_confirmed_at;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getHideShareButtons(): bool
+    {
+        return (bool) $this->hide_share_buttons;
+    }
+
+    /**
+     * @param bool $value
+     * @return User
+     */
+    public function setHideShareButtons(bool $value): User
+    {
+        $this->hide_share_buttons = $value;
+        return $this;
+    }
+
+    /**
      * Subscribes user to another user.
      *
      * @param mixed $guid
@@ -825,7 +894,7 @@ class User extends \ElggUser
         $export['programs'] = $this->getPrograms();
         $export['plus'] = (bool) $this->isPlus();
         $export['pro'] = (bool) $this->isPro();
-        $export['pro_published'] = (bool) $this->isProPublished();
+        $export['pro_published'] = $this->isPro() && $this->isProPublished();
         $export['verified'] = (bool) $this->verified;
         $export['founder'] = (bool) $this->founder;
         $export['disabled_boost'] = (bool) $this->disabled_boost;
@@ -869,8 +938,15 @@ class User extends \ElggUser
             $export['deleted'] = $this->getDeleted();
         }
 
+        $export['email_confirmed'] =
+            (!$this->getEmailConfirmationToken() && !$this->getEmailConfirmedAt()) || // Old users poly-fill
+            $this->isEmailConfirmed();
+
         $export['eth_wallet'] = $this->getEthWallet() ?: '';
         $export['rating'] = $this->getRating();
+
+        $export['hide_share_buttons'] = $this->getHideShareButtons();
+        $export['autoplay_videos'] = $this->getAutoplayVideos();
 
         return $export;
     }
@@ -902,11 +978,11 @@ class User extends \ElggUser
     /**
      * Is the user a plus user.
      *
-     * @return int
+     * @return bool
      */
     public function isPlus()
     {
-        return (bool) ((int) $this->plus_expires > time());
+        return $this->isPro() || ((int) $this->plus_expires > time());
     }
 
     /**
@@ -1144,7 +1220,6 @@ class User extends \ElggUser
         return array_merge(parent::getExportableValues(), [
             'website',
             'briefdescription',
-            'dob',
             'gender',
             'city',
             'merchant',
@@ -1177,6 +1252,8 @@ class User extends \ElggUser
             'toaster_notifications',
             'mode',
             'btc_address',
+            'surge_token',
+            'hide_share_buttons',
         ]);
     }
 
@@ -1302,6 +1379,28 @@ class User extends \ElggUser
     }
 
     /**
+     * Returns toaster notifications state.
+     *
+     * @return bool true if autoplay videos is enabled
+     */
+    public function getAutoplayVideos()
+    {
+        return (bool) $this->autoplay_videos;
+    }
+
+    /**
+     * Set on/off autoplay videos.
+     *
+     * @return User
+     */
+    public function setAutoplayVideos($enabled = true)
+    {
+        $this->autoplay_videos = $enabled ? 1 : 0;
+
+        return $this;
+    }
+
+    /**
      * Returns channel mode value.
      *
      * @return int channel mode
@@ -1342,6 +1441,28 @@ class User extends \ElggUser
     {
         $this->btc_address = (string) $btc_address;
 
+        return $this;
+    }
+
+    /**
+     * Gets the Surge Token of the user for push notifications.
+     *
+     * @return string Token.
+     */
+    public function getSurgeToken(): string
+    {
+        return (string) $this->surge_token ?? '';
+    }
+
+    /**
+     * Sets the Surge Token of the user for push notifications.
+     *
+     * @param string $token - the token string.
+     * @return User instance of $this for chaining.
+     */
+    public function setSurgeToken(string $token = ''): User
+    {
+        $this->surge_token = $token;
         return $this;
     }
 }

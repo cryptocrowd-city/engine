@@ -95,6 +95,7 @@ class User extends Cli\Controller implements Interfaces\CliControllerInterface
         if (!$this->getOpt('username')) {
             throw new Exceptions\CliException('Missing username');
         }
+        $username = $this->getOpt('username');
         $ban = new Ban();
         $user = new Entities\User($this->getOpt('username'));
         $ban->setUser($user);
@@ -115,11 +116,29 @@ class User extends Cli\Controller implements Interfaces\CliControllerInterface
         if (!$this->getOpt('username')) {
             throw new Exceptions\CliException('Missing username');
         }
+        $username = $this->getOpt('username');
         $ban = new Ban();
-        $user = new Entities\User($this->getOpt('username'));
+        $user = new Entities\User();
         $ban->setUser($user);
         $this->out("Unbanning ".$username);
         $ban->unban();
         $this->out("Success if there are no errors above. Unbanned ".$username.".");
+    }
+
+    public function register_complete()
+    {
+        $username = $this->getOpt('username');
+
+        if (!$username) {
+            throw new Exceptions\CliException('Missing username');
+        }
+
+        $user = new Entities\User(strtolower($username));
+
+        if (!$user->guid) {
+            throw new Exceptions\CliException('User does not exist');
+        }
+
+        Core\Events\Dispatcher::trigger('register/complete', 'user', [ 'user' => $user ]);
     }
 }

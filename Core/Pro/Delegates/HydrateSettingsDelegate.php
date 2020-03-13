@@ -10,7 +10,6 @@ use Minds\Core\Config;
 use Minds\Core\Di\Di;
 use Minds\Core\EntitiesBuilder;
 use Minds\Core\Pro\Settings;
-use Minds\Entities\Object\Carousel;
 use Minds\Entities\User;
 use Minds\Helpers\Text;
 
@@ -43,10 +42,11 @@ class HydrateSettingsDelegate
     public function onGet(User $user, Settings $settings): Settings
     {
         try {
-            $logoImage = $settings->getLogoGuid() ? sprintf(
-                '%sfs/v1/thumbnail/%s/master',
+            $logoImage = $settings->hasCustomLogo() ? sprintf(
+                '%sfs/v1/pro/%s/logo/%s',
                 $this->config->get('cdn_url'),
-                $settings->getLogoGuid()
+                $settings->getUserGuid(),
+                $settings->getTimeUpdated()
             ) : $user->getIconURL('large');
 
             if ($logoImage) {
@@ -58,17 +58,20 @@ class HydrateSettingsDelegate
         }
 
         try {
-            $carousels = $this->entitiesBuilder->get(['subtype' => 'carousel', 'owner_guid' => (string) $user->guid]);
-            $carousel = $carousels[0] ?? null;
+            $backgroundImage = null;
 
-            if ($carousel) {
+            if ($settings->hasCustomBackground()) {
+                $backgroundImage = sprintf(
+                    '%sfs/v1/pro/%s/background/%s',
+                    $this->config->get('cdn_url'),
+                    $settings->getUserGuid(),
+                    $settings->getTimeUpdated()
+                );
+            }
+
+            if ($backgroundImage) {
                 $settings
-                    ->setBackgroundImage(sprintf(
-                        '%sfs/v1/banners/%s/fat/%s',
-                        $this->config->get('cdn_url'),
-                        $carousel->guid,
-                        $carousel->last_updated
-                    ));
+                    ->setBackgroundImage($backgroundImage);
             }
         } catch (\Exception $e) {
             error_log($e);
