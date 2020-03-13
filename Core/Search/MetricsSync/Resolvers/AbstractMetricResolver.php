@@ -1,7 +1,7 @@
 <?php
 namespace Minds\Core\Search\MetricsSync\Resolvers;
 
-use Minds\Core\Search\MetricsSync;
+use Minds\Core\Search\MetricsSync\MetricsSync;
 
 abstract class AbstractMetricResolver implements MetricResolverInterface
 {
@@ -26,20 +26,31 @@ abstract class AbstractMetricResolver implements MetricResolverInterface
     /**
      * Set the type
      * @param string $type
-     * @return self
+     * @return MetricResolverInterface
      */
-    public function setType(string $type): self
+    public function setType(string $type): MetricResolverInterface
     {
         $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * Set the subtype
+     * @param string $subtype
+     * @return MetricResolverInterface
+     */
+    public function setSubtype(string $subtype): MetricResolverInterface
+    {
+        $this->subtype = $subtype;
         return $this;
     }
     
     /**
      * Set min timestamp
      * @param int $from
-     * @return self
+     * @return MetricResolverInterface
      */
-    public function setFrom(int $from): self
+    public function setFrom(int $from): MetricResolverInterface
     {
         $this->from = $from;
         return $this;
@@ -48,9 +59,9 @@ abstract class AbstractMetricResolver implements MetricResolverInterface
     /**
      * Set max timestamp
      * @param int $to
-     * @return self
+     * @return MetricResolverInterface
      */
-    public function setTo(int $to): self
+    public function setTo(int $to): MetricResolverInterface
     {
         $this->to = $to;
         return $this;
@@ -66,8 +77,8 @@ abstract class AbstractMetricResolver implements MetricResolverInterface
             ->setLimit(10000)
             ->setType($this->type)
             ->setSubtype($this->subtype)
-            ->setFrom($from)
-            ->setTo($to);
+            ->setFrom($this->from)
+            ->setTo($this->to);
 
         $type = $this->type;
 
@@ -78,8 +89,8 @@ abstract class AbstractMetricResolver implements MetricResolverInterface
         foreach ($this->aggregator->get() as $guid => $uniqueCountValue) {
             $count = $this->getTotalCount($guid);
 
-            $metric = new MetricsSync();
-            $metric
+            $metricsSync = new MetricsSync();
+            $metricsSync
                 ->setGuid($guid)
                 ->setType($type)
                 ->setMetric($this->metricId)

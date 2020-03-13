@@ -38,11 +38,4 @@ interface MetricResolverInterface
      * @return MetricsSync[]
      */
     public function get(): iterable;
-
-    /**
-     * Return the total count
-     * @param string $guid
-     * @return int
-     */
-    public function getTotalCount(strig $guid): int;
 }

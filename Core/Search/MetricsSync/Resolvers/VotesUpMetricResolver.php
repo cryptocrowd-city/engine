@@ -1,6 +1,8 @@
 <?php
 namespace Minds\Core\Search\MetricsSync\Resolvers;
 
+use Minds\Core\Trending\Aggregates;
+
 class VotesUpMetricResolver extends AbstractVotesMetricResolver
 {
     /** @var Aggegates\Aggregate */
@@ -12,9 +14,9 @@ class VotesUpMetricResolver extends AbstractVotesMetricResolver
     /** @var string */
     protected $metricId = 'votes:up';
 
-    public function __constructor($counters = null, $aggregator = null)
+    public function __construct($counters = null, $aggregator = null)
     {
-        parent::__constructor($counters);
+        parent::__construct($counters);
         $this->aggregator = $aggregator ?? new Aggregates\Votes();
     }
 }

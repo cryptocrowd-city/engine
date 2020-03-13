@@ -23,7 +23,7 @@ class Manager
     protected $type;
 
     /** @var string */
-    protected $subtype;
+    protected $subtype = '';
 
     /** @var int */
     protected $from;
@@ -55,9 +55,9 @@ class Manager
 
     /**
      * @param string $type
-     * @return Sync
+     * @return self
      */
-    public function setType(string $type): Sync
+    public function setType(string $type): self
     {
         $this->type = $type;
         return $this;
@@ -65,9 +65,9 @@ class Manager
 
     /**
      * @param string $subtype
-     * @return Sync
+     * @return self
      */
-    public function setSubtype(string $subtype): Sync
+    public function setSubtype(string $subtype): self
     {
         $this->subtype = $subtype;
         return $this;
@@ -75,9 +75,9 @@ class Manager
 
     /**
      * @param int $from
-     * @return Sync
+     * @return self
      */
-    public function setFrom(int $from): Sync
+    public function setFrom(int $from): self
     {
         $this->from = $from;
         return $this;
@@ -85,9 +85,9 @@ class Manager
 
     /**
      * @param int $to
-     * @return Sync
+     * @return self
      */
-    public function setTo(int $to): Sync
+    public function setTo(int $to): self
     {
         $this->to = $to;
         return $this;
@@ -95,15 +95,16 @@ class Manager
 
     /**
      * @param string $metric
-     * @return Sync
+     * @return self
      */
-    public function setMetric(string $metric): Sync
+    public function setMetric(string $metric): self
     {
         $this->metric = $metric;
         return $this;
     }
 
     /**
+     * @param MetricResolverInterface[] $resolvers
      * @throws Exception
      */
     public function run(array $resolvers = []): void

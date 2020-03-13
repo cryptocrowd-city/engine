@@ -2,6 +2,7 @@
 namespace Minds\Core\Search\MetricsSync\Resolvers;
 
 use Minds\Core\Di\Di;
+use Minds\Core\Counters;
 
 abstract class AbstractVotesMetricResolver extends AbstractMetricResolver
 {
@@ -19,9 +20,9 @@ abstract class AbstractVotesMetricResolver extends AbstractMetricResolver
     /**
      * Set the type
      * @param string $type
-     * @return self
+     * @return MetricResolverInterface
      */
-    public function setType(string $type): self
+    public function setType(string $type): MetricResolverInterface
     {
         if ($type === 'user') {
             throw new \Exception('Can not perform votes sync on a user');

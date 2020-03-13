@@ -2,6 +2,7 @@
 namespace Minds\Core\Search\MetricsSync\Resolvers;
 
 use Minds\Core\Di\Di;
+use Minds\Core\Trending\Aggregates;
 
 class CommentsCountMetricResolver extends AbstractMetricResolver
 {
@@ -20,9 +21,9 @@ class CommentsCountMetricResolver extends AbstractMetricResolver
     /**
     * Set the type
     * @param string $type
-    * @return self
+    * @return MetricResolverInterface
     */
-    public function setType(string $type): self
+    public function setType(string $type): MetricResolverInterface
     {
         if ($type === 'user') {
             throw new \Exception('Can not perform comment count sync on a user');
