@@ -27,17 +27,17 @@ class progress implements Interfaces\Api
         /** @var \Minds\Core\Features\Manager $manager */
         $featuresManager = Di::_()->get('Features\Manager');
 
-        if ($featuresManager->has('onboarding-december-2019')) {
-            return Factory::response([
-                'show_onboarding' => !$manager->wasOnboardingShown(),
-            ]);
-        }
-
         $allItems = $manager->getAllItems();
         $completedItems = $manager->getCompletedItems();
 
+        if ($featuresManager->has('onboarding-december-2019')) {
+            $showOnboarding = !$manager->wasOnboardingShown();
+        } else {
+            $showOnboarding = !$manager->wasOnboardingShown() && count($allItems) > count($completedItems);
+        }
+
         return Factory::response([
-            'show_onboarding' => !$manager->wasOnboardingShown() && count($allItems) > count($completedItems),
+            'show_onboarding' => $showOnboarding,
             'all_items' => $allItems,
             'completed_items' => $completedItems,
             'creator_frequency' => $manager->getCreatorFrequency(),

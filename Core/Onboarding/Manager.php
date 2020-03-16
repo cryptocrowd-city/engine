@@ -4,7 +4,9 @@ namespace Minds\Core\Onboarding;
 
 use Minds\Core\Config;
 use Minds\Core\Di\Di;
+use Minds\Core\Features\Exceptions\FeatureNotImplementedException;
 use Minds\Entities\User;
+use Minds\Core\Features\Manager as FeaturesManager;
 
 class Manager
 {
@@ -18,6 +20,9 @@ class Manager
     /** @var Delegates\OnboardingDelegate[] */
     protected $items;
 
+    /** @var FeaturesManager */
+    protected $features;
+
     /** @var Config */
     protected $config;
 
@@ -27,21 +32,36 @@ class Manager
     /**
      * Manager constructor.
      *
-     * @param null $items
+     * @param array $items
+     * @param FeaturesManager $features
+     * @param Config $config
+     * @throws FeatureNotImplementedException
      */
-    public function __construct($items = null, $config = null)
+    public function __construct($items = null, $features = null, $config = null)
     {
-        $this->items = $items ?: [
-            // 'creator_frequency' => new Delegates\CreatorFrequencyDelegate(),
-            'suggested_hashtags' => new Delegates\SuggestedHashtagsDelegate(),
-            'suggested_channels' => new Delegates\SuggestedChannelsDelegate(),
-            // 'suggested_groups' => new Delegates\SuggestedGroupsDelegate(),
-            'avatar' => new Delegates\AvatarDelegate(),
-            'display_name' => new Delegates\DisplayNameDelegate(),
-            'briefdescription' => new Delegates\BriefdescriptionDelegate(),
-            'tokens_verification' => new Delegates\TokensVerificationDelegate(),
-        ];
         $this->config = $config ?: Di::_()->get('Config');
+        $this->features = $features ?: Di::_()->get('Features\Manager');
+
+        if ($items) {
+            $this->items = $items;
+        } elseif ($this->features->has('onboarding-december-2019')) {
+            $this->items = [
+                'suggested_hashtags' => new Delegates\SuggestedHashtagsDelegate(),
+                'tokens_verification' => new Delegates\TokensVerificationDelegate(),
+                'location' => new Delegates\LocationDelegate(),
+                'dob' => new Delegates\DateOfBirthDelegate(),
+                'avatar' => new Delegates\AvatarDelegate(),
+            ];
+        } else {
+            $this->items = [
+                'suggested_hashtags' => new Delegates\SuggestedHashtagsDelegate(),
+                'suggested_channels' => new Delegates\SuggestedChannelsDelegate(),
+                'avatar' => new Delegates\AvatarDelegate(),
+                'display_name' => new Delegates\DisplayNameDelegate(),
+                'briefdescription' => new Delegates\BriefdescriptionDelegate(),
+                'tokens_verification' => new Delegates\TokensVerificationDelegate(),
+            ];
+        }
     }
 
     /**
