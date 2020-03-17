@@ -5,8 +5,8 @@ namespace Minds\Core\Onboarding;
 use Minds\Core\Config;
 use Minds\Core\Di\Di;
 use Minds\Core\Features\Exceptions\FeatureNotImplementedException;
-use Minds\Entities\User;
 use Minds\Core\Features\Manager as FeaturesManager;
+use Minds\Entities\User;
 
 class Manager
 {
@@ -87,7 +87,7 @@ class Manager
             throw new \Exception('User not set');
         }
 
-        $timestamp = $this->config->get('onboarding_modal_timestamp') ?: 0;
+        $timestamp = $this->getOnboardingFeatureTimestamp();
 
         return $this->user->getTimeCreated() <= $timestamp || $this->user->wasOnboardingShown();
     }
@@ -189,5 +189,16 @@ class Manager
     public function isComplete()
     {
         return count($this->getAllItems()) === count($this->getCompletedItems());
+    }
+
+    /**
+     * Returns the currently enabled onboarding feature timestamp
+     * @return int
+     * @throws FeatureNotImplementedException
+     */
+    private function getOnboardingFeatureTimestamp(): int
+    {
+        $key = $this->features->has('onboarding-december-2019') ? 'onboarding_v2_timestamp' : 'onboarding_modal_timestamp';
+        return $this->config->get($key) ?: 0;
     }
 }
