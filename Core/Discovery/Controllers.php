@@ -22,8 +22,11 @@ class Controllers
      */
     public function getTrends(ServerRequest $request): JsonResponse
     {
+        $queryParams = $request->getQueryParams();
+        $shuffle = $queryParams['shuffle'] ?? true;
         $tagLimit = 8;
         $postLimit = 5;
+
         $tagTrends = $this->manager->getTagTrends([ 'limit' => $tagLimit * 2 ]); //Return more tags than we need for posts to feed from
         $postTrends = $this->manager->getPostTrends(array_map(function ($trend) {
             return $trend->getHashtag();
@@ -32,7 +35,10 @@ class Controllers
         $hero = array_shift($postTrends);
 
         $trends =  array_merge(array_slice($tagTrends, 0, $tagLimit), $postTrends);
-        shuffle($trends);
+        
+        if ($shuffle) {
+            shuffle($trends);
+        }
 
         return new JsonResponse([
             'status' => 'success',
@@ -60,6 +66,11 @@ class Controllers
         ]);
     }
 
+    /**
+     * Controller for getting tags
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
     public function getTags(ServerRequest $request): JsonResponse
     {
         $tags = $this->manager->getTags();
