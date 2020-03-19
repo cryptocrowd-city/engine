@@ -629,6 +629,11 @@ $CONFIG->set('ban_reasons', [
     16 => [ 'label' => 'Token manipulation' ],
 ]);
 
+$CONFIG->set('contact_details', [
+    'name' => 'Minds',
+    'email' => 'info@minds.com',
+]);
+
 $CONFIG->set('upgrades', [
     'pro' => [
         'monthly' => [
