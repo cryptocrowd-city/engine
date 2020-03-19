@@ -62,7 +62,7 @@ class Events
      * @return string the first reason in the ban reason tree, or
      *  if text is in the reason field, it will return that.
      */
-    public function getBanReasons($reason)
+    public function getBanReasons($reason): string
     {
         $banReasons = Di::_()->get('Config')->get('ban_reasons');
         $splitReason = preg_split("/\./", $reason);
