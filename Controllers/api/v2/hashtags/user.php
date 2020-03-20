@@ -52,6 +52,12 @@ class user implements Interfaces\Api
 
         $result = $manager->add([$entity]);
 
+        // set hashtags on users channel.
+        $user->setHashtags(
+            array_merge($user->getHashtags(), [$hashtag])
+        );
+
+        // set opted in hashtags.
         $user->setOptedInHashtags(1);
         $user->save();
 
@@ -95,6 +101,12 @@ class user implements Interfaces\Api
 
         $result = $manager->remove([$entity]);
 
+        // remove matching hashtag from users channel.
+        $user->setHashtags(
+            array_diff($user->getHashtags(), [$hashtag])
+        );
+
+        // remove opted in hashtag.
         $user->setOptedInHashtags(-1);
         $user->save();
 
