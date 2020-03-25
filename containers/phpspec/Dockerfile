@@ -1,5 +1,5 @@
 FROM minds/php:7.3
-
+asda
 WORKDIR /var/www/Minds/engine
 
 COPY ./containers/phpspec/phpspec.sh /var/www/Minds/phpspec.sh
