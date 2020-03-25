@@ -44,7 +44,7 @@ class Manager
 
         if ($items) {
             $this->items = $items;
-        } elseif ($this->features->has('onboarding-december-2019')) {
+        } elseif ($this->features->has('ux-2020')) {
             $this->items = [
                 'suggested_hashtags' => new Delegates\SuggestedHashtagsDelegate(),
                 'tokens_verification' => new Delegates\TokensVerificationDelegate(),
@@ -198,7 +198,7 @@ class Manager
      */
     private function getOnboardingFeatureTimestamp(): int
     {
-        $key = $this->features->has('onboarding-december-2019') ? 'onboarding_v2_timestamp' : 'onboarding_modal_timestamp';
+        $key = $this->features->has('ux-2020') ? 'onboarding_v2_timestamp' : 'onboarding_modal_timestamp';
         return $this->config->get($key) ?: 0;
     }
 }

@@ -30,7 +30,7 @@ class progress implements Interfaces\Api
         $allItems = $manager->getAllItems();
         $completedItems = $manager->getCompletedItems();
 
-        if ($featuresManager->has('onboarding-december-2019')) {
+        if ($featuresManager->has('ux-2020')) {
             $showOnboarding = !$manager->wasOnboardingShown();
         } else {
             $showOnboarding = !$manager->wasOnboardingShown() && count($allItems) > count($completedItems);
