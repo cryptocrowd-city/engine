@@ -5,7 +5,14 @@
 
 namespace Minds\Core\Media\YouTubeImporter;
 
-class Module
+use Minds\Interfaces\ModuleInterface;
+
+class Module implements ModuleInterface
 {
+    public function onInit()
+    {
+        (new Provider())->register();
+        (new Routes())->register();
+    }
 
 }

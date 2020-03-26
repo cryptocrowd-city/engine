@@ -1,7 +1,4 @@
 <?php
-/**
- * Minds Onboarding Provider.
- */
 
 namespace Minds\Core\Media\YouTubeImporter;
 
@@ -11,5 +8,8 @@ class Provider extends DiProvider
 {
     public function register()
     {
+        $this->di->bind('Media\YouTubeImporter\Controller', function ($di) {
+            return new Controller();
+        });
     }
 }
