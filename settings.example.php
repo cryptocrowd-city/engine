@@ -635,3 +635,8 @@ $CONFIG->set('captcha', [
     'jwt_secret' => '{{site-secret}}',
     'bypass_key' => '{{site-secret}}',
 ]);
+
+$CONFIG->set('youtube', [
+    'client_id' => '{{yt-client-id}}',
+    'secret' => '{{yt-secret}}',
+]);
