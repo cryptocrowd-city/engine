@@ -67,6 +67,9 @@ class User extends \ElggUser
         $this->attributes['kite_ref_ts'] = 0;
         $this->attributes['kite_state'] = 'unknown';
         $this->attributes['disable_autoplay_videos'] = 0;
+        $this->attributes['yt_token'] = null;
+        $this->attributes['yt_connected'] = null;
+        $this->attributes['auto_import_yt_videos'] = false;
 
         parent::initializeAttributes();
     }
@@ -947,6 +950,7 @@ class User extends \ElggUser
 
         $export['hide_share_buttons'] = $this->getHideShareButtons();
         $export['disable_autoplay_videos'] = $this->getDisableAutoplayVideos();
+        $export['yt_connected'] = $this->getYouTubeConnected();
 
         return $export;
     }
@@ -1418,6 +1422,58 @@ class User extends \ElggUser
     public function setMode(int $mode)
     {
         $this->mode = $mode;
+
+        return $this;
+    }
+
+    /**
+     * Returns the YouTube OAuth Token
+     * @return string
+     */
+    public function getYouTubeToken()
+    {
+        return $this->attributes['yt_token'] ?? null;
+    }
+
+    /**
+     * Sets YouTube OAuth Token and when updates the connection timestamp
+     * @param string $token
+     * @return $this
+     */
+    public function setYouTubeToken(string $token)
+    {
+        $this->attributes['yt_token'] = $token;
+        $this->attributes['yt_connected'] = now();
+
+        return $this;
+    }
+
+    /**
+     * Returns when the user connected to its YouTube account
+     * @return int
+     */
+    public function getYouTubeConnected()
+    {
+        return $this->attributes['yt_connected'] ?? null;
+    }
+
+    /**
+     * Returns if the user's YouTube videos should be auto-imported
+     * @return bool
+     */
+    public function getAutoImportYouTubeVideos()
+    {
+        return (bool) $this->attributes['auto_import_yt_videos'] ?? false;
+    }
+
+    /**
+     * Sets if the user's YouTube videos should be auto-imported
+     * @param bool $value
+     * @return $this
+     */
+    public function setAutoImportYouTubeVideos(bool $value)
+    {
+        $this->attributes['auto_import_yt_videos'] = $value;
 
         return $this;
     }
