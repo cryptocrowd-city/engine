@@ -12,7 +12,6 @@ class Controller
 {
     public function __construct()
     {
-
     }
 
     public function getVideos(ServerRequest $request): JsonResponse
@@ -26,7 +25,6 @@ class Controller
 
     public function getImportableVideos(ServerRequest $request): JsonResponse
     {
-
         return new JsonResponse([
             'status' => 'success',
         ]);
