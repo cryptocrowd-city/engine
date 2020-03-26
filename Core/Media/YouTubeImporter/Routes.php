@@ -24,15 +24,28 @@ class Routes extends ModuleRoutes
                 LoggedInMiddleware::class,
             ])
             ->do(function (Route $route) {
-                // returns list of already transferred videos
+                // Requests OAuth token
+                $route->get(
+                    'oauth',
+                    Ref::_('Media\YouTubeImporter\Controller', 'getToken')
+                );
+
+                // Requests OAuth token
+                $route->get(
+                    'oauth/redirect',
+                    Ref::_('Media\YouTubeImporter\Controller', 'receiveToken')
+                );
+
+                // returns list of videos
                 $route->get(
                     'videos',
                     Ref::_('Media\YouTubeImporter\Controller', 'getVideos')
                 );
-                // returns a list of available videos from YouTube, and videos that are in process or queued
-                $route->get(
-                    'videos/import',
-                    Ref::_('Media\YouTubeImporter\Controller', 'getImportableVideos')
+
+                // imports a video
+                $route->post(
+                    'videos',
+                    Ref::_('Media\YouTubeImporter\Controller', 'import')
                 );
             });
     }

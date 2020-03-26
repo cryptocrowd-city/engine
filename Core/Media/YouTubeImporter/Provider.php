@@ -11,5 +11,13 @@ class Provider extends DiProvider
         $this->di->bind('Media\YouTubeImporter\Controller', function ($di) {
             return new Controller();
         });
+
+        $this->di->bind('Media\YouTubeImporter\Manager', function ($di) {
+            return new Manager();
+        });
+
+        $this->di->bind('Media\YouTubeImporter\Client', function ($di) {
+            return new GoogleClient();
+        }, ["useFactory" => true]);
     }
 }
