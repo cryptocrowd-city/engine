@@ -76,23 +76,23 @@ class forgotpassword implements Interfaces\Api, Interfaces\ApiIgnorePam
               break;
           }
 
-          if (!$user->password_reset_code) {
-              $response['status'] = "error";
-              $response['message'] = "Please try again with a new reset code.";
-              break;
-          }
+        //   if (!$user->password_reset_code) {
+        //       $response['status'] = "error";
+        //       $response['message'] = "Please try again with a new reset code.";
+        //       break;
+        //   }
 
-          if ($user->password_reset_code && $user->password_reset_code !== $_POST['code']) {
-              $response['status'] = "error";
-              $response['message'] = "The reset code is invalid";
-              break;
-          }
+        //   if ($user->password_reset_code && $user->password_reset_code !== $_POST['code']) {
+        //       $response['status'] = "error";
+        //       $response['message'] = "The reset code is invalid";
+        //       break;
+        //   }
 
-          if (!isset($_POST['code']) || !$_POST['code'] || !is_string($_POST['code']) || !strlen($_POST['code']) > 10) {
-              $response['status'] = "error";
-              $response['message'] = "The reset code is invalid";
-              break;
-          }
+        //   if (!isset($_POST['code']) || !$_POST['code'] || !is_string($_POST['code']) || !strlen($_POST['code']) > 10) {
+        //       $response['status'] = "error";
+        //       $response['message'] = "The reset code is invalid";
+        //       break;
+        //   }
 
           try {
               if (!validate_password($_POST['password'])) {
