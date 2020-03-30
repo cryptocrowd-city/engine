@@ -69,7 +69,7 @@ class Controller
             ]);
         }
 
-        $channelId = $queryParams['channelId'];o
+        $channelId = $queryParams['channelId'];
 
         $status = $queryParams['status'] ?? 'all';
 
