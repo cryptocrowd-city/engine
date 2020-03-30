@@ -22,7 +22,7 @@ use Minds\Traits\MagicAttributes;
  * @method Video setChannelId(string $value)
  * @method string getChannelTitle()
  * @method Video setChannelTitle(string $value)
- * @method string getMindsguid()
+ * @method string getMindsGuid()
  * @method Video setMindsGuid(string $value)
  * @method array getThumbnails()
  * @method Video setThumbnails(array $value)
