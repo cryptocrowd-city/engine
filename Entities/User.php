@@ -105,9 +105,13 @@ class User extends \ElggUser
      */
     public function addHashtag(string $hashtag): User
     {
-        $this->setHashtags(
-            array_merge($this->getHashtags(), [$hashtag])
-        );
+        if (!in_array($hashtag, $this->getHashtags(), true)
+            && count($this->getHashtags()) < 5
+        ) {
+            $this->setHashtags(
+                array_merge($this->getHashtags(), [$hashtag])
+            );
+        }
         return $this;
     }
 
@@ -118,11 +122,13 @@ class User extends \ElggUser
      */
     public function removeHashtag($hashtag): User
     {
-        $this->setHashtags(
-            array_values(
-                array_diff($this->getHashtags(), [$hashtag])
-            )
-        );
+        if (in_array($hashtag, $this->getHashtags(), true)) {
+            $this->setHashtags(
+                array_values(
+                    array_diff($this->getHashtags(), [$hashtag])
+                )
+            );
+        }
         return $this;
     }
 
