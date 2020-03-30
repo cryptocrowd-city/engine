@@ -46,6 +46,8 @@ class Installer
             'twilio-auth-token' => '',
             'twilio-from' => '',
             'google-api-key' => '',
+            'yt-client-id' => '',
+            'yt-client-secret' => '',
             'apple-sandbox-enabled' => 0,
             'apple-certificate' => '',
             'site-name' => 'Minds',

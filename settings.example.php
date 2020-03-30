@@ -251,7 +251,9 @@ $CONFIG->set('google', [
             'key_path' => __DIR__ . '/.auth/analytics.json',
         ],
         'ads' => '', // get it from https://ga-dev-tools.appspot.com/account-explorer/
-    ]
+    ],
+    'client_id' => '{{yt-client-id}}',
+    'secret' => '{{yt-secret}}',
 ]);
 
 $CONFIG->set('apple', [
@@ -634,9 +636,4 @@ $CONFIG->set('unleash', [
 $CONFIG->set('captcha', [
     'jwt_secret' => '{{site-secret}}',
     'bypass_key' => '{{site-secret}}',
-]);
-
-$CONFIG->set('youtube', [
-    'client_id' => '{{yt-client-id}}',
-    'secret' => '{{yt-secret}}',
 ]);
