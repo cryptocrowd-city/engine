@@ -25,6 +25,8 @@ class Video extends MindsObject
         $this->attributes['boost_rejection_reason'] = -1;
         $this->attributes['rating'] = 2;
         $this->attributes['time_sent'] = null;
+        $this->attributes['youtube_id'] = null;
+        $this->attributes['transcoding_status'] = null;
     }
 
 
