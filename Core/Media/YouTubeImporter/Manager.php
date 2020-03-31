@@ -6,20 +6,27 @@
 namespace Minds\Core\Media\YouTubeImporter;
 
 use Minds\Core\Config\Config;
+use Minds\Core\Data\cache\abstractCacher;
 use Minds\Core\Di\Di;
 use Minds\Entities\User;
 
 class Manager
 {
+    private const CACHE_KEY = 'youtube:token';
+
     /** @var \Google_Client */
     protected $client;
 
     /** @var Config */
     protected $config;
 
-    public function __construct($client = null, $config = null)
+    /** @var abstractCacher */
+    protected $cacher;
+
+    public function __construct($client = null, $cacher = null, $config = null)
     {
         $this->config = $config ?: Di::_()->get('Config');
+        $this->cacher = $cacher ?: Di::_()->get('Cache');
         $this->client = $client ?: $this->buildClient();
     }
 
@@ -87,9 +94,9 @@ class Manager
         }
 
         // Use Minds' access token
-        $this->client->setAccessToken($this->config->get('google')['youtube']['oauth_token']);
-        $youtube = new \Google_Service_YouTube($this->client);
+        $this->client->setAccessToken($this->cacher->get(self::CACHE_KEY));
 
+        $youtube = new \Google_Service_YouTube($this->client);
 
         // TODO query the database and get all imported/importing videos
 
@@ -168,6 +175,18 @@ class Manager
             . 'api/v3/media/youtube-importer/oauth/redirect');
 
         $client->setAccessType('offline');
+
+        // cache this
+        $token = $this->config->get('google')['youtube']['oauth_token'];
+        if (!$this->cacher->get(self::CACHE_KEY)) {
+            $this->cacher->set(self::CACHE_KEY, $token);
+        }
+
+        // if we have an access token and it's expired, fetch the refresh token
+        $expiryTime = $token['created'] + $token['expires_in'];
+        if ($expiryTime >= time()) {
+            $this->cacher->set(self::CACHE_KEY, $client->refreshToken($token['refresh_token']));
+        }
 
         return $client;
     }
