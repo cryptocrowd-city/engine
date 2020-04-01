@@ -8,11 +8,19 @@ namespace Minds\Core\Media\YouTubeImporter;
 use Minds\Core\Config\Config;
 use Minds\Core\Data\cache\abstractCacher;
 use Minds\Core\Di\Di;
+use Minds\Core\Entities\Actions\Save;
+use Minds\Core\Media\AssetsFactory;
+use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
+use Minds\Core\Notification\PostSubscriptions\Manager as PostSubscriptionsManager;
+use Minds\Core\Session;
 use Minds\Entities\User;
 
 class Manager
 {
     private const CACHE_KEY = 'youtube:token';
+
+    // preferred qualities, in order of preference
+    private const PREFERRED_QUALITIES = ['1080p', '720p', '360p', '240p', '144p'];
 
     /** @var \Google_Client */
     protected $client;
@@ -23,10 +31,18 @@ class Manager
     /** @var abstractCacher */
     protected $cacher;
 
-    public function __construct($client = null, $cacher = null, $config = null)
+    /** @var QueueDelegate */
+    protected $queueDelegate;
+
+    /** @var Save */
+    protected $save;
+
+    public function __construct($client = null, $queueDelegate = null, $save = null, $cacher = null, $config = null)
     {
         $this->config = $config ?: Di::_()->get('Config');
         $this->cacher = $cacher ?: Di::_()->get('Cache');
+        $this->queueDelegate = $queueDelegate ?? new QueueDelegate();
+        $this->save = $save ?: new Save();
         $this->client = $client ?: $this->buildClient();
     }
 
@@ -59,8 +75,8 @@ class Manager
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
             if (count(array_filter($channels, function ($value) use ($channel) {
-                    return $value['id'] === $channel['id'];
-                })) === 0) {
+                return $value['id'] === $channel['id'];
+            })) === 0) {
                 $channels[] = [
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],
@@ -69,7 +85,7 @@ class Manager
             }
         }
 
-        $user->setYouTubeChannels($token)
+        $user->setYouTubeChannels($channels)
             ->save();
     }
 
@@ -120,7 +136,7 @@ class Manager
             // TODO: if it matches the filter, include the status in the entity
             foreach ($playlistResponse['items'] as $item) {
                 $video = (new Video())
-                    ->setYoutubeId($item['id'])
+                    ->setYoutubeId($item['snippet']['resourceId']['videoId'])
                     ->setChannelId($item['snippet']['channelId'])
                     ->setChannelTitle($item['snippet']['channelTitle'])
                     ->setDescription($item['snippet']['description'])
@@ -143,9 +159,92 @@ class Manager
      */
     public function import(User $user, $channelId, $videoId)
     {
-        // TODO query video from youtube and get its data
-        // TODO trigger the queue
-        // TODO find out how to download video
+        // get and decode the data
+        parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $videoId), $info);
+
+        $videoData = json_decode($info['player_response'], true);
+
+        // get video details
+        $videoDetails = $videoData['videoDetails'];
+
+        // get streaming formats
+        $streamingDataFormats = $videoData['streamingData']['formats'];
+
+        // find best suitable format
+        $suitableFormat = [];
+        $i = 0;
+
+        $length = count(static::PREFERRED_QUALITIES);
+        while (count($suitableFormat) === 0 && $i < $length) {
+            foreach ($streamingDataFormats as $format) {
+                if ($format['qualityLabel'] === static::PREFERRED_QUALITIES[$i]) {
+                    $suitableFormat = $format;
+                }
+            }
+
+            $i++;
+        }
+
+        // create video entity
+        $video = new \Minds\Entities\Video();
+
+        $video->patch([
+            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
+            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
+            'batch_guid' => 0,
+            'access_id' => 2,
+            'owner_guid' => $user->guid,
+            'full_hd' => $user->isPro(),
+            'youtube_id' => $videoId,
+            'youtube_channel_id' => $channelId,
+        ]);
+
+        // send to queue so it gets downloaded
+        $this->queueDelegate->onAdd($video, $suitableFormat);
+    }
+
+    /**
+     * @param \Minds\Entities\Video $video
+     * @param array $format
+     * @throws \Exception
+     */
+    public function onQueue(\Minds\Entities\Video $video, array $format)
+    {
+        echo "[YouTubeDownloader] Downloading YouTube video ({$video->getYoutubeId()}) \n";
+
+        $file = tmpfile();
+        $path = stream_get_meta_data($file)['uri'];
+        file_put_contents($path, fopen($format['url'], 'r'));
+
+        echo "[YouTubeDownloader] File saved (path: {$path}) \n";
+
+        $media = [
+            'type' => filetype($path),
+            'file' => $path,
+        ];
+
+        $assets = new \Minds\Core\Media\Assets\Video();
+        $assets->setEntity($video);
+
+        $assets->validate($media);
+
+        $video->setAssets($assets->upload($media, []));
+
+        echo "[YouTubeDownloader] Saving video ({$video->guid}) \n";
+
+        $success = $this->save
+            ->setEntity($video)
+            ->save(true);
+
+        if (!$success) {
+            throw new \Exception('Error saving media entity');
+        }
+
+        // Follow activity
+        (new PostSubscriptionsManager())
+            ->setEntityGuid($video->guid)
+            ->setUserGuid($video->getOwnerGUID())
+            ->follow();
     }
 
     /**
@@ -154,7 +253,6 @@ class Manager
      */
     public function updateVideoStatus($videoId)
     {
-
     }
 
     /**
@@ -190,5 +288,4 @@ class Manager
 
         return $client;
     }
-
 }
