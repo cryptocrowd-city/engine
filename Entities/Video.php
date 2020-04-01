@@ -26,6 +26,7 @@ class Video extends MindsObject
         $this->attributes['rating'] = 2;
         $this->attributes['time_sent'] = null;
         $this->attributes['youtube_id'] = null;
+        $this->attributes['youtube_channel_id'] = null;
         $this->attributes['transcoding_status'] = null;
     }
 
@@ -123,6 +124,9 @@ class Video extends MindsObject
             'mature',
             'boost_rejection_reason',
             'time_sent',
+            'youtube_id',
+            'youtube_channel_id',
+            'transcoding_status',
         ]);
     }
 
@@ -199,6 +203,9 @@ class Video extends MindsObject
             'rating' => 2, //open by default
             'time_sent' => time(),
             'full_hd' => false,
+            'youtube_id' => null,
+            'youtube_channel_id' => null,
+            'transcoding_status' => null,
         ], $data);
 
         $allowed = [
@@ -214,6 +221,9 @@ class Video extends MindsObject
             'rating',
             'time_sent',
             'full_hd',
+            'youtube_id',
+            'youtube_channel_id',
+            'transcoding_status',
         ];
 
         foreach ($allowed as $field) {
