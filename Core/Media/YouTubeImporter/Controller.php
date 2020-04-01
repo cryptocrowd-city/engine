@@ -76,55 +76,55 @@ class Controller
         /** @var User $user */
         $user = Session::getLoggedinUser();
 
-        try {
-            $videos = $this->manager->getVideos($user, $channelId, $status);
+//        try {
+        $videos = $this->manager->getVideos($user, $channelId, $status);
 
-            return new JsonResponse([
+        return new JsonResponse([
                 'status' => 'success',
                 'videos' => Exportable::_($videos),
             ]);
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ]);
-        }
+//        } catch (\Exception $e) {
+//            return new JsonResponse([
+//                'status' => 'error',
+//                'message' => $e->getMessage(),
+//            ]);
+//        }
     }
 
     public function import(ServerRequest $request): JsonResponse
     {
-        $queryParams = $request->getQueryParams();
+        $params = $request->getParsedBody();
 
         /** @var User $user */
         $user = Session::getLoggedinUser();
 
-        if (!isset($queryParams['channelId'])) {
+        if (!isset($params['channelId'])) {
             return new JsonResponse([
                 'status' => 'error',
                 'message' => 'You must provide a channelId',
             ]);
         }
 
-        $channelId = $queryParams['channelId'];
+        $channelId = $params['channelId'];
 
         // if the channel does not belong to the User
         if (count(array_filter($user->getYouTubeChannels(), function ($value) use ($channelId) {
-                return $value['id'] === $channelId;
-            })) === 0) {
+            return $value['id'] === $channelId;
+        })) === 0) {
             return new JsonResponse([
                 'status' => 'error',
                 'message' => 'channelId is not registered to this user',
             ]);
         }
 
-        if (!isset($queryParams['videoId'])) {
+        if (!isset($params['videoId'])) {
             return new JsonResponse([
                 'status' => 'error',
                 'message' => 'You must provide a videoId',
             ]);
         }
 
-        $videoId = $queryParams['videoId'];
+        $videoId = $params['videoId'];
 
         $this->manager->import($user, $channelId, $videoId);
 
@@ -132,5 +132,4 @@ class Controller
             'status' => 'success',
         ]);
     }
-
 }
