@@ -12,6 +12,13 @@ use Minds\Core\Di\Di;
 use cinemr;
 use Minds\Helpers;
 
+/**
+ * Class Video
+ * @package Minds\Entities
+ * @property string $youtube_id
+ * @property string $youtube_channel_id
+ * @property string $transcoding_status
+ */
 class Video extends MindsObject
 {
     private $cinemr;
@@ -56,11 +63,10 @@ class Video extends MindsObject
     {
         // TODO: Confirm why this is still here
         $this->generateGuid();
-
         // Upload the source and start the transcoder pipeline
         $transcoderManager = Di::_()->get('Media\Video\Transcoder\Manager');
-        $transcoderManager->uploadSource($this, $filepath)
-            ->createTranscodes($this);
+        $transcoderManager->uploadSource($this, $filepath);
+        $transcoderManager->createTranscodes($this);
 
         // Legacy support
         $this->cinemr_guid = $this->getGuid();
@@ -313,6 +319,27 @@ class Video extends MindsObject
     }
 
     /**
+     * Returns title
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title  ?: '';
+    }
+
+    /**
+     * Sets title
+     *
+     * @param string $title
+     * @return Video
+     */
+    public function setTitle($title): Video
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
      * Return description
      * @return string
      */
@@ -330,6 +357,69 @@ class Video extends MindsObject
     public function setDescription($description): Video
     {
         $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * Returns YouTube video ID
+     * @return string
+     */
+    public function getYoutubeId(): string
+    {
+        return $this->youtube_id  ?: '';
+    }
+
+    /**
+     * Sets YouTube video ID
+     *
+     * @param string $id
+     * @return Video
+     */
+    public function setYoutubeId($id): Video
+    {
+        $this->youtube_id = $id;
+        return $this;
+    }
+
+    /**
+     * Returns YouTube channel ID
+     * @return string
+     */
+    public function getYoutubeChannelId(): string
+    {
+        return $this->youtube_channel_id  ?: '';
+    }
+
+    /**
+     * Sets YouTube channel ID
+     *
+     * @param string $id
+     * @return Video
+     */
+    public function setYoutubeChannelId($id): Video
+    {
+        $this->youtube_channel_id = $id;
+        return $this;
+    }
+
+    /**
+     * Returns transcoding status
+     * @return string
+     */
+    public function getTranscodingStatus(): string
+    {
+        return $this->transcoding_status  ?: '';
+    }
+
+    /**
+     * Sets transcoding status
+     *
+     * @param string $status
+     * @return Video
+     */
+    public function setTranscodingStatus($status): Video
+    {
+        $this->transcoding_status = $status;
         return $this;
     }
 }
