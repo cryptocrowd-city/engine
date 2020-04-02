@@ -45,6 +45,12 @@ abstract class ElggEntity extends ElggData implements
 
     protected $_context = 'default';
 
+    /**
+     * Used by runners or CLIs that want to create entities
+     * @var bool
+     */
+    protected $acl_override = false;
+
 	/**
 	 * Initialize the attributes array.
 	 *
@@ -700,19 +706,34 @@ abstract class ElggEntity extends ElggData implements
 		));
 	}
 
+    /**
+     * Sets $acl_override. Used by runners and CLIs
+     * @param bool $value
+     * @return $this
+     */
+    function setACLOverride(bool $value)
+    {
+        $this->acl_override = $value;
+        return $this;
+    }
+
 	/**
 	 * Can a user edit this entity.
 	 *
 	 * @param int $user_guid The user GUID, optionally (default: logged in user)
 	 *
 	 * @return bool
-	 */
-	function canEdit($user_guid = 0) {
-		return Minds\Core\Security\ACL::_()->write($this);
-	}
+     */
+    function canEdit($user_guid = 0)
+    {
+        if ($this->acl_override) {
+            return true;
+        }
+        return Minds\Core\Security\ACL::_()->write($this);
+    }
 
-	/**
-	 * Can a user edit metadata on this entity
+    /**
+     * Can a user edit metadata on this entity
 	 *
 	 * @param ElggMetadata $metadata  The piece of metadata to specifically check
 	 * @param int          $user_guid The user GUID, optionally (default: logged in user)
@@ -1049,15 +1070,16 @@ abstract class ElggEntity extends ElggData implements
 		return true;
 	}
 
-	/**
-	 * Save an entity.
-	 *
-	 * @return bool|int
-	 * @throws IOException
-	 */
+    /**
+     * Save an entity.
+     * @return bool|int
+     * @throws IOException
+     * @throws ConfigurationException
+     */
 	public function save($timebased = true) {
         if ($this->guid) {
             if (!$this->canEdit()) {
+                var_dump('cannot edit'); die();
                 return false;
             }
             $this->time_updated = time();
@@ -1563,7 +1585,7 @@ abstract class ElggEntity extends ElggData implements
                 throw \Exception('Incorrect NSFW value provided');
             }
     	}
-		
+
 		$this->nsfw = $array;
 		return $this;
 	}
@@ -1585,7 +1607,7 @@ abstract class ElggEntity extends ElggData implements
 
         return $array;
 	}
-	
+
 	/**
      * Set NSFW lock tags for administrators. Users cannot remove these themselves.
      *
@@ -1640,7 +1662,7 @@ abstract class ElggEntity extends ElggData implements
     {
         $this->time_moderated = $timeModerated;
     }
-	
+
     /**
      * Gets the time moderated
      * @return int
