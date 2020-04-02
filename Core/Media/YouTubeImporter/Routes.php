@@ -44,7 +44,7 @@ class Routes extends ModuleRoutes
 
                 // imports a video
                 $route->post(
-                    'videos',
+                    'videos/import',
                     Ref::_('Media\YouTubeImporter\Controller', 'import')
                 );
             });
