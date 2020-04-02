@@ -64,6 +64,7 @@ class Video extends MindsObject
         // TODO: Confirm why this is still here
         $this->generateGuid();
         // Upload the source and start the transcoder pipeline
+        /** @var Core\Media\Video\Transcoder\Manager $transcoderManager */
         $transcoderManager = Di::_()->get('Media\Video\Transcoder\Manager');
         $transcoderManager->uploadSource($this, $filepath);
         $transcoderManager->createTranscodes($this);
@@ -212,6 +213,7 @@ class Video extends MindsObject
             'youtube_id' => null,
             'youtube_channel_id' => null,
             'transcoding_status' => null,
+            'owner_guid' => null,
         ], $data);
 
         $allowed = [
@@ -230,6 +232,7 @@ class Video extends MindsObject
             'youtube_id',
             'youtube_channel_id',
             'transcoding_status',
+            'owner_guid',
         ];
 
         foreach ($allowed as $field) {
