@@ -10,6 +10,7 @@ use Minds\Core\Data\cache\abstractCacher;
 use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Media\AssetsFactory;
+use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Core\Notification\PostSubscriptions\Manager as PostSubscriptionsManager;
 use Minds\Core\Session;
@@ -35,14 +36,18 @@ class Manager
     /** @var QueueDelegate */
     protected $queueDelegate;
 
+    /** @var EntityCreatorDelegate */
+    protected $entityDelegate;
+
     /** @var Save */
     protected $save;
 
-    public function __construct($client = null, $queueDelegate = null, $save = null, $cacher = null, $config = null)
+    public function __construct($client = null, $queueDelegate = null, $entityDelegate=null, $save = null, $cacher = null, $config = null)
     {
         $this->config = $config ?: Di::_()->get('Config');
         $this->cacher = $cacher ?: Di::_()->get('Cache');
-        $this->queueDelegate = $queueDelegate ?? new QueueDelegate();
+        $this->queueDelegate = $queueDelegate ?: new QueueDelegate();
+        $this->entityDelegate = $entityDelegate ?: new EntityCreatorDelegate();
         $this->save = $save ?: new Save();
         $this->client = $client ?: $this->buildClient();
     }
@@ -195,9 +200,6 @@ class Manager
      * @param User $user
      * @param array $videoDetails
      * @param array $formats
-     * @throws \IOException
-     * @throws \InvalidParameterException
-     * @throws \Minds\Exceptions\StopEventException
      */
     public function onQueue(User $user, array $videoDetails, array $formats)
     {
@@ -230,74 +232,8 @@ class Manager
             'file' => $path,
         ];
 
-
-        // TODO: move entity creation logic to a delegate
-        // create video entity
-        $video = new \Minds\Entities\Video();
-
-        $video->patch([
-            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
-            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
-            'batch_guid' => 0,
-            'access_id' => 2,
-            'owner_guid' => $user->guid,
-            'full_hd' => $user->isPro(),
-            'youtube_id' => $videoDetails['youtube_id'],
-            'youtube_channel_id' => $videoDetails['youtube_channel_id'],
-        ]);
-
-        $assets = new \Minds\Core\Media\Assets\Video();
-        $assets->setEntity($video);
-
-        $assets->validate($media);
-
-        $video->setAssets($assets->upload($media, []));
-
-        echo "[YouTubeDownloader] Saving video ({$video->guid}) \n";
-
-        $video->setACLOverride(true);
-        $success = $this->save
-            ->setEntity($video)
-            ->save(true);
-
-        if (!$success) {
-            throw new \Exception('Error saving video');
-        }
-
-        // create activity
-        $activity = new Activity();
-        $activity->setTimeCreated(time());
-        $activity->setTimeSent(time());
-        $activity->access_id = 2;
-        $activity->setMessage($video->getTitle());
-        $activity->setFromEntity($video)
-            ->setCustom('video', [
-                'thumbnail_src' => $video->getIconUrl(),
-                'guid' => $video->guid,
-                'mature' => false,
-            ])
-            ->setTitle($video->getTitle())
-            ->setACLOverride(true);
-
-        $guid = $this->save->setEntity($activity)->save();
-
-        if ($guid) {
-            echo "[YouTubeDownloader] Created activity ({$guid}) \n";
-
-            // Follow activity
-            (new PostSubscriptionsManager())
-                ->setEntityGuid($activity->guid)
-                ->setUserGuid($activity->getOwnerGUID())
-                ->follow();
-
-            // Follow video
-            (new PostSubscriptionsManager())
-                ->setEntityGuid($video->guid)
-                ->setUserGuid($video->getOwnerGUID())
-                ->follow();
-        } else {
-            echo "[YouTubeDownloader] Failed to create activity ({$guid}) \n";
-        }
+        // create Video entity, upload, trigger the transcode and create the activity
+        $this->entityDelegate->onCreate($user, $videoDetails, $media);
     }
 
     /**
@@ -321,7 +257,9 @@ class Manager
         // add scopes
         $client->addScope(\Google_Service_YouTube::YOUTUBE_READONLY);
 
-        //add redirect URI
+
+        // TODO redirect URI should be to our youtube importer page for better UX
+        // add redirect URI
         $client->setRedirectUri($this->config->get('site_url')
             . 'api/v3/media/youtube-importer/oauth/redirect');
 
