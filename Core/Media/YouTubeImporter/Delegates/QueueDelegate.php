@@ -6,8 +6,8 @@
 namespace Minds\Core\Media\YouTubeImporter\Delegates;
 
 use Minds\Core\Di\Di;
-use Minds\Core\Media\Video\Transcoder\Transcode;
 use Minds\Core\Queue\Interfaces\QueueClient;
+use Minds\Entities\User;
 use Minds\Entities\Video;
 
 class QueueDelegate
@@ -22,17 +22,19 @@ class QueueDelegate
 
     /**
      * Add a download to the queue
-     * @param Video $video
-     * @param array $format
+     * @param User $user
+     * @param array $videoDetails
+     * @param array $formats
      * @return void
      */
-    public function onAdd(Video $video, array $format): void
+    public function onAdd(User $user, array $videoDetails, array $formats): void
     {
         $this->queueClient
             ->setQueue('YouTubeDownloader')
             ->send([
-                'video' => serialize($video),
-                'format' => serialize($format),
+                'user' => serialize($user),
+                'videoDetails' => serialize($videoDetails),
+                'formats' => serialize($formats),
             ]);
     }
 }

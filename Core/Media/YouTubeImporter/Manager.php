@@ -13,6 +13,7 @@ use Minds\Core\Media\AssetsFactory;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Core\Notification\PostSubscriptions\Manager as PostSubscriptionsManager;
 use Minds\Core\Session;
+use Minds\Entities\Activity;
 use Minds\Entities\User;
 
 class Manager
@@ -156,8 +157,12 @@ class Manager
      * @param User $user
      * @param $channelId
      * @param $videoId
+     * @param bool $immediate
+     * @throws \IOException
+     * @throws \InvalidParameterException
+     * @throws \Minds\Exceptions\StopEventException
      */
-    public function import(User $user, $channelId, $videoId)
+    public function import(User $user, $channelId, $videoId, $immediate = false)
     {
         // get and decode the data
         parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $videoId), $info);
@@ -170,21 +175,63 @@ class Manager
         // get streaming formats
         $streamingDataFormats = $videoData['streamingData']['formats'];
 
+        $details = [
+            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
+            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
+            'youtube_id' => $videoId,
+            'youtube_channel_id' => $channelId,
+        ];
+
+        // send to queue so it gets downloaded
+
+        if ($immediate) {
+            $this->onQueue($user, $details, $streamingDataFormats);
+        } else {
+            $this->queueDelegate->onAdd($user, $details, $streamingDataFormats);
+        }
+    }
+
+    /**
+     * @param User $user
+     * @param array $videoDetails
+     * @param array $formats
+     * @throws \IOException
+     * @throws \InvalidParameterException
+     * @throws \Minds\Exceptions\StopEventException
+     */
+    public function onQueue(User $user, array $videoDetails, array $formats)
+    {
         // find best suitable format
-        $suitableFormat = [];
+        $format = [];
         $i = 0;
 
         $length = count(static::PREFERRED_QUALITIES);
-        while (count($suitableFormat) === 0 && $i < $length) {
-            foreach ($streamingDataFormats as $format) {
-                if ($format['qualityLabel'] === static::PREFERRED_QUALITIES[$i]) {
-                    $suitableFormat = $format;
+        while (count($format) === 0 && $i < $length) {
+            foreach ($formats as $f) {
+                if ($f['qualityLabel'] === static::PREFERRED_QUALITIES[$i]) {
+                    $format = $f;
                 }
             }
 
             $i++;
         }
 
+        echo "[YouTubeDownloader] Downloading YouTube video ({$videoDetails['youtube_id']}) \n";
+
+        // TODO use length from $videoData so we don't have to download the video
+        // we need to download the file so we can validate it
+        $file = tmpfile();
+        $path = stream_get_meta_data($file)['uri'];
+        file_put_contents($path, fopen($format['url'], 'r'));
+
+        echo "[YouTubeDownloader] File saved (path: {$path}) \n";
+
+        $media = [
+            'file' => $path,
+        ];
+
+
+        // TODO: move entity creation logic to a delegate
         // create video entity
         $video = new \Minds\Entities\Video();
 
@@ -195,33 +242,9 @@ class Manager
             'access_id' => 2,
             'owner_guid' => $user->guid,
             'full_hd' => $user->isPro(),
-            'youtube_id' => $videoId,
-            'youtube_channel_id' => $channelId,
+            'youtube_id' => $videoDetails['youtube_id'],
+            'youtube_channel_id' => $videoDetails['youtube_channel_id'],
         ]);
-
-        // send to queue so it gets downloaded
-        $this->queueDelegate->onAdd($video, $suitableFormat);
-    }
-
-    /**
-     * @param \Minds\Entities\Video $video
-     * @param array $format
-     * @throws \Exception
-     */
-    public function onQueue(\Minds\Entities\Video $video, array $format)
-    {
-        echo "[YouTubeDownloader] Downloading YouTube video ({$video->getYoutubeId()}) \n";
-
-        $file = tmpfile();
-        $path = stream_get_meta_data($file)['uri'];
-        file_put_contents($path, fopen($format['url'], 'r'));
-
-        echo "[YouTubeDownloader] File saved (path: {$path}) \n";
-
-        $media = [
-            'type' => filetype($path),
-            'file' => $path,
-        ];
 
         $assets = new \Minds\Core\Media\Assets\Video();
         $assets->setEntity($video);
@@ -232,19 +255,49 @@ class Manager
 
         echo "[YouTubeDownloader] Saving video ({$video->guid}) \n";
 
+        $video->setACLOverride(true);
         $success = $this->save
             ->setEntity($video)
             ->save(true);
 
         if (!$success) {
-            throw new \Exception('Error saving media entity');
+            throw new \Exception('Error saving video');
         }
 
-        // Follow activity
-        (new PostSubscriptionsManager())
-            ->setEntityGuid($video->guid)
-            ->setUserGuid($video->getOwnerGUID())
-            ->follow();
+        // create activity
+        $activity = new Activity();
+        $activity->setTimeCreated(time());
+        $activity->setTimeSent(time());
+        $activity->access_id = 2;
+        $activity->setMessage($video->getTitle());
+        $activity->setFromEntity($video)
+            ->setCustom('video', [
+                'thumbnail_src' => $video->getIconUrl(),
+                'guid' => $video->guid,
+                'mature' => false,
+            ])
+            ->setTitle($video->getTitle())
+            ->setACLOverride(true);
+
+        $guid = $this->save->setEntity($activity)->save();
+
+        if ($guid) {
+            echo "[YouTubeDownloader] Created activity ({$guid}) \n";
+
+            // Follow activity
+            (new PostSubscriptionsManager())
+                ->setEntityGuid($activity->guid)
+                ->setUserGuid($activity->getOwnerGUID())
+                ->follow();
+
+            // Follow video
+            (new PostSubscriptionsManager())
+                ->setEntityGuid($video->guid)
+                ->setUserGuid($video->getOwnerGUID())
+                ->follow();
+        } else {
+            echo "[YouTubeDownloader] Failed to create activity ({$guid}) \n";
+        }
     }
 
     /**
