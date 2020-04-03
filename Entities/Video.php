@@ -18,6 +18,7 @@ use Minds\Helpers;
  * @property string $youtube_id
  * @property string $youtube_channel_id
  * @property string $transcoding_status
+ * @property int $time_transcoded
  */
 class Video extends MindsObject
 {
@@ -35,6 +36,7 @@ class Video extends MindsObject
         $this->attributes['youtube_id'] = null;
         $this->attributes['youtube_channel_id'] = null;
         $this->attributes['transcoding_status'] = null;
+        $this->attributes['time_transcoded'] = null;
     }
 
 
@@ -313,7 +315,8 @@ class Video extends MindsObject
 
     /**
      * Set time_sent
-     * @return Image
+     * @param $time_sent
+     * @return Video
      */
     public function setTimeSent($time_sent)
     {
@@ -332,7 +335,6 @@ class Video extends MindsObject
 
     /**
      * Sets title
-     *
      * @param string $title
      * @return Video
      */
@@ -353,7 +355,6 @@ class Video extends MindsObject
 
     /**
     * Set description
-    *
     * @param string $description - description to be set.
     * @return Video
     */
@@ -374,7 +375,6 @@ class Video extends MindsObject
 
     /**
      * Sets YouTube video ID
-     *
      * @param string $id
      * @return Video
      */
@@ -395,7 +395,6 @@ class Video extends MindsObject
 
     /**
      * Sets YouTube channel ID
-     *
      * @param string $id
      * @return Video
      */
@@ -416,13 +415,32 @@ class Video extends MindsObject
 
     /**
      * Sets transcoding status
-     *
      * @param string $status
      * @return Video
      */
     public function setTranscodingStatus($status): Video
     {
         $this->transcoding_status = $status;
+        return $this;
+    }
+
+    /**
+     * Returns when the video was transcoded
+     * @return int
+     */
+    public function getTimeTranscoded(): int
+    {
+        return $this->time_transcoded ?: 0;
+    }
+
+    /**
+     * Sets when the video was transcoded
+     * @param int $time
+     * @return Video
+     */
+    public function setTimeTranscoded(int $time): Video
+    {
+        $this->time_transcoded = $time;
         return $this;
     }
 }
