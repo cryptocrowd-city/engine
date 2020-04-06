@@ -252,8 +252,12 @@ $CONFIG->set('google', [
         ],
         'ads' => '', // get it from https://ga-dev-tools.appspot.com/account-explorer/
     ],
-    'client_id' => '{{yt-client-id}}',
-    'secret' => '{{yt-secret}}',
+
+    'youtube' => [
+        'client_id' => '{{yt-client-id}}',
+        'secret' => '{{yt-secret}}',
+        'max_daily_imports' => 10
+    ]
 ]);
 
 $CONFIG->set('apple', [
