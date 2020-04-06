@@ -7,6 +7,7 @@ namespace Minds\Core\Media\YouTubeImporter\Delegates;
 
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Notification\PostSubscriptions\Manager as PostSubscriptionsManager;
+use Minds\Core\Security\ACL;
 use Minds\Entities\Activity;
 use Minds\Entities\User;
 use Minds\Entities\Video;
@@ -25,48 +26,8 @@ class EntityCreatorDelegate
         $this->manager = $postsSubscriptionManager ?: new PostSubscriptionsManager();
     }
 
-    /**
-     * Creates video and activity
-     * @param User $user
-     * @param array $videoDetails
-     * @param array $media
-     * @return void
-     */
-    public function onCreate(User $user, array $videoDetails, array $media): void
+    public function createActivity(Video $video)
     {
-        // create video entity
-        $video = new Video();
-
-        $video->patch([
-            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
-            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
-            'batch_guid' => 0,
-            'access_id' => 2,
-            'owner_guid' => $user->guid,
-            'full_hd' => $user->isPro(),
-            'youtube_id' => $videoDetails['youtube_id'],
-            'youtube_channel_id' => $videoDetails['youtube_channel_id'],
-        ]);
-
-        $assets = new \Minds\Core\Media\Assets\Video();
-        $assets->setEntity($video);
-
-        $assets->validate($media);
-
-        $video->setAssets($assets->upload($media, []));
-
-        echo "[YouTubeDownloader] Saving video ({$video->guid}) \n";
-
-        $video->setACLOverride(true);
-        $success = $this->save
-            ->setEntity($video)
-            ->save(true);
-
-        if (!$success) {
-            throw new \Exception('Error saving video');
-        }
-
-        // create activity
         $activity = new Activity();
         $activity->setTimeCreated(time());
         $activity->setTimeSent(time());
@@ -78,8 +39,7 @@ class EntityCreatorDelegate
                 'guid' => $video->guid,
                 'mature' => false,
             ])
-            ->setTitle($video->getTitle())
-            ->setACLOverride(true);
+            ->setTitle($video->getTitle());
 
         $guid = $this->save->setEntity($activity)->save();
 

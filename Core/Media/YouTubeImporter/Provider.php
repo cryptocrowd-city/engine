@@ -12,6 +12,10 @@ class Provider extends DiProvider
             return new Controller();
         });
 
+        $this->di->bind('Media\YouTubeImporter\Repository', function ($di) {
+            return new Repository();
+        });
+
         $this->di->bind('Media\YouTubeImporter\Manager', function ($di) {
             return new Manager();
         });

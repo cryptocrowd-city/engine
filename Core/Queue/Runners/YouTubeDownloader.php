@@ -17,15 +17,14 @@ class YouTubeDownloader implements Interfaces\QueueRunner
             ->receive(function ($data) {
                 $d = $data->getData();
                 $user = unserialize($d['user']);
-                $videoDetails = unserialize($d['videoDetails']);
-                $formats = unserialize($d['formats']);
+                $video = unserialize($d['video']);
 
                 echo "[YouTubeDownloader] Received a YouTube download request from {$user->username} ({$user->guid})\n";
 
                 /** @var Core\Media\YouTubeImporter\Manager $manager */
                 $manager = Di::_()->get('Media\YouTubeImporter\Manager');
 
-                $manager->onQueue($user, $videoDetails, $formats);
+                $manager->onQueue($user, $video);
             }, ['max_messages' => 1]);
     }
 }

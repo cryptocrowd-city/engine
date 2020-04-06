@@ -5,6 +5,7 @@
 
 namespace Minds\Core\Media\YouTubeImporter;
 
+use Minds\Common\Repository\Response;
 use Minds\Core\Config\Config;
 use Minds\Core\Data\cache\abstractCacher;
 use Minds\Core\Di\Di;
@@ -13,9 +14,11 @@ use Minds\Core\Media\AssetsFactory;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Core\Notification\PostSubscriptions\Manager as PostSubscriptionsManager;
+use Minds\Core\Security\ACL;
 use Minds\Core\Session;
 use Minds\Entities\Activity;
 use Minds\Entities\User;
+use Minds\Entities\Video;
 
 class Manager
 {
@@ -23,6 +26,9 @@ class Manager
 
     // preferred qualities, in order of preference
     private const PREFERRED_QUALITIES = ['1080p', '720p', '360p', '240p', '144p'];
+
+    /** @var Repository */
+    protected $repository;
 
     /** @var \Google_Client */
     protected $client;
@@ -42,8 +48,9 @@ class Manager
     /** @var Save */
     protected $save;
 
-    public function __construct($client = null, $queueDelegate = null, $entityDelegate=null, $save = null, $cacher = null, $config = null)
+    public function __construct($repository = null, $client = null, $queueDelegate = null, $entityDelegate = null, $save = null, $cacher = null, $config = null)
     {
+        $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
         $this->config = $config ?: Di::_()->get('Config');
         $this->cacher = $cacher ?: Di::_()->get('Cache');
         $this->queueDelegate = $queueDelegate ?: new QueueDelegate();
@@ -81,8 +88,8 @@ class Manager
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
             if (count(array_filter($channels, function ($value) use ($channel) {
-                return $value['id'] === $channel['id'];
-            })) === 0) {
+                    return $value['id'] === $channel['id'];
+                })) === 0) {
                 $channels[] = [
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],
@@ -95,24 +102,23 @@ class Manager
             ->save();
     }
 
-    /**
-     * Get Videos per channel IF $channelId is registered in yt_channels
-     * (uses Repository for getting the status of videos)
-     * @param User $user
-     * @param string $channelId
-     * @param string $status
-     * @return array
-     * @throws \Exception
-     */
-    public function getVideos(User $user, string $channelId, string $status)
-    {
-        $channel = array_filter($user->getYouTubeChannels(), function ($value) use ($channelId) {
-            return $value['id'] === $channelId;
-        });
+    public function getVideos(array $opts) {
+        $opts = array_merge([
+            'limit' => 12,
+            'offset' => '',
+            'user_guid' => null,
+            'youtube_id' => null,
+            'youtube_channel_id' => null,
+            'status' => null,
+            'time_created' => [
+                'lt' => null,
+                'gt' => null,
+            ],
+        ], $opts);
 
-        if (!$channel) {
-            // TODO refactor to a custom exception
-            throw new \Exception('YouTube Channel is not registered to user');
+        // if status is 'queued', then we don't consult youtube
+        if(isset($opts['status']) && $opts['status'] === 'queued') {
+            return $this->repository->getVideos($opts);
         }
 
         // Use Minds' access token
@@ -124,7 +130,7 @@ class Manager
 
         // get channel
         $channelsResponse = $youtube->channels->listChannels('contentDetails', [
-            'id' => $channelId,
+            'id' => $opts['youtube_channel_id'],
         ]);
 
         $videos = [];
@@ -141,19 +147,25 @@ class Manager
             // TODO only add the video if it matches the filter (check with the ones from Repository)
             // TODO: if it matches the filter, include the status in the entity
             foreach ($playlistResponse['items'] as $item) {
-                $video = (new Video())
-                    ->setYoutubeId($item['snippet']['resourceId']['videoId'])
-                    ->setChannelId($item['snippet']['channelId'])
-                    ->setChannelTitle($item['snippet']['channelTitle'])
-                    ->setDescription($item['snippet']['description'])
-                    ->setPublishedAt($item['snippet']['publishedAt'])
-                    ->setTitle($item['snippet']['title'])
-                    ->setThumbnails($item['snippet']['thumbnails']);
+                $youtubeId = $item['snippet']['resourceId']['videoId'];
 
-                $videos[] = $video;
+                // try to find it in our db
+                $response = $this->repository->getVideos(['youtube_id' => $youtubeId])->toArray();
+
+                if (count($response) > 0) {
+                    $videos[] = $response[0];
+                } else {
+                    $video = (new Video())
+                        ->setYoutubeId($item['snippet']['resourceId']['videoId'])
+                        ->setYoutubeChannelId($item['snippet']['channelId'])
+                        ->setDescription($item['snippet']['description'])
+                        ->setTitle($item['snippet']['title'])
+                        ->setYouTubeThumbnail($item['snippet']['thumbnails']->getHigh()['url']);
+
+                    $videos[] = $video;
+                }
             }
         }
-
         return $videos;
     }
 
@@ -162,12 +174,10 @@ class Manager
      * @param User $user
      * @param $channelId
      * @param $videoId
-     * @param bool $immediate
      * @throws \IOException
      * @throws \InvalidParameterException
-     * @throws \Minds\Exceptions\StopEventException
      */
-    public function import(User $user, $channelId, $videoId, $immediate = false)
+    public function import(User $user, $channelId, $videoId)
     {
         // get and decode the data
         parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $videoId), $info);
@@ -180,36 +190,13 @@ class Manager
         // get streaming formats
         $streamingDataFormats = $videoData['streamingData']['formats'];
 
-        $details = [
-            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
-            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
-            'youtube_id' => $videoId,
-            'youtube_channel_id' => $channelId,
-        ];
-
-        // send to queue so it gets downloaded
-
-        if ($immediate) {
-            $this->onQueue($user, $details, $streamingDataFormats);
-        } else {
-            $this->queueDelegate->onAdd($user, $details, $streamingDataFormats);
-        }
-    }
-
-    /**
-     * @param User $user
-     * @param array $videoDetails
-     * @param array $formats
-     */
-    public function onQueue(User $user, array $videoDetails, array $formats)
-    {
         // find best suitable format
         $format = [];
         $i = 0;
 
         $length = count(static::PREFERRED_QUALITIES);
         while (count($format) === 0 && $i < $length) {
-            foreach ($formats as $f) {
+            foreach ($streamingDataFormats as $f) {
                 if ($f['qualityLabel'] === static::PREFERRED_QUALITIES[$i]) {
                     $format = $f;
                 }
@@ -218,13 +205,53 @@ class Manager
             $i++;
         }
 
-        echo "[YouTubeDownloader] Downloading YouTube video ({$videoDetails['youtube_id']}) \n";
+        // create the video
+        $video = new Video();
+
+        $video->patch([
+            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
+            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
+            'batch_guid' => 0,
+            'access_id' => 0,
+            'owner_guid' => $user->guid,
+            'full_hd' => $user->isPro(),
+            'youtube_id' => $videoId,
+            'youtube_channel_id' => $channelId,
+            'transcoding_status' => 'queued',
+            'chosen_format_url' => $format['url'],
+        ]);
+
+        // check if we're below the threshold
+        if ($this->checkOwnerEligibility([$user->guid])[$user->guid] < $this->getThreshold()) {
+            $this->queue($user, $video);
+        }
+
+    }
+
+    public function queue(User $user, Video $video)
+    {
+        // send to queue so it gets downloaded
+        $this->queueDelegate->onAdd($user, $video);
+    }
+
+    public function getThreshold()
+    {
+        return $this->config->get('google')['youtube']['max_daily_imports'];
+    }
+
+    /**
+     * @param User $user
+     * @param Video $video
+     */
+    public function onQueue(User $user, Video $video)
+    {
+        echo "[YouTubeDownloader] Downloading YouTube video ({$video->getYoutubeId()}) \n";
 
         // TODO use length from $videoData so we don't have to download the video
         // we need to download the file so we can validate it
         $file = tmpfile();
         $path = stream_get_meta_data($file)['uri'];
-        file_put_contents($path, fopen($format['url'], 'r'));
+        file_put_contents($path, fopen($video->getChosenFormatUrl(), 'r'));
 
         echo "[YouTubeDownloader] File saved (path: {$path}) \n";
 
@@ -232,16 +259,32 @@ class Manager
             'file' => $path,
         ];
 
-        // create Video entity, upload, trigger the transcode and create the activity
-        $this->entityDelegate->onCreate($user, $videoDetails, $media);
+        $assets = new \Minds\Core\Media\Assets\Video();
+        $assets->setEntity($video);
+
+        $assets->validate($media);
+
+        echo "[YouTubeDownloader] Initiating upload to S3 ({$video->guid}) \n";
+
+        $video->setAssets($assets->upload($media, []));
+
+        echo "[YouTubeDownloader] Saving video ({$video->guid}) \n";
+
+        $success = $this->save
+            ->setEntity($video)
+            ->save(true);
+
+        if (!$success) {
+            throw new \Exception('Error saving video');
+        }
+
+        // create activity
+        $this->entityDelegate->createActivity($video);
     }
 
-    /**
-     * Updates a video's status in ES (called by runners)
-     * @param $videoId
-     */
-    public function updateVideoStatus($videoId)
+    public function checkOwnerEligibility(array $ownerGuids): array
     {
+        return $this->repository->checkOwnerEligibility($ownerGuids);
     }
 
     /**
@@ -256,7 +299,6 @@ class Manager
 
         // add scopes
         $client->addScope(\Google_Service_YouTube::YOUTUBE_READONLY);
-
 
         // TODO redirect URI should be to our youtube importer page for better UX
         // add redirect URI

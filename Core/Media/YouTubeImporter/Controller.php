@@ -71,13 +71,17 @@ class Controller
 
         $channelId = $queryParams['channelId'];
 
-        $status = $queryParams['status'] ?? 'all';
+        $status = $queryParams['status'] ?? null;
 
         /** @var User $user */
         $user = Session::getLoggedinUser();
 
 //        try {
-        $videos = $this->manager->getVideos($user, $channelId, $status);
+        $videos = $this->manager->getVideos([
+            'user_guid' => $user->guid,
+            'youtube_channel_id' => $channelId,
+            'status' => $status
+        ]);
 
         return new JsonResponse([
                 'status' => 'success',

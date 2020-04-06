@@ -23,18 +23,16 @@ class QueueDelegate
     /**
      * Add a download to the queue
      * @param User $user
-     * @param array $videoDetails
-     * @param array $formats
+     * @param Video $video
      * @return void
      */
-    public function onAdd(User $user, array $videoDetails, array $formats): void
+    public function onAdd(User $user, Video $video): void
     {
         $this->queueClient
             ->setQueue('YouTubeDownloader')
             ->send([
                 'user' => serialize($user),
-                'videoDetails' => serialize($videoDetails),
-                'formats' => serialize($formats),
+                'video' => serialize($video),
             ]);
     }
 }
