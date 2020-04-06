@@ -45,12 +45,6 @@ abstract class ElggEntity extends ElggData implements
 
     protected $_context = 'default';
 
-    /**
-     * Used by runners or CLIs that want to create entities
-     * @var bool
-     */
-    protected $acl_override = false;
-
 	/**
 	 * Initialize the attributes array.
 	 *
@@ -706,17 +700,6 @@ abstract class ElggEntity extends ElggData implements
 		));
 	}
 
-    /**
-     * Sets $acl_override. Used by runners and CLIs
-     * @param bool $value
-     * @return $this
-     */
-    function setACLOverride(bool $value)
-    {
-        $this->acl_override = $value;
-        return $this;
-    }
-
 	/**
 	 * Can a user edit this entity.
 	 *
@@ -726,9 +709,6 @@ abstract class ElggEntity extends ElggData implements
      */
     function canEdit($user_guid = 0)
     {
-        if ($this->acl_override) {
-            return true;
-        }
         return Minds\Core\Security\ACL::_()->write($this);
     }
 
