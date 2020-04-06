@@ -41,7 +41,7 @@ class YouTubeDownloader extends Cli\Controller implements Interfaces\CliControll
         $ownerGuids = [];
 
         foreach ($videos as $video) {
-            if (!in_array($video->getOwnerGUID(), $ownerGuids)) {
+            if (!in_array($video->getOwnerGUID(), $ownerGuids, true)) {
                 $ownerGuids[] = $video->getOwnerGUID();
             }
         }

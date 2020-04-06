@@ -88,8 +88,8 @@ class Manager
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
             if (count(array_filter($channels, function ($value) use ($channel) {
-                    return $value['id'] === $channel['id'];
-                })) === 0) {
+                return $value['id'] === $channel['id'];
+            })) === 0) {
                 $channels[] = [
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],
@@ -102,7 +102,8 @@ class Manager
             ->save();
     }
 
-    public function getVideos(array $opts) {
+    public function getVideos(array $opts)
+    {
         $opts = array_merge([
             'limit' => 12,
             'offset' => '',
@@ -117,7 +118,7 @@ class Manager
         ], $opts);
 
         // if status is 'queued', then we don't consult youtube
-        if(isset($opts['status']) && $opts['status'] === 'queued') {
+        if (isset($opts['status']) && $opts['status'] === 'queued') {
             return $this->repository->getVideos($opts);
         }
 
@@ -225,7 +226,6 @@ class Manager
         if ($this->checkOwnerEligibility([$user->guid])[$user->guid] < $this->getThreshold()) {
             $this->queue($user, $video);
         }
-
     }
 
     public function queue(User $user, Video $video)
