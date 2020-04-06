@@ -4,6 +4,7 @@
  *
  * Handles basic communication with cinemr
  */
+
 namespace Minds\Entities;
 
 use Minds\Core;
@@ -18,7 +19,8 @@ use Minds\Helpers;
  * @property string $youtube_id
  * @property string $youtube_channel_id
  * @property string $transcoding_status
- * @property int $time_transcoded
+ * @property string $chosen_format_url
+ * @property string $youtube_thumbnail
  */
 class Video extends MindsObject
 {
@@ -36,7 +38,8 @@ class Video extends MindsObject
         $this->attributes['youtube_id'] = null;
         $this->attributes['youtube_channel_id'] = null;
         $this->attributes['transcoding_status'] = null;
-        $this->attributes['time_transcoded'] = null;
+        $this->attributes['chosen_format_url'] = null;
+        $this->attributes['youtube_thumbnail'] = null; // this is ephemeral
     }
 
 
@@ -85,19 +88,24 @@ class Video extends MindsObject
 
         // return $domain . 'api/v1/media/thumbnails/' . $this->guid . '/' . $this->time_updated;
 
+        // if we didn't save this and it has a YouTube video ID, return YouTube's thumbnail
+        if (!$this->guid && $this->youtube_id) {
+            return $this->getYouTubeThumbnail();
+        }
+
         $mediaManager = Di::_()->get('Media\Image\Manager');
         return $mediaManager->getPublicAssetUri($this, 'medium');
     }
 
     public function getURL()
     {
-        return elgg_get_site_url() . 'media/'.$this->guid;
+        return elgg_get_site_url() . 'media/' . $this->guid;
     }
 
     protected function getIndexKeys($ia = false)
     {
         $indexes = [
-            "object:video:network:$this->owner_guid"
+            "object:video:network:$this->owner_guid",
         ];
         return array_merge(parent::getIndexKeys($ia), $indexes);
     }
@@ -142,7 +150,7 @@ class Video extends MindsObject
     public function getAlbumChildrenGuids()
     {
         $db = new Core\Data\Call('entities_by_time');
-        $row= $db->getRow("object:container:$this->container_guid", ['limit'=>100]);
+        $row = $db->getRow("object:container:$this->container_guid", ['limit' => 100]);
         $guids = [];
         foreach ($row as $col => $val) {
             $guids[] = (string) $col;
@@ -159,7 +167,7 @@ class Video extends MindsObject
         $export['thumbnail_src'] = $this->getIconUrl();
         $export['src'] = [
             '360.mp4' => $this->getSourceUrl('360.mp4'),
-            '720.mp4' => $this->getSourceUrl('720.mp4')
+            '720.mp4' => $this->getSourceUrl('720.mp4'),
         ];
         $export['play:count'] = Helpers\Counters::get($this->guid, 'plays');
         $export['thumbs:up:count'] = Helpers\Counters::get($this->guid, 'thumbs:up');
@@ -216,6 +224,7 @@ class Video extends MindsObject
             'youtube_channel_id' => null,
             'transcoding_status' => null,
             'owner_guid' => null,
+            'chosen_format_url' => null,
         ], $data);
 
         $allowed = [
@@ -235,6 +244,7 @@ class Video extends MindsObject
             'youtube_channel_id',
             'transcoding_status',
             'owner_guid',
+            'chosen_format_url',
         ];
 
         foreach ($allowed as $field) {
@@ -284,7 +294,7 @@ class Video extends MindsObject
                 'mature' => $this->getFlag('mature'),
                 'full_hd' => $this->getFlag('full_hd'),
                 'license' => $this->license ?? '',
-            ]
+            ],
         ];
     }
 
@@ -330,7 +340,7 @@ class Video extends MindsObject
      */
     public function getTitle(): string
     {
-        return $this->title  ?: '';
+        return $this->title ?: '';
     }
 
     /**
@@ -350,14 +360,14 @@ class Video extends MindsObject
      */
     public function getDescription(): string
     {
-        return $this->description  ?: '';
+        return $this->description ?: '';
     }
 
     /**
-    * Set description
-    * @param string $description - description to be set.
-    * @return Video
-    */
+     * Set description
+     * @param string $description - description to be set.
+     * @return Video
+     */
     public function setDescription($description): Video
     {
         $this->description = $description;
@@ -370,7 +380,7 @@ class Video extends MindsObject
      */
     public function getYoutubeId(): string
     {
-        return $this->youtube_id  ?: '';
+        return $this->youtube_id ?: '';
     }
 
     /**
@@ -390,7 +400,7 @@ class Video extends MindsObject
      */
     public function getYoutubeChannelId(): string
     {
-        return $this->youtube_channel_id  ?: '';
+        return $this->youtube_channel_id ?: '';
     }
 
     /**
@@ -410,7 +420,27 @@ class Video extends MindsObject
      */
     public function getTranscodingStatus(): string
     {
-        return $this->transcoding_status  ?: '';
+        return $this->transcoding_status ?: '';
+    }
+
+    /**
+     * Gets YouTube thumbnail
+     * @return string
+     */
+    public function getYouTubeThumbnail(): string
+    {
+        return $this->youtube_thumbnail ?: '';
+    }
+
+    /**
+     * Sets YouTube thumbnail
+     * @param string $url
+     * @return Video
+     */
+    public function setYouTubeThumbnail(string $url): Video
+    {
+        $this->youtube_thumbnail = $url;
+        return $this;
     }
 
     /**
@@ -425,22 +455,22 @@ class Video extends MindsObject
     }
 
     /**
-     * Returns when the video was transcoded
-     * @return int
+     * Returns the chosen format URL
+     * @return string
      */
-    public function getTimeTranscoded(): int
+    public function getChosenFormatUrl(): string
     {
-        return $this->time_transcoded ?: 0;
+        return $this->chosen_format_url ?: '';
     }
 
     /**
-     * Sets when the video was transcoded
-     * @param int $time
+     * Sets the chosen format URL
+     * @param string $url
      * @return Video
      */
-    public function setTimeTranscoded(int $time): Video
+    public function setChosenFormatUrl(string $url): Video
     {
-        $this->time_transcoded = $time;
+        $this->chosen_format_url = $url;
         return $this;
     }
 }
