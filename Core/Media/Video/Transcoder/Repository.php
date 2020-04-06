@@ -214,6 +214,13 @@ class Repository
             return false;
         }
 
+        // also update the status in the video
+        if ($transcode->getStatus() === $transcode->getVideo()->getTranscodingStatus()) {
+            $transcode->getVideo()->patch([
+                'transcoding_status' => $transcode->getStatus(),
+            ]);
+        }
+
         return true;
     }
 
