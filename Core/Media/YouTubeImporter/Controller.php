@@ -76,23 +76,24 @@ class Controller
         /** @var User $user */
         $user = Session::getLoggedinUser();
 
-//        try {
-        $videos = $this->manager->getVideos([
-            'user_guid' => $user->guid,
-            'youtube_channel_id' => $channelId,
-            'status' => $status
-        ]);
+        try {
+            $videos = $this->manager->getVideos([
+                'user_guid' => $user->guid,
+                'youtube_channel_id' => $channelId,
+                'status' => $status,
+            ]);
 
-        return new JsonResponse([
+            return new JsonResponse([
                 'status' => 'success',
                 'videos' => Exportable::_($videos),
+                'nextPageToken' => $videos->getPagingToken(),
             ]);
-//        } catch (\Exception $e) {
-//            return new JsonResponse([
-//                'status' => 'error',
-//                'message' => $e->getMessage(),
-//            ]);
-//        }
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function import(ServerRequest $request): JsonResponse
@@ -130,7 +131,15 @@ class Controller
 
         $videoId = $params['videoId'];
 
-        $this->manager->import($user, $channelId, $videoId);
+        try {
+            $this->manager->import($user, $channelId, $videoId);
+        } catch (\Exception $e) {
+            error_log($e);
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
 
         return new JsonResponse([
             'status' => 'success',

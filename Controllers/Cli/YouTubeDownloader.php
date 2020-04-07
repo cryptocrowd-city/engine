@@ -32,6 +32,7 @@ class YouTubeDownloader extends Cli\Controller implements Interfaces\CliControll
 
         $videos = $manager->getVideos([
             'status' => 'queued',
+            'limit' => 1000
         ]);
 
         $this->out("[Cli/YouTubeDownloader] Found {$videos->count()} videos");

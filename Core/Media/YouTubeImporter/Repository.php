@@ -24,26 +24,23 @@ class Repository
     /** @var EntitiesBuilder */
     protected $entitiesBuilder;
 
-    /** @var Config */
-    protected $config;
-
-    public function __construct(Client $client = null, EntitiesBuilder $entitiesBuilder = null, Config $config = null)
+    public function __construct(Client $client = null, EntitiesBuilder $entitiesBuilder = null)
     {
         $this->client = $client ?: Di::_()->get('Database\ElasticSearch');
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
-        $this->config = $config ?: Di::_()->get('Config');
     }
 
     /**
      * Returns saved videos
      * @param array $opts
      * @return Response
+     * @throws \Exception
      */
     public function getVideos(array $opts): Response
     {
         $opts = array_merge([
             'limit' => 12,
-            'offset' => '',
+            'offset' => 0,
             'user_guid' => null,
             'youtube_id' => null,
             'status' => null,
@@ -52,6 +49,8 @@ class Repository
                 'gt' => null,
             ],
         ], $opts);
+
+        $filter = [];
 
         if (isset($opts['status'])) {
             if (!in_array($opts['status'], static::ALLOWED_STATUSES, true)) {
@@ -65,7 +64,6 @@ class Repository
             ];
         }
 
-        $filter = [];
         $timeCreatedRange = [];
 
         if (isset($opts['time_created'])) {
@@ -76,6 +74,14 @@ class Repository
             if (isset($opts['time_created']['gt'])) {
                 $timeCreatedRange['gt'] = $opts['time_created']['gt'];
             }
+        }
+
+        if (isset($opts['youtube_id'])) {
+            $filter[] = [
+                'term' => [
+                    'youtube_id' => $opts['youtube_id'],
+                ],
+            ];
         }
 
         if (count($timeCreatedRange) > 0) {
@@ -89,6 +95,8 @@ class Repository
         $query = [
             'index' => 'minds_badger',
             'type' => 'object:video',
+            'size' => $opts['limit'],
+            'from' => $opts['offset'],
             'body' => [
                 'query' => [
                     'bool' => [
@@ -98,25 +106,26 @@ class Repository
             ],
         ];
 
-        $prepared = new Search();
-        $prepared->query($query);
-
-        $result = $this->client->request($prepared);
-        //        var_dump($result);
-        //        die();
-
         $response = new Response();
 
-        if (!isset($result) || !(isset($result['hits'])) || !isset($result['hits']['hits'])) {
-            return $response;
-        }
+        $prepared = new Search();
+        $prepared->query($query);
+        try {
+            $result = $this->client->request($prepared);
 
-        $guids = [];
-        foreach ($result['hits']['hits'] as $entry) {
-            $guids[] = $entry['source']['guid'];
-        }
+            if (!isset($result) || !(isset($result['hits'])) || !isset($result['hits']['hits'])) {
+                return $response;
+            }
 
-        $response = new Response($this->entitiesBuilder->get(['guid' => $guids]));
+            $guids = [];
+            foreach ($result['hits']['hits'] as $entry) {
+                $guids[] = $entry['_source']['guid'];
+            }
+
+            $response = new Response($this->entitiesBuilder->get(['guid' => $guids]));
+        } catch (\Exception $e) {
+            error_log('[YouTubeImporter\Repository]' . $e->getMessage());
+        }
 
         return $response;
     }
@@ -124,7 +133,8 @@ class Repository
     public function checkOwnerEligibility(array $guids): array
     {
         $result = [];
-        for ($i = count($guids); $i >= 0; $i--) {
+
+        for ($i = count($guids) - 1; $i >= 0; $i--) {
             $guid = $guids[$i];
 
             /* check for all transcoded videos created in a 24 hour
@@ -134,7 +144,7 @@ class Repository
                     'range' => [
                         'time_created' => [
                             'lt' => time(),
-                            'gte' => strtotime('-1 day'),
+                            'gte' => strtotime('-10 day'),
                         ],
                     ],
                 ],
@@ -170,8 +180,9 @@ class Repository
             $prepared = new Count();
             $prepared->query($query);
 
-            $result = $this->client->request($prepared);
-            $count = $result['count'] ?? 0;
+            $response = $this->client->request($prepared);
+
+            $count = $response['count'] ?? 0;
             $result[$guid] = $count;
         }
 

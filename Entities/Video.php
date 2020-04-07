@@ -185,6 +185,10 @@ class Video extends MindsObject
         }
 
         $export['boost_rejection_reason'] = $this->getBoostRejectionReason() ?: -1;
+
+        $export['youtube_id'] = $this->getYoutubeId();
+        $export['youtube_channel_id'] = $this->getYoutubeChannelId();
+        $export['transcoding_status'] = $this->getTranscodingStatus();
         return $export;
     }
 
@@ -424,6 +428,17 @@ class Video extends MindsObject
     }
 
     /**
+     * Sets transcoding status
+     * @param string $status
+     * @return Video
+     */
+    public function setTranscodingStatus($status): Video
+    {
+        $this->transcoding_status = $status;
+        return $this;
+    }
+
+    /**
      * Gets YouTube thumbnail
      * @return string
      */
@@ -440,17 +455,6 @@ class Video extends MindsObject
     public function setYouTubeThumbnail(string $url): Video
     {
         $this->youtube_thumbnail = $url;
-        return $this;
-    }
-
-    /**
-     * Sets transcoding status
-     * @param string $status
-     * @return Video
-     */
-    public function setTranscodingStatus($status): Video
-    {
-        $this->transcoding_status = $status;
         return $this;
     }
 

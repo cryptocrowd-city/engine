@@ -1059,7 +1059,6 @@ abstract class ElggEntity extends ElggData implements
 	public function save($timebased = true) {
         if ($this->guid) {
             if (!$this->canEdit()) {
-                var_dump('cannot edit'); die();
                 return false;
             }
             $this->time_updated = time();

@@ -102,11 +102,18 @@ class Manager
             ->save();
     }
 
-    public function getVideos(array $opts)
+    /**
+     * @param array $opts
+     * @return Response
+     * @throws \IOException
+     * @throws \InvalidParameterException
+     * @throws \Exception
+     */
+    public function getVideos(array $opts): Response
     {
         $opts = array_merge([
             'limit' => 12,
-            'offset' => '',
+            'offset' => 0,
             'user_guid' => null,
             'youtube_id' => null,
             'youtube_channel_id' => null,
@@ -117,8 +124,8 @@ class Manager
             ],
         ], $opts);
 
-        // if status is 'queued', then we don't consult youtube
-        if (isset($opts['status']) && $opts['status'] === 'queued') {
+        // if status is 'queued' or 'completed', then we don't consult youtube
+        if (isset($opts['status']) && in_array($opts['status'], ['queued', 'completed'], true)) {
             return $this->repository->getVideos($opts);
         }
 
@@ -127,14 +134,12 @@ class Manager
 
         $youtube = new \Google_Service_YouTube($this->client);
 
-        // TODO query the database and get all imported/importing videos
-
         // get channel
         $channelsResponse = $youtube->channels->listChannels('contentDetails', [
             'id' => $opts['youtube_channel_id'],
         ]);
 
-        $videos = [];
+        $videos = new Response();
 
         foreach ($channelsResponse['items'] as $channel) {
             $uploadsListId = $channel['contentDetails']['relatedPlaylists']['uploads'];
@@ -145,8 +150,8 @@ class Manager
                 'maxResults' => 50,
             ]);
 
-            // TODO only add the video if it matches the filter (check with the ones from Repository)
-            // TODO: if it matches the filter, include the status in the entity
+            $videos->setPagingToken($playlistResponse->getNextPageToken());
+
             foreach ($playlistResponse['items'] as $item) {
                 $youtubeId = $item['snippet']['resourceId']['videoId'];
 
@@ -177,6 +182,7 @@ class Manager
      * @param $videoId
      * @throws \IOException
      * @throws \InvalidParameterException
+     * @throws \Exception
      */
     public function import(User $user, $channelId, $videoId)
     {
@@ -190,6 +196,9 @@ class Manager
 
         // get streaming formats
         $streamingDataFormats = $videoData['streamingData']['formats'];
+
+        // validate length
+        (new \Minds\Core\Media\Assets\Video())->validate(['length' => $videoDetails['lengthSeconds'] / 60]);
 
         // find best suitable format
         $format = [];
@@ -247,13 +256,12 @@ class Manager
     {
         echo "[YouTubeDownloader] Downloading YouTube video ({$video->getYoutubeId()}) \n";
 
-        // TODO use length from $videoData so we don't have to download the video
-        // we need to download the file so we can validate it
+        // download the file
         $file = tmpfile();
         $path = stream_get_meta_data($file)['uri'];
         file_put_contents($path, fopen($video->getChosenFormatUrl(), 'r'));
 
-        echo "[YouTubeDownloader] File saved (path: {$path}) \n";
+        echo "[YouTubeDownloader] File saved \n";
 
         $media = [
             'file' => $path,

@@ -24,7 +24,9 @@ class YouTubeDownloader implements Interfaces\QueueRunner
                 /** @var Core\Media\YouTubeImporter\Manager $manager */
                 $manager = Di::_()->get('Media\YouTubeImporter\Manager');
 
+                Core\Security\ACL::$ignore = true;
                 $manager->onQueue($user, $video);
+                Core\Security\ACL::$ignore = false;
             }, ['max_messages' => 1]);
     }
 }
