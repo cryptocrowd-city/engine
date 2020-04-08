@@ -16,7 +16,6 @@ class YouTubeImporter implements Interfaces\QueueRunner
         $client->setQueue("YouTubeImporter")
             ->receive(function ($data) {
                 $d = $data->getData();
-                $user = unserialize($d['user']);
                 $video = unserialize($d['video']);
 
                 echo "[YouTubeImporter] Received a YouTube download request from {$user->username} ({$user->guid})\n";
@@ -25,7 +24,7 @@ class YouTubeImporter implements Interfaces\QueueRunner
                 $manager = Di::_()->get('Media\YouTubeImporter\Manager');
 
                 Core\Security\ACL::$ignore = true;
-                $manager->onQueue($user, $video);
+                $manager->onQueue($video);
                 Core\Security\ACL::$ignore = false;
             }, ['max_messages' => 1]);
     }

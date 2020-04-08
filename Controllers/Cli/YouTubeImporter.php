@@ -57,7 +57,7 @@ class YouTubeImporter extends Cli\Controller implements Interfaces\CliController
                 $this->out("[Cli/YouTubeDownloader] Sending video to transcode (guid: {$video->guid}");
 
                 // transcode
-                $manager->queue(new User($video->getOwnerEntity()), $video);
+                $manager->queue($video);
 
                 // add 1 to the count of imported videos so we don't surpass the daily threshold
                 $ownerGuids[$video->getOwnerGUID()] += 1;

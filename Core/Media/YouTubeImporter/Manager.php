@@ -253,19 +253,18 @@ class Manager
 
         // check if we're below the threshold
         if ($this->getOwnersEligibility([$user->guid])[$user->guid] < $this->getThreshold()) {
-            $this->queue($user, $video);
+            $this->queue($video);
         }
     }
 
     /**
      * Sends a video to a queue to be transcoded
-     * @param User $user
      * @param Video $video
      */
-    public function queue(User $user, Video $video): void
+    public function queue(Video $video): void
     {
         // send to queue so it gets downloaded
-        $this->queueDelegate->onAdd($user, $video);
+        $this->queueDelegate->onAdd($video);
     }
 
     /**
@@ -284,7 +283,7 @@ class Manager
      * @param Video $video
      * @throws \Minds\Exceptions\StopEventException
      */
-    public function onQueue(User $user, Video $video): void
+    public function onQueue(Video $video): void
     {
         $this->logger->info("[YouTubeImporter] Downloading YouTube video ({$video->getYoutubeId()}) \n");
 
