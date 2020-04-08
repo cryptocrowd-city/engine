@@ -14,6 +14,10 @@ use Minds\Core\Di\Di;
 use Minds\Core\EntitiesBuilder;
 use Minds\Entities\Entity;
 
+/**
+ * YouTube Importer Repository
+ * @package Minds\Core\Media\YouTubeImporter
+ */
 class Repository
 {
     const ALLOWED_STATUSES = ['queued', 'transcoding', 'completed'];

@@ -18,6 +18,10 @@ use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Entities\User;
 use Minds\Entities\Video;
 
+/**
+ * YouTube Importer Manager
+ * @package Minds\Core\Media\YouTubeImporter
+ */
 class Manager
 {
     private const CACHE_KEY = 'youtube:token';
@@ -68,7 +72,7 @@ class Manager
     /**
      * Connects to a channel
      */
-    public function connect()
+    public function connect(): void
     {
         return $this->client->createAuthUrl();
     }
@@ -78,7 +82,7 @@ class Manager
      * @param User $user
      * @param string $code
      */
-    public function fetchToken(User $user, string $code)
+    public function fetchToken(User $user, string $code): void
     {
         $token = $this->client->fetchAccessTokenWithAuthCode($code);
 
@@ -280,7 +284,7 @@ class Manager
      * @param Video $video
      * @throws \Minds\Exceptions\StopEventException
      */
-    public function onQueue(User $user, Video $video)
+    public function onQueue(User $user, Video $video): void
     {
         $this->logger->info("[YouTubeImporter] Downloading YouTube video ({$video->getYoutubeId()}) \n");
 
