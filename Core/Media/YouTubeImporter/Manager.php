@@ -282,14 +282,14 @@ class Manager
      */
     public function onQueue(User $user, Video $video)
     {
-        $this->logger->info("[YouTubeDownloader] Downloading YouTube video ({$video->getYoutubeId()}) \n");
+        $this->logger->info("[YouTubeImporter] Downloading YouTube video ({$video->getYoutubeId()}) \n");
 
         // download the file
         $file = tmpfile();
         $path = stream_get_meta_data($file)['uri'];
         file_put_contents($path, fopen($video->getChosenFormatUrl(), 'r'));
 
-        $this->logger->info("[YouTubeDownloader] File saved \n");
+        $this->logger->info("[YouTubeImporter] File saved \n");
 
         $media = [
             'file' => $path,
@@ -300,11 +300,11 @@ class Manager
 
         $assets->validate($media);
 
-        $this->logger->info("[YouTubeDownloader] Initiating upload to S3 ({$video->guid}) \n");
+        $this->logger->info("[YouTubeImporter] Initiating upload to S3 ({$video->guid}) \n");
 
         $video->setAssets($assets->upload($media, []));
 
-        $this->logger->info("[YouTubeDownloader] Saving video ({$video->guid}) \n");
+        $this->logger->info("[YouTubeImporter] Saving video ({$video->guid}) \n");
 
         $success = $this->save
             ->setEntity($video)

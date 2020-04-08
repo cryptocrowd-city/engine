@@ -29,7 +29,7 @@ class QueueDelegate
     public function onAdd(User $user, Video $video): void
     {
         $this->queueClient
-            ->setQueue('YouTubeDownloader')
+            ->setQueue('YouTubeImporter')
             ->send([
                 'user' => serialize($user),
                 'video' => serialize($video),

@@ -5,25 +5,29 @@
 
 namespace Minds\Core\Media\YouTubeImporter\Delegates;
 
+use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
+use Minds\Core\Log\Logger;
 use Minds\Core\Notification\PostSubscriptions\Manager as PostSubscriptionsManager;
-use Minds\Core\Security\ACL;
 use Minds\Entities\Activity;
-use Minds\Entities\User;
 use Minds\Entities\Video;
 
 class EntityCreatorDelegate
 {
     /** @var Save */
-    private $save;
+    protected $save;
 
     /** @var PostSubscriptionsManager */
-    private $manager;
+    protected $postsSubscriptionsManager;
 
-    public function __construct($save = null, $postsSubscriptionManager = null)
+    /** @var Logger */
+    protected $logger;
+
+    public function __construct($save = null, $postsSubscriptionManager = null, $logger = null)
     {
         $this->save = $save ?: new Save();
-        $this->manager = $postsSubscriptionManager ?: new PostSubscriptionsManager();
+        $this->postsSubscriptionsManager = $postsSubscriptionManager ?: new PostSubscriptionsManager();
+        $this->logger = $logger ?: Di::_()->get('Logger');
     }
 
     public function createActivity(Video $video)
@@ -44,21 +48,21 @@ class EntityCreatorDelegate
         $guid = $this->save->setEntity($activity)->save();
 
         if ($guid) {
-            echo "[YouTubeDownloader] Created activity ({$guid}) \n";
+            $this->logger->log("[YouTubeImporter] Created activity ({$guid}) \n");
 
             // Follow activity
-            $this->manager
+            $this->postsSubscriptionsManager
                 ->setEntityGuid($activity->guid)
                 ->setUserGuid($activity->getOwnerGUID())
                 ->follow();
 
             // Follow video
-            $this->manager
+            $this->postsSubscriptionsManager
                 ->setEntityGuid($video->guid)
                 ->setUserGuid($video->getOwnerGUID())
                 ->follow();
         } else {
-            echo "[YouTubeDownloader] Failed to create activity ({$guid}) \n";
+            $this->logger->error("[YouTubeImporter] Failed to create activity ({$guid}) \n");
         }
     }
 }

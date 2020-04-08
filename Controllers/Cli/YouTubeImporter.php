@@ -9,7 +9,7 @@ use Minds\Interfaces;
 use Minds\Exceptions;
 use Minds\Exceptions\ProvisionException;
 
-class YouTubeDownloader extends Cli\Controller implements Interfaces\CliControllerInterface
+class YouTubeImporter extends Cli\Controller implements Interfaces\CliControllerInterface
 {
     public function __construct()
     {
@@ -23,7 +23,7 @@ class YouTubeDownloader extends Cli\Controller implements Interfaces\CliControll
 
     public function exec()
     {
-        $this->out("[Cli/YouTubeDownloader] Checking for videos to download");
+        $this->out("[Cli/YouTubeImporter] Checking for videos to download");
 
         /** @var Core\Media\YouTubeImporter\Manager $manager */
         $manager = Di::_()->get('Media\YouTubeImporter\Manager');
@@ -35,7 +35,7 @@ class YouTubeDownloader extends Cli\Controller implements Interfaces\CliControll
             'limit' => 1000
         ]);
 
-        $this->out("[Cli/YouTubeDownloader] Found {$videos->count()} videos");
+        $this->out("[Cli/YouTubeImporter] Found {$videos->count()} videos");
 
         // gather their owner guids
 
