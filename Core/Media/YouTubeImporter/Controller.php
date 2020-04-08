@@ -27,6 +27,12 @@ class Controller
         $this->config = $config ?: Di::_()->get('Config');
     }
 
+    /**
+     * Requests a token so a User can connect to his YouTube account.
+     * Called by v3/media/youtube-importer/oauth
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
     public function getToken(ServerRequest $request): JsonResponse
     {
         return new JsonResponse([
@@ -35,7 +41,13 @@ class Controller
         ]);
     }
 
-    public function receiveToken(ServerRequest $request): JsonResponse
+    /**
+     * Receives an access code and requests a token.
+     * Called by v3/media/youtube-importer/oauth/redirect
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
+    public function receiveAccessCode(ServerRequest $request): JsonResponse
     {
         $token = null;
         $code = $request->getQueryParams()['code'];
@@ -50,7 +62,7 @@ class Controller
         /** @var User $user */
         $user = Session::getLoggedinUser();
 
-        $this->manager->receiveToken($user, $code);
+        $this->manager->fetchToken($user, $code);
 
         // redirect back to the URL
         // TODO this should redirect to an URL with the youtube importer opened
@@ -58,6 +70,11 @@ class Controller
         exit;
     }
 
+    /**
+     * Gets a list of videos by channelId and status (optional)
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
     public function getVideos(ServerRequest $request): JsonResponse
     {
         $queryParams = $request->getQueryParams();
@@ -96,6 +113,11 @@ class Controller
         }
     }
 
+    /**
+     * Imports a given YouTube video. You can only import videos that belong to your user.
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
     public function import(ServerRequest $request): JsonResponse
     {
         $params = $request->getParsedBody();
@@ -146,6 +168,11 @@ class Controller
         ]);
     }
 
+    /**
+     * Subscribe to push notifications for a given YouTube channel
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
     public function subscribe(ServerRequest $request): JsonResponse
     {
         $params = $request->getParsedBody();
@@ -165,6 +192,11 @@ class Controller
         ]);
     }
 
+    /**
+     * Unsubscribe from push notifications for a given YouTube channel
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
     public function unsubscribe(ServerRequest $request): JsonResponse
     {
         $params = $request->getQueryParams();
@@ -184,6 +216,13 @@ class Controller
         ]);
     }
 
+    /**
+     * Webhook for YouTube push notifications
+     * @param ServerRequest $request
+     * @return JsonResponse
+     * @throws \IOException
+     * @throws \InvalidParameterException
+     */
     public function callback(ServerRequest $request): JsonResponse
     {
         $params = $request->getQueryParams();

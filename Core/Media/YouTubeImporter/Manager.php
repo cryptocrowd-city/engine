@@ -12,6 +12,7 @@ use Minds\Core\Data\cache\abstractCacher;
 use Minds\Core\Data\Call;
 use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
+use Minds\Core\Log\Logger;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Entities\User;
@@ -48,7 +49,10 @@ class Manager
     /** @var Call */
     protected $call;
 
-    public function __construct($repository = null, $client = null, $queueDelegate = null, $entityDelegate = null, $save = null, $cacher = null, $call = null, $config = null)
+    /** @var Logger */
+    protected $logger;
+
+    public function __construct($repository = null, $client = null, $queueDelegate = null, $entityDelegate = null, $save = null, $cacher = null, $call = null, $config = null, $logger = null)
     {
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
         $this->config = $config ?: Di::_()->get('Config');
@@ -58,6 +62,7 @@ class Manager
         $this->save = $save ?: new Save();
         $this->call = Di::_()->get('Database\Cassandra\Indexes') ?: new Call('entities_by_time');
         $this->client = $client ?: $this->buildClient();
+        $this->logger = $logger ?: Di::_()->get('Logger');
     }
 
     /**
@@ -73,7 +78,7 @@ class Manager
      * @param User $user
      * @param string $code
      */
-    public function receiveToken(User $user, string $code)
+    public function fetchToken(User $user, string $code)
     {
         $token = $this->client->fetchAccessTokenWithAuthCode($code);
 
@@ -89,8 +94,8 @@ class Manager
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
             if (count(array_filter($channels, function ($value) use ($channel) {
-                return $value['id'] === $channel['id'];
-            })) === 0) {
+                    return $value['id'] === $channel['id'];
+                })) === 0) {
                 $channels[] = [
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],
@@ -277,14 +282,14 @@ class Manager
      */
     public function onQueue(User $user, Video $video)
     {
-        echo "[YouTubeDownloader] Downloading YouTube video ({$video->getYoutubeId()}) \n";
+        $this->logger->info("[YouTubeDownloader] Downloading YouTube video ({$video->getYoutubeId()}) \n");
 
         // download the file
         $file = tmpfile();
         $path = stream_get_meta_data($file)['uri'];
         file_put_contents($path, fopen($video->getChosenFormatUrl(), 'r'));
 
-        echo "[YouTubeDownloader] File saved \n";
+        $this->logger->info("[YouTubeDownloader] File saved \n");
 
         $media = [
             'file' => $path,
@@ -295,11 +300,11 @@ class Manager
 
         $assets->validate($media);
 
-        echo "[YouTubeDownloader] Initiating upload to S3 ({$video->guid}) \n";
+        $this->logger->info("[YouTubeDownloader] Initiating upload to S3 ({$video->guid}) \n");
 
         $video->setAssets($assets->upload($media, []));
 
-        echo "[YouTubeDownloader] Saving video ({$video->guid}) \n";
+        $this->logger->info("[YouTubeDownloader] Saving video ({$video->guid}) \n");
 
         $success = $this->save
             ->setEntity($video)

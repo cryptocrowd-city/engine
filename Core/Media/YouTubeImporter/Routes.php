@@ -33,7 +33,7 @@ class Routes extends ModuleRoutes
                 // Requests OAuth token
                 $route->get(
                     'oauth/redirect',
-                    Ref::_('Media\YouTubeImporter\Controller', 'receiveToken')
+                    Ref::_('Media\YouTubeImporter\Controller', 'receiveAccessCode')
                 );
 
                 // returns list of videos
