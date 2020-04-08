@@ -213,6 +213,7 @@ class ElggObject extends ElggEntity {
             }
         }
 
-        return parent::save($index);
+        $guid = parent::save($index);
+		return $guid;
 	}
 }
