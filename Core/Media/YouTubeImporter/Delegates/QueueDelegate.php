@@ -7,7 +7,6 @@ namespace Minds\Core\Media\YouTubeImporter\Delegates;
 
 use Minds\Core\Di\Di;
 use Minds\Core\Queue\Interfaces\QueueClient;
-use Minds\Entities\User;
 use Minds\Entities\Video;
 
 class QueueDelegate

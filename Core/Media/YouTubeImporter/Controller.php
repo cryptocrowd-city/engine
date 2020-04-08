@@ -153,8 +153,14 @@ class Controller
 
         $videoId = $params['videoId'];
 
+        $video = (new YTVideo())
+            ->setChannelId($channelId)
+            ->setVideoId($videoId)
+            ->setOwner($user)
+            ->setOwnerGuid($user->guid);
+
         try {
-            $this->manager->import($user, $channelId, $videoId);
+            $this->manager->import($video);
         } catch (\Exception $e) {
             error_log($e);
             return new JsonResponse([
@@ -184,7 +190,7 @@ class Controller
             ]);
         }
 
-        $done = $this->manager->subscribe($params['channelId'], true);
+        $done = $this->manager->updateSubscription($params['channelId'], true);
 
         return new JsonResponse([
             'status' => 'success',
@@ -208,7 +214,7 @@ class Controller
             ]);
         }
 
-        $done = $this->manager->subscribe($params['channelId'], false);
+        $done = $this->manager->updateSubscription($params['channelId'], false);
 
         return new JsonResponse([
             'status' => 'success',
@@ -234,9 +240,12 @@ class Controller
         $xml = simplexml_load_string(file_get_contents('php://input'), 'SimpleXMLElement', LIBXML_NOCDATA);
         $videoId = substr((string) $xml->entry->id, 9);
         $channelId = substr((string) $xml->entry->author->uri, 32);
-        //        $published = (string) $xml->entry->published;
 
-        $this->manager->receiveNewVideo($videoId, $channelId);
+        $video = (new YTVideo())
+            ->setVideoId($videoId)
+            ->setChannelId($channelId);
+
+        $this->manager->receiveNewVideo($video);
 
         return new JsonResponse([
             'status' => 'success',

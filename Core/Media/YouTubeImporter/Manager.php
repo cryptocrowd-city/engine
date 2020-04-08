@@ -72,7 +72,7 @@ class Manager
     /**
      * Connects to a channel
      */
-    public function connect(): void
+    public function connect(): string
     {
         return $this->client->createAuthUrl();
     }
@@ -125,8 +125,6 @@ class Manager
     /**
      * @param array $opts
      * @return Response
-     * @throws \IOException
-     * @throws \InvalidParameterException
      * @throws \Exception
      */
     public function getVideos(array $opts): Response
@@ -178,18 +176,29 @@ class Manager
                 // try to find it in our db
                 $response = $this->repository->getVideos(['youtube_id' => $youtubeId])->toArray();
 
+                $ytVideo = new YTVideo();
                 if (count($response) > 0) {
-                    $videos[] = $response[0];
+                    /** @var Video $video */
+                    $video = $response[0];
+                    $ytVideo
+                        ->setEntity($video)
+                        ->setOwnerGuid($video->owner_guid)
+                        ->setOwner($video->getOwnerEntity())
+                        ->setStatus($video->getTranscodingStatus())
+                        ->setThumbnail($video->getIconUrl())
+                        ->setVideoId($video->getYoutubeId())
+                        ->setChannelId($video->getYoutubeChannelId())
+                        ->setTitle($video->getTitle())
+                        ->setDescription($video->getDescription());
                 } else {
-                    $video = (new Video())
-                        ->setYoutubeId($item['snippet']['resourceId']['videoId'])
-                        ->setYoutubeChannelId($item['snippet']['channelId'])
+                    $ytVideo
+                        ->setVideoId($item['snippet']['resourceId']['videoId'])
+                        ->setChannelId($item['snippet']['channelId'])
                         ->setDescription($item['snippet']['description'])
                         ->setTitle($item['snippet']['title'])
-                        ->setYouTubeThumbnail($item['snippet']['thumbnails']->getHigh()['url']);
-
-                    $videos[] = $video;
+                        ->setThumbnail($item['snippet']['thumbnails']->getHigh()['url']);
                 }
+                $videos[] = $ytVideo;
             }
         }
         return $videos;
@@ -197,17 +206,14 @@ class Manager
 
     /**
      * Initiates video import (uses Repository - queues for transcoding)
-     * @param User $user
-     * @param $channelId
-     * @param $videoId
+     * @param YTVideo $ytVideo
      * @throws \IOException
      * @throws \InvalidParameterException
-     * @throws \Exception
      */
-    public function import(User $user, $channelId, $videoId): void
+    public function import(YTVideo $ytVideo): void
     {
         // get and decode the data
-        parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $videoId), $info);
+        parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $ytVideo->getVideoId()), $info);
 
         $videoData = json_decode($info['player_response'], true);
 
@@ -243,16 +249,16 @@ class Manager
             'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
             'batch_guid' => 0,
             'access_id' => 0,
-            'owner_guid' => $user->guid,
-            'full_hd' => $user->isPro(),
-            'youtube_id' => $videoId,
-            'youtube_channel_id' => $channelId,
+            'owner_guid' => $ytVideo->getOwnerGuid(),
+            'full_hd' => $ytVideo->getOwner()->isPro(),
+            'youtube_id' => $ytVideo->getVideoId(),
+            'youtube_channel_id' => $ytVideo->getChannelId(),
             'transcoding_status' => 'queued',
             'chosen_format_url' => $format['url'],
         ]);
 
         // check if we're below the threshold
-        if ($this->getOwnersEligibility([$user->guid])[$user->guid] < $this->getThreshold()) {
+        if ($this->getOwnersEligibility([$ytVideo->getOwner()->guid])[$ytVideo->getOwner()->guid] < $this->getThreshold()) {
             $this->queue($video);
         }
     }
@@ -279,7 +285,6 @@ class Manager
     /**
      * Downloads a video, triggers the transcode and creates an activity.
      * Gets called by the queue runner.
-     * @param User $user
      * @param Video $video
      * @throws \Minds\Exceptions\StopEventException
      */
@@ -327,7 +332,7 @@ class Manager
      * @param bool $subscribe
      * @return bool returns true if it succeeds
      */
-    public function subscribe(string $channelId, bool $subscribe): bool
+    public function updateSubscription(string $channelId, bool $subscribe): bool
     {
         $subscribeUrl = 'https://pubsubhubbub.appspot.com/subscribe';
         $topicUrl = "https://www.youtube.com/xml/feeds/videos.xml?channel_id={$channelId}";
@@ -357,33 +362,34 @@ class Manager
 
     /**
      * Imports a newly added YT video. This is called when the hook receives a new update.
-     * @param string $videoId
-     * @param string $channelId
+     * @param YTVideo $video
      * @throws \IOException
      * @throws \InvalidParameterException
      */
-    public function receiveNewVideo(string $videoId, string $channelId): void
+    public function receiveNewVideo(YTVideo $video): void
     {
         // see if we have a video like this already saved
-        $response = $this->repository->getVideos(['youtube_id' => $videoId]);
+        $response = $this->repository->getVideos(['youtube_id' => $video->getVideoId()]);
 
         // if the video isn't there, we'll download it
         if ($response->count() === 0) {
             // fetch User associated with this channelId
-            $result = $this->call->getRow("yt_channel:user:{$channelId}");
+            $result = $this->call->getRow("yt_channel:user:{$video->getChannelId()}");
 
             if (count($result) === 0) {
                 // no User is associated with this youtube channel
                 return;
             }
 
-            $user = new User($result[$channelId]);
+            $user = new User($result[$video->getChannelId()]);
 
             if ($user->isBanned() || $user->getDeleted()) {
                 return;
             }
 
-            $this->import($user, $videoId, $channelId);
+            $video->setOwner($user);
+
+            $this->import($video);
         }
     }
 

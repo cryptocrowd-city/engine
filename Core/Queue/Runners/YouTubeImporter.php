@@ -18,7 +18,7 @@ class YouTubeImporter implements Interfaces\QueueRunner
                 $d = $data->getData();
                 $video = unserialize($d['video']);
 
-                echo "[YouTubeImporter] Received a YouTube download request from {$user->username} ({$user->guid})\n";
+                echo "[YouTubeImporter] Received a YouTube download request from {$video->getOwner()->username} ({$video->getOwner()->guid})\n";
 
                 /** @var Core\Media\YouTubeImporter\Manager $manager */
                 $manager = Di::_()->get('Media\YouTubeImporter\Manager');
