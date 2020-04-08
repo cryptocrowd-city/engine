@@ -130,7 +130,7 @@ class Repository
         return $response;
     }
 
-    public function checkOwnerEligibility(array $guids): array
+    public function getOwnersEligibility(array $guids): array
     {
         $result = [];
 

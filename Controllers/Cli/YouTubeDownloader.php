@@ -48,7 +48,7 @@ class YouTubeDownloader extends Cli\Controller implements Interfaces\CliControll
         }
 
         // check which owners are eligible for importing a YouTube a video today
-        $ownerGuids = $manager->checkOwnerEligibility($ownerGuids);
+        $ownerGuids = $manager->getOwnersEligibility($ownerGuids);
 
         // for all eligible owners, transcode their videos, keeping count so we don't surpass the threshold
         foreach ($videos as $video) {

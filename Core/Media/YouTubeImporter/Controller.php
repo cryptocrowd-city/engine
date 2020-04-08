@@ -145,4 +145,62 @@ class Controller
             'status' => 'success',
         ]);
     }
+
+    public function subscribe(ServerRequest $request): JsonResponse
+    {
+        $params = $request->getParsedBody();
+
+        if (!isset($params['channelId'])) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'You must provide a channelId',
+            ]);
+        }
+
+        $done = $this->manager->subscribe($params['channelId'], true);
+
+        return new JsonResponse([
+            'status' => 'success',
+            'done' => $done,
+        ]);
+    }
+
+    public function unsubscribe(ServerRequest $request): JsonResponse
+    {
+        $params = $request->getQueryParams();
+
+        if (!isset($params['channelId'])) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'You must provide a channelId',
+            ]);
+        }
+
+        $done = $this->manager->subscribe($params['channelId'], false);
+
+        return new JsonResponse([
+            'status' => 'success',
+            'done' => $done,
+        ]);
+    }
+
+    public function callback(ServerRequest $request): JsonResponse
+    {
+        $params = $request->getQueryParams();
+        if (isset($params['hub_challenge'])) {
+            echo $params['hub_challenge'];
+            exit;
+        }
+
+        $xml = simplexml_load_string(file_get_contents('php://input'), 'SimpleXMLElement', LIBXML_NOCDATA);
+        $videoId = substr((string) $xml->entry->id, 9);
+        $channelId = substr((string) $xml->entry->author->uri, 32);
+        //        $published = (string) $xml->entry->published;
+
+        $this->manager->receiveNewVideo($videoId, $channelId);
+
+        return new JsonResponse([
+            'status' => 'success',
+        ]);
+    }
 }
