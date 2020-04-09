@@ -15,8 +15,7 @@ class ObjectVideoMappingSpec extends ObjectBehavior
 
     public function it_should_map_a_video(
         Video $video
-    )
-    {
+    ) {
         $now = time();
 
         $video->get('rating')->willReturn(1);
