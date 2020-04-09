@@ -134,13 +134,15 @@ class Repository
         return $response;
     }
 
+    /**
+     * @param array $guids
+     * @return array
+     */
     public function getOwnersEligibility(array $guids): array
     {
         $result = [];
 
-        for ($i = count($guids) - 1; $i >= 0; $i--) {
-            $guid = $guids[$i];
-
+        foreach ($guids as $guid) {
             /* check for all transcoded videos created in a 24 hour
              * period that correspond to a youtube video */
             $filter = [

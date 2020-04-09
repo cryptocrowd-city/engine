@@ -55,7 +55,7 @@ class RepositorySpec extends ObjectBehavior
             ->shouldReturnAnInstanceOf(Response::class);
     }
 
-    public function it_should_check_owner_eligibility()
+    public function it_should_get_owners_eligibility()
     {
         $this->client->request(Argument::that(function ($query) {
             return $query->build()['body']['query']['bool']['filter'][3]['term']['owner_guid'] === 1;
@@ -71,10 +71,10 @@ class RepositorySpec extends ObjectBehavior
 
         $guids = [1, 2];
 
-        $this->checkOwnerEligibility($guids)
+        $this->getOwnersEligibility($guids)
             ->shouldReturn([
-                2 => 10,
                 1 => 3,
+                2 => 10,
             ]);
     }
 }
