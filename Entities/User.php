@@ -1446,10 +1446,10 @@ class User extends \ElggUser
         return $this;
     }
 
-     /**
-     * Returns if the user's YouTube videos should be auto-imported
-     * @return bool
-     */
+    /**
+    * Returns if the user's YouTube videos should be auto-imported
+    * @return bool
+    */
     public function getAutoImportYouTubeVideos()
     {
         return (bool) $this->attributes['auto_import_yt_videos'] ?? false;

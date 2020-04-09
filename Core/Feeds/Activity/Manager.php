@@ -40,7 +40,7 @@ class Manager
         $activity->setFromEntity($entity);
         $activity->access_id = $entity->access_id;
 
-        if ($entity->type === 'object' && in_array($entity->subtype, ['image', 'video'])) {
+        if ($entity->type === 'object' && in_array($entity->subtype, ['image', 'video'], true)) {
             $activity->setCustom($entity->getActivityParameters());
         }
 

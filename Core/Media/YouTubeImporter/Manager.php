@@ -98,8 +98,8 @@ class Manager
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
             if (count(array_filter($channels, function ($value) use ($channel) {
-                    return $value['id'] === $channel['id'];
-                })) === 0) {
+                return $value['id'] === $channel['id'];
+            })) === 0) {
                 $channels[] = [
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],

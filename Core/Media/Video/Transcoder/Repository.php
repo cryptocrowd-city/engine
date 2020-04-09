@@ -216,7 +216,7 @@ class Repository
 
         // also update the status in the video
         try {
-            if ($transcode->getStatus() === $transcode->getVideo()->getTranscodingStatus()) {
+            if ($transcode->getStatus() !== $transcode->getVideo()->getTranscodingStatus()) {
                 $transcode->getVideo()
                     ->patch([
                         'transcoding_status' => $transcode->getStatus(),
