@@ -639,3 +639,7 @@ $CONFIG->set('captcha', [
 $CONFIG->set('cypress', [
     'shared_key' => '{{site-secret}}',
 ]);
+
+$CONFIG->set('sendwyre', [
+    'baseUrl' => 'https://pay.sendwyre.com/'
+]);
