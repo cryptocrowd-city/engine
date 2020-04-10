@@ -8,6 +8,7 @@ use Minds\Core\EntitiesBuilder;
 use Minds\Core\Config;
 use Minds\Core\Data\ElasticSearch;
 use Minds\Core\Hashtags\User\Manager as HashtagManager;
+use Minds\Core\Hashtags\HashtagEntity;
 use Minds\Common\Repository\Response;
 use Minds\Core\Feeds\Elastic\Manager as ElasticFeedsManager;
 use Minds\Api\Exportable;
@@ -151,7 +152,8 @@ class Manager
             $trend = new Trend();
             $trend->setId("tag_{$tag}_{$hoursAgo}h")
                 ->setHashtag($tag)
-                ->setVolume($bucket['doc_count']);
+                ->setVolume($bucket['doc_count'])
+                ->setPeriod($hoursAgo);
             $trends[] = $trend;
         }
 
@@ -167,14 +169,14 @@ class Manager
     public function getPostTrends(array $tags, array $opts = []): array
     {
         $opts = array_merge([
-            'hoursAgo' => 12,
+            'hoursAgo' => rand(12, 32),
             'limit' => 5,
             'shuffle' => true,
         ], $opts);
 
         $query = [
             'index' => $this->config->get('elasticsearch')['index'],
-            'type' => 'activity,object:video',
+            'type' => 'activity,object:video,object:blog',
             'body' =>  [
                 'query' => [
                     'bool' => [
@@ -187,10 +189,12 @@ class Manager
                                 ],
                             ],
                             [
-                                'terms' => [
-                                    'tags' => $tags,
-                                ]
-                            ],
+                                'multi_match' => [
+                                    'query' => implode(' ', $tags),
+                                    'operator' => 'OR',
+                                    'fields' => ['title^12', 'message^12', 'tags^24'],
+                                ],
+                            ]
                         ]
                     ]
                 ],
@@ -205,8 +209,15 @@ class Manager
         $response = $this->es->request($prepared);
         
         $trends = [];
+        $ownerGuids = [];
 
         foreach ($response['hits']['hits'] as $doc) {
+            $ownerGuid = $doc['_source']['owner_guid'];
+            if (isset($ownerGuids[$ownerGuid])) {
+                continue;
+            }
+            $ownerGuids[$ownerGuid] = true;
+
             $title = $doc['_source']['title'] ?: $doc['_source']['message'];
 
             shuffle($doc['_source']['tags']);
@@ -225,7 +236,8 @@ class Manager
                 ->setId($doc['_id'])
                 ->setEntity($entity)
                 ->setVolume($doc['_source']['comments:count'])
-                ->setHashtag($hashtag);
+                ->setHashtag($hashtag)
+                ->setPeriod((time() - $entity->getTimeCreated()) / 3600);
 
             $trends[] = $trend;
 
@@ -301,7 +313,7 @@ class Manager
         $tagsList = $this->hashtagManager
             ->setUser($this->user)
             ->get([
-                'defaults' => false,
+                'defaults' => true,
                 'trending' => true,
                 'limit' => 20,
             ]);
@@ -311,7 +323,7 @@ class Manager
         });
 
         $trending = array_filter($tagsList, function ($tag) {
-            return $tag['type'] === 'trending';
+            return $tag['type'] === 'trending' || $tag['type'] === 'default';
         });
 
         return [
@@ -333,5 +345,30 @@ class Manager
             ->get([
                 'defaults' => false,
             ]));
+    }
+
+    /**
+     * Set the tags a user wants to subscribe to
+     * @param array $selected
+     * @param array $deslected
+     * @return bool
+     */
+    public function setTags(array $selected, array $deselected): bool
+    {
+        $add = array_map(function ($tag) {
+            return (new HashtagEntity)
+               ->setGuid($this->user->getGuid())
+               ->setHashtag($tag);
+        }, $selected);
+
+        $remove = array_map(function ($tag) {
+            return (new HashtagEntity)
+               ->setGuid($this->user->getGuid())
+               ->setHashtag($tag);
+        }, $deselected);
+
+        return $this->hashtagManager
+           ->setUser($this->user)
+          ->batch($add, $remove);
     }
 }

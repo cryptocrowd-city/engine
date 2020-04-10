@@ -43,7 +43,7 @@ class Controllers
         return new JsonResponse([
             'status' => 'success',
             'trends' => Exportable::_($trends),
-            'hero' => $hero->export(),
+            'hero' => $hero ? $hero->export() : null,
         ]);
     }
 
@@ -79,5 +79,20 @@ class Controllers
             'tags' => $tags['tags'],
             'trending' => $tags['trending'],
         ]);
+    }
+
+    /**
+     * Set the tags a user wants to prefer
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
+    public function setTags(ServerRequest $request): JsonResponse
+    {
+        $body = $request->getParsedBody();
+        $selected = $body['selected'] ?? [];
+        $deselected = $body['deselected'] ?? [];
+
+        $success = $this->manager->setTags($selected, $deselected);
+        return new JsonResponse([ 'status' => $success ? 'success' : 'error', ]);
     }
 }
