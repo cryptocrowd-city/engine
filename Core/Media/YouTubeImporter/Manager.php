@@ -16,6 +16,7 @@ use Minds\Core\Log\Logger;
 use Minds\Core\Media\Assets\Video as VideoAssets;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
+use Minds\Entities\EntitiesFactory;
 use Minds\Entities\User;
 use Minds\Entities\Video;
 
@@ -57,6 +58,9 @@ class Manager
     /** @var VideoAssets */
     protected $videoAssets;
 
+    /** @var EntitiesFactory */
+    protected $entitiesBuilder;
+
     /** @var Logger */
     protected $logger;
 
@@ -70,9 +74,9 @@ class Manager
         $call = null,
         $config = null,
         $assets = null,
+        $entitiesBuilder = null,
         $logger = null
-    )
-    {
+    ) {
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
         $this->config = $config ?: Di::_()->get('Config');
         $this->cacher = $cacher ?: Di::_()->get('Cache');
@@ -82,6 +86,7 @@ class Manager
         $this->call = $call ?: Di::_()->get('Database\Cassandra\Indexes');
         $this->client = $client ?: $this->buildClient();
         $this->videoAssets = $assets ?: new VideoAssets();
+        $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
         $this->logger = $logger ?: Di::_()->get('Logger');
     }
 
@@ -114,8 +119,8 @@ class Manager
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
             if (count(array_filter($channels, function ($value) use ($channel) {
-                    return $value['id'] === $channel['id'];
-                })) === 0) {
+                return $value['id'] === $channel['id'];
+            })) === 0) {
                 $channels[] = [
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],
@@ -402,7 +407,8 @@ class Manager
                 return;
             }
 
-            $user = new User($result[$video->getChannelId()]);
+            /** @var User $user */
+            $user = $this->entitiesBuilder->single($result[$video->getChannelId()]);
 
             if ($user->isBanned() || $user->getDeleted()) {
                 return;
