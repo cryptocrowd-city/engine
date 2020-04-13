@@ -641,5 +641,6 @@ $CONFIG->set('cypress', [
 ]);
 
 $CONFIG->set('sendwyre', [
-    'baseUrl' => 'https://pay.sendwyre.com/'
+    'baseUrl' => 'https://pay.sendwyre.com/',
+    'accountId' => '',
 ]);
