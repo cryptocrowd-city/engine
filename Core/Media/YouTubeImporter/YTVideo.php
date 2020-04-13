@@ -63,13 +63,13 @@ class YTVideo
         $export = [
             'video_id' => $this->videoId,
             'channel_id' => $this->channelId,
-            'entity' => $this->entity->export(),
+            'entity' => $this->entity ? $this->entity->export() : null,
             'status' => $this->status,
             'title' => $this->title,
             'description' => $this->description,
             'thumbnail' => $this->thumbnail,
             'ownerGuid' => $this->ownerGuid,
-            'owner' => $this->owner->export(),
+            'owner' => $this->owner ? $this->owner->export() : null,
         ];
 
         return $export;
