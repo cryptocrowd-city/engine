@@ -706,14 +706,13 @@ abstract class ElggEntity extends ElggData implements
 	 * @param int $user_guid The user GUID, optionally (default: logged in user)
 	 *
 	 * @return bool
-     */
-    function canEdit($user_guid = 0)
-    {
-        return Minds\Core\Security\ACL::_()->write($this);
-    }
+	 */
+	function canEdit($user_guid = 0) {
+		return Minds\Core\Security\ACL::_()->write($this);
+	}
 
-    /**
-     * Can a user edit metadata on this entity
+	/**
+	 * Can a user edit metadata on this entity
 	 *
 	 * @param ElggMetadata $metadata  The piece of metadata to specifically check
 	 * @param int          $user_guid The user GUID, optionally (default: logged in user)
@@ -1050,12 +1049,12 @@ abstract class ElggEntity extends ElggData implements
 		return true;
 	}
 
-    /**
-     * Save an entity.
-     * @return bool|int
-     * @throws IOException
-     * @throws ConfigurationException
-     */
+	/**
+	 * Save an entity.
+	 *
+	 * @return bool|int
+	 * @throws IOException
+	 */
 	public function save($timebased = true) {
         if ($this->guid) {
             if (!$this->canEdit()) {
@@ -1564,7 +1563,7 @@ abstract class ElggEntity extends ElggData implements
                 throw \Exception('Incorrect NSFW value provided');
             }
     	}
-
+		
 		$this->nsfw = $array;
 		return $this;
 	}
@@ -1586,7 +1585,7 @@ abstract class ElggEntity extends ElggData implements
 
         return $array;
 	}
-
+	
 	/**
      * Set NSFW lock tags for administrators. Users cannot remove these themselves.
      *
@@ -1641,7 +1640,7 @@ abstract class ElggEntity extends ElggData implements
     {
         $this->time_moderated = $timeModerated;
     }
-
+	
     /**
      * Gets the time moderated
      * @return int

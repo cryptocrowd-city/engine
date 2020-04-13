@@ -197,13 +197,12 @@ class ElggObject extends ElggEntity {
 		$owner = new Minds\Entities\User($this->owner_guid, false);
  		return $owner;
 	}
-
-    /**
-     * Save an object.
-     * @return bool|int
-     * @throws IOException
-     * @throws ConfigurationException
-     */
+	/**
+ 	 * Save an object.
+	 *
+	 * @return bool|int
+	 * @throws IOException
+	 */
 	public function save($index = true) {
 		//cache owner_guid for brief
 		if($owner = $this->getOwnerEntity(false)){
@@ -213,7 +212,7 @@ class ElggObject extends ElggEntity {
             }
         }
 
-        $guid = parent::save($index);
-		return $guid;
+		$guid = parent::save($index);
+        return $guid;
 	}
 }
