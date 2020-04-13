@@ -13,6 +13,7 @@ use Minds\Core\Data\Call;
 use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Log\Logger;
+use Minds\Core\Media\Assets\Video as VideoAssets;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Entities\User;
@@ -53,10 +54,24 @@ class Manager
     /** @var Call */
     protected $call;
 
+    /** @var VideoAssets */
+    protected $videoAssets;
+
     /** @var Logger */
     protected $logger;
 
-    public function __construct($repository = null, $client = null, $queueDelegate = null, $entityDelegate = null, $save = null, $cacher = null, $call = null, $config = null, $logger = null)
+    public function __construct(
+        $repository = null,
+        $client = null,
+        $queueDelegate = null,
+        $entityDelegate = null,
+        $save = null,
+        $cacher = null,
+        $call = null,
+        $config = null,
+        $assets = null,
+        $logger = null
+    )
     {
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
         $this->config = $config ?: Di::_()->get('Config');
@@ -64,8 +79,9 @@ class Manager
         $this->queueDelegate = $queueDelegate ?: new QueueDelegate();
         $this->entityDelegate = $entityDelegate ?: new EntityCreatorDelegate();
         $this->save = $save ?: new Save();
-        $this->call = Di::_()->get('Database\Cassandra\Indexes') ?: new Call('entities_by_time');
+        $this->call = $call ?: Di::_()->get('Database\Cassandra\Indexes');
         $this->client = $client ?: $this->buildClient();
+        $this->videoAssets = $assets ?: new VideoAssets();
         $this->logger = $logger ?: Di::_()->get('Logger');
     }
 
@@ -98,8 +114,8 @@ class Manager
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
             if (count(array_filter($channels, function ($value) use ($channel) {
-                return $value['id'] === $channel['id'];
-            })) === 0) {
+                    return $value['id'] === $channel['id'];
+                })) === 0) {
                 $channels[] = [
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],
@@ -230,7 +246,7 @@ class Manager
         $streamingDataFormats = $videoData['streamingData']['formats'];
 
         // validate length
-        (new \Minds\Core\Media\Assets\Video())->validate(['length' => $videoDetails['lengthSeconds'] / 60]);
+        $this->videoAssets->validate(['length' => $videoDetails['lengthSeconds'] / 60]);
 
         // find best suitable format
         $format = [];
@@ -309,14 +325,13 @@ class Manager
             'file' => $path,
         ];
 
-        $assets = new \Minds\Core\Media\Assets\Video();
-        $assets->setEntity($video);
-
-        $assets->validate($media);
+        $this->videoAssets
+            ->setEntity($video)
+            ->validate($media);
 
         $this->logger->info("[YouTubeImporter] Initiating upload to S3 ({$video->guid}) \n");
 
-        $video->setAssets($assets->upload($media, []));
+        $video->setAssets($this->videoAssets->upload($media, []));
 
         $this->logger->info("[YouTubeImporter] Saving video ({$video->guid}) \n");
 
