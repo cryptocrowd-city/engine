@@ -12,6 +12,7 @@ use Minds\Core\Log\Logger;
 use Minds\Core\Media\Assets\Video as VideoAssets;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
+use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
 use Minds\Core\Media\YouTubeImporter\Manager;
 use Minds\Core\Media\YouTubeImporter\Repository;
 use Minds\Core\Media\YouTubeImporter\YTVideo;
@@ -109,14 +110,39 @@ class ManagerSpec extends ObjectBehavior
         $this->connect()->shouldReturn('url');
     }
 
-    public function it_should_get_completed_videos(Response $response)
+    public function it_should_not_get_videos_if_channel_is_not_associated_to_user(Response $response, User $user)
+    {
+        $user->getYouTubeChannels()
+            ->shouldBeCalled()
+            ->willReturn([]);
+
+        $this->shouldThrow(UnregisteredChannelException::class)->during('getVideos', [
+            [
+                'user' => $user,
+                'status' => 'completed',
+                'youtube_channel_id' => 'id123',
+            ],
+        ]);
+    }
+
+    public function it_should_get_completed_videos(Response $response, User $user)
     {
         $this->repository->getList(Argument::any())
             ->shouldBeCalled()
             ->willReturn($response);
 
+        $user->getYouTubeChannels()
+            ->shouldBeCalled()
+            ->willReturn([
+                [
+                    'id' => 'id123',
+                ],
+            ]);
+
         $this->getVideos([
+            'user' => $user,
             'status' => 'completed',
+            'youtube_channel_id' => 'id123',
         ])
             ->shouldReturn($response);
     }

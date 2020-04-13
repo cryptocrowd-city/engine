@@ -16,9 +16,11 @@ use Minds\Core\Log\Logger;
 use Minds\Core\Media\Assets\Video as VideoAssets;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
+use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
 use Minds\Entities\EntitiesFactory;
 use Minds\Entities\User;
 use Minds\Entities\Video;
+use Zend\Diactoros\Response\JsonResponse;
 
 /**
  * YouTube Importer Manager
@@ -147,6 +149,7 @@ class Manager
      * @param array $opts
      * @return Response
      * @throws \Exception
+     * @throws UnregisteredChannelException
      */
     public function getVideos(array $opts): Response
     {
@@ -162,6 +165,10 @@ class Manager
                 'gt' => null,
             ],
         ], $opts);
+
+        if (!$this->validateChannel($opts['user'], $opts['youtube_channel_id'])) {
+            throw new UnregisteredChannelException();
+        }
 
         // if status is 'queued' or 'completed', then we don't consult youtube
         if (isset($opts['status']) && in_array($opts['status'], ['queued', 'completed'], true)) {
@@ -236,9 +243,13 @@ class Manager
      * @param YTVideo $ytVideo
      * @throws \IOException
      * @throws \InvalidParameterException
+     * @throws UnregisteredChannelException
      */
     public function import(YTVideo $ytVideo): void
     {
+        if (!$this->validateChannel($ytVideo->getOwner(), $ytVideo->getChannelId())) {
+            throw new UnregisteredChannelException();
+        }
         // get and decode the data
         parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $ytVideo->getVideoId()), $info);
 
@@ -357,9 +368,14 @@ class Manager
      * @param string $channelId
      * @param bool $subscribe
      * @return bool returns true if it succeeds
+     * @throws UnregisteredChannelException
      */
-    public function updateSubscription(string $channelId, bool $subscribe): bool
+    public function updateSubscription(User $user, string $channelId, bool $subscribe): bool
     {
+        if (!$this->validateChannel($user, $channelId)) {
+            throw new UnregisteredChannelException();
+        }
+
         $subscribeUrl = 'https://pubsubhubbub.appspot.com/subscribe';
         $topicUrl = "https://www.youtube.com/xml/feeds/videos.xml?channel_id={$channelId}";
         $callbackUrl = $this->config->get('site_url') . 'api/v3/media/youtube-importer/hook';
@@ -465,5 +481,18 @@ class Manager
         }
 
         return $client;
+    }
+
+    /**
+     * Returns whether the channel belongs to the User
+     * @param User $user
+     * @param string $channelId
+     * @return bool
+     */
+    private function validateChannel(User $user, string $channelId): bool
+    {
+        return count(array_filter($user->getYouTubeChannels(), function ($value) use ($channelId) {
+            return $value['id'] === $channelId;
+        })) !== 0;
     }
 }

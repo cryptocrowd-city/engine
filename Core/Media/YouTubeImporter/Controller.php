@@ -95,6 +95,7 @@ class Controller
 
         try {
             $videos = $this->manager->getVideos([
+                'user' => $user,
                 'user_guid' => $user->guid,
                 'youtube_channel_id' => $channelId,
                 'status' => $status,
@@ -133,16 +134,6 @@ class Controller
         }
 
         $channelId = $params['channelId'];
-
-        // if the channel does not belong to the User
-        if (count(array_filter($user->getYouTubeChannels(), function ($value) use ($channelId) {
-            return $value['id'] === $channelId;
-        })) === 0) {
-            return new JsonResponse([
-                'status' => 'error',
-                'message' => 'channelId is not registered to this user',
-            ]);
-        }
 
         if (!isset($params['videoId'])) {
             return new JsonResponse([
@@ -190,12 +181,22 @@ class Controller
             ]);
         }
 
-        $done = $this->manager->updateSubscription($params['channelId'], true);
+        /** @var User $user */
+        $user = Session::getLoggedinUser();
 
-        return new JsonResponse([
-            'status' => 'success',
-            'done' => $done,
-        ]);
+        try {
+            $done = $this->manager->updateSubscription($user, $params['channelId'], true);
+
+            return new JsonResponse([
+                'status' => 'success',
+                'done' => $done,
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -214,12 +215,22 @@ class Controller
             ]);
         }
 
-        $done = $this->manager->updateSubscription($params['channelId'], false);
+        /** @var User $user */
+        $user = Session::getLoggedinUser();
 
-        return new JsonResponse([
-            'status' => 'success',
-            'done' => $done,
-        ]);
+        try {
+            $done = $this->manager->updateSubscription($user, $params['channelId'], false);
+
+            return new JsonResponse([
+                'status' => 'success',
+                'done' => $done,
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
