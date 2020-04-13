@@ -174,12 +174,16 @@ class Manager
                 $youtubeId = $item['snippet']['resourceId']['videoId'];
 
                 // try to find it in our db
-                $response = $this->repository->getVideos(['youtube_id' => $youtubeId])->toArray();
+                $response = $this->repository->getVideos([
+                    'youtube_id' => $youtubeId,
+                    'limit' => 1,
+                ])->toArray();
 
                 $ytVideo = new YTVideo();
                 if (count($response) > 0) {
                     /** @var Video $video */
                     $video = $response[0];
+
                     $ytVideo
                         ->setEntity($video)
                         ->setOwnerGuid($video->owner_guid)
@@ -191,12 +195,14 @@ class Manager
                         ->setTitle($video->getTitle())
                         ->setDescription($video->getDescription());
                 } else {
+                    $thumbnail = $this->config->get('cdn_url') . 'api/v2/media/proxy?src=' . urlencode($item['snippet']['thumbnails']->getHigh()['url']);
+
                     $ytVideo
                         ->setVideoId($item['snippet']['resourceId']['videoId'])
                         ->setChannelId($item['snippet']['channelId'])
                         ->setDescription($item['snippet']['description'])
                         ->setTitle($item['snippet']['title'])
-                        ->setThumbnail($item['snippet']['thumbnails']->getHigh()['url']);
+                        ->setThumbnail($thumbnail);
                 }
                 $videos[] = $ytVideo;
             }
