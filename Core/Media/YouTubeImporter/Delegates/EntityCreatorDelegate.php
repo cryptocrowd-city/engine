@@ -35,13 +35,18 @@ class EntityCreatorDelegate
         $this->logger = $logger ?: Di::_()->get('Logger');
     }
 
-    public function createActivity(Video $video)
+    /**
+     * Creates an activity for the Video and subscribes to both the Activity and the Video entities
+     * @param Video $video
+     * @throws \Minds\Exceptions\StopEventException
+     */
+    public function createActivity(Video $video): void
     {
         $activity = $this->activityManager->createFromEntity($video);
         $guid = $this->save->setEntity($activity)->save();
 
         if ($guid) {
-            $this->logger->log("[YouTubeImporter] Created activity ({$guid}) \n");
+            $this->logger->info("[YouTubeImporter] Created activity ({$guid}) \n");
 
             // Follow activity
             $this->postsSubscriptionsManager
