@@ -40,7 +40,7 @@ class Repository
      * @return Response
      * @throws \Exception
      */
-    public function getVideos(array $opts): Response
+    public function getList(array $opts): Response
     {
         $opts = array_merge([
             'limit' => 12,

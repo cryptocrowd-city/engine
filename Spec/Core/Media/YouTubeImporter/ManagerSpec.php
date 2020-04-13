@@ -75,7 +75,7 @@ class ManagerSpec extends ObjectBehavior
 
     public function it_should_get_completed_videos(Response $response)
     {
-        $this->repository->getVideos(Argument::any())
+        $this->repository->getList(Argument::any())
             ->shouldBeCalled()
             ->willReturn($response);
 
@@ -95,7 +95,7 @@ class ManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn('channel_id');
 
-        $this->repository->getVideos(['youtube_id' => 'id'])
+        $this->repository->getList(['youtube_id' => 'id'])
             ->shouldBeCalled()
             ->willReturn(new Response());
 

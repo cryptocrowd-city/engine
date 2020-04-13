@@ -144,7 +144,7 @@ class Manager
 
         // if status is 'queued' or 'completed', then we don't consult youtube
         if (isset($opts['status']) && in_array($opts['status'], ['queued', 'completed'], true)) {
-            return $this->repository->getVideos($opts);
+            return $this->repository->getList($opts);
         }
 
         // Use Minds' access token
@@ -174,7 +174,7 @@ class Manager
                 $youtubeId = $item['snippet']['resourceId']['videoId'];
 
                 // try to find it in our db
-                $response = $this->repository->getVideos([
+                $response = $this->repository->getList([
                     'youtube_id' => $youtubeId,
                     'limit' => 1,
                 ])->toArray();
@@ -375,7 +375,7 @@ class Manager
     public function receiveNewVideo(YTVideo $video): void
     {
         // see if we have a video like this already saved
-        $response = $this->repository->getVideos(['youtube_id' => $video->getVideoId()]);
+        $response = $this->repository->getList(['youtube_id' => $video->getVideoId()]);
 
         // if the video isn't there, we'll download it
         if ($response->count() === 0) {
