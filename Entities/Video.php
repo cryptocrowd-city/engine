@@ -68,6 +68,7 @@ class Video extends MindsObject
     {
         // TODO: Confirm why this is still here
         $this->generateGuid();
+
         // Upload the source and start the transcoder pipeline
         /** @var Core\Media\Video\Transcoder\Manager $transcoderManager */
         $transcoderManager = Di::_()->get('Media\Video\Transcoder\Manager');
@@ -339,23 +340,23 @@ class Video extends MindsObject
     }
 
     /**
-     * Returns title
+     * Set title
+     * @param string $title
+     * @return self
+     */
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * Get Title
      * @return string
      */
     public function getTitle(): string
     {
-        return $this->title ?: '';
-    }
-
-    /**
-     * Sets title
-     * @param string $title
-     * @return Video
-     */
-    public function setTitle($title): Video
-    {
-        $this->title = $title;
-        return $this;
+        return $this->title;
     }
 
     /**
@@ -368,14 +369,25 @@ class Video extends MindsObject
     }
 
     /**
-     * Set description
-     * @param string $description - description to be set.
-     * @return Video
-     */
-    public function setDescription($description): Video
+    * Set description
+    *
+    * @param string $description - description to be set.
+    * @return Video
+    */
+    public function setDescription($description): self
     {
         $this->description = $description;
         return $this;
+    }
+
+    /**
+     * Set message (description)
+     * @param string $description
+     * @return self
+     */
+    public function setMessage($description): self
+    {
+        return $this->setDescription($description);
     }
 
     /**
