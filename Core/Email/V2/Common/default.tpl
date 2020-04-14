@@ -551,15 +551,19 @@
                                             color: #7d7d82;
                                           "
                                         >
-                                          <div style="display: inline-block;">
-                                            Sent to you from
+                                          <div>
+                                            <div style="display: inline-block;">
+                                              Sent to you from
+                                            </div>
+                                            <div style="display: inline-block;">
+                                              Minds Inc
+                                              <span style="white-space: nowrap;"
+                                                >© 2020</span
+                                              >
+                                            </div>
                                           </div>
-                                          <div style="display: inline-block;">
-                                            Minds Inc
-                                            <span style="white-space: nowrap;"
-                                              >© 2020</span
-                                            >
-                                          </div>
+                                          <div>PO Box 7681, Wilton CT 06897</div>
+
                                         </td>
                                       </tr>
                                     </table>

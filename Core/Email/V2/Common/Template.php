@@ -7,6 +7,7 @@ use Minds\Core\Di\Di;
 
 class Template
 {
+    // TODO code docs
     protected $template;
     protected $template_path;
     protected $emailStyles;
