@@ -564,7 +564,7 @@
                                           </div>
                                           <div>
                                             <div style="display: inline-block;">PO Box 7681, </div>
-                                            <div style="display: inline-block;">Wilton CT 06897</div>
+                                            <div style="display: inline-block;">Wilton, CT 06897</div>
                                           </div>
                                         </td>
                                       </tr>
