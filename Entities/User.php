@@ -67,6 +67,8 @@ class User extends \ElggUser
         $this->attributes['kite_ref_ts'] = 0;
         $this->attributes['kite_state'] = 'unknown';
         $this->attributes['disable_autoplay_videos'] = 0;
+        $this->attributes['yt_channels'] = [];
+        $this->attributes['auto_import_yt_videos'] = false;
 
         parent::initializeAttributes();
     }
@@ -947,6 +949,7 @@ class User extends \ElggUser
 
         $export['hide_share_buttons'] = $this->getHideShareButtons();
         $export['disable_autoplay_videos'] = $this->getDisableAutoplayVideos();
+        $export['yt_channels'] = $this->getYouTubeChannels();
 
         return $export;
     }
@@ -1418,6 +1421,48 @@ class User extends \ElggUser
     public function setMode(int $mode)
     {
         $this->mode = $mode;
+
+        return $this;
+    }
+
+    /**
+     * Returns the YouTube OAuth Token
+     * @return array
+     */
+    public function getYouTubeChannels()
+    {
+        return $this->attributes['yt_channels'] ?? [];
+    }
+
+    /**
+     * Sets YouTube OAuth Token and when updates the connection timestamp
+     * @param array $channels
+     * @return $this
+     */
+    public function setYouTubeChannels(array $channels)
+    {
+        $this->attributes['yt_channels'] = $channels;
+
+        return $this;
+    }
+
+    /**
+    * Returns if the user's YouTube videos should be auto-imported
+    * @return bool
+    */
+    public function getAutoImportYouTubeVideos()
+    {
+        return (bool) $this->attributes['auto_import_yt_videos'] ?? false;
+    }
+
+    /**
+     * Sets if the user's YouTube videos should be auto-imported
+     * @param bool $value
+     * @return $this
+     */
+    public function setAutoImportYouTubeVideos(bool $value)
+    {
+        $this->attributes['auto_import_yt_videos'] = $value;
 
         return $this;
     }
