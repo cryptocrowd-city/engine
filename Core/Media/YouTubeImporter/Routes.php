@@ -4,7 +4,7 @@
  * @author edgebal
  */
 
-namespace Minds\Core\Media\YoutubeImporter;
+namespace Minds\Core\Media\YouTubeImporter;
 
 use Minds\Core\Di\Ref;
 use Minds\Core\Router\Middleware\LoggedInMiddleware;

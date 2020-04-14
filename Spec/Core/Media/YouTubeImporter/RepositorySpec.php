@@ -35,7 +35,7 @@ class RepositorySpec extends ObjectBehavior
     public function it_should_throw_an_exception_if_status_is_invalid()
     {
         $this->shouldThrow(new \Exception('Invalid status param'))
-            ->during('getVideos', [['status' => 'test']]);
+            ->during('getList', [['status' => 'test']]);
     }
 
 
@@ -44,7 +44,7 @@ class RepositorySpec extends ObjectBehavior
         $this->client->request(Argument::any())
             ->shouldBeCalled();
 
-        $this->getVideos([
+        $this->getList([
             'status' => 'queued',
             'time_created' => [
                 'lt' => 1000,
