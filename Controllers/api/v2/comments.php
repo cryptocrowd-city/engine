@@ -71,7 +71,7 @@ class comments implements Interfaces\Api
 
         $response['comments'] = Exportable::_($comments);
         $token = (string) $comments->getPagingToken();
-        $offset = count($comments) <= $limit ? '' : $comments[count($comments)-1]->getGuid();
+        $offset = count($comments) < $limit ? '' : $comments[count($comments)-1]->getGuid();
 
         $response['load-previous'] = $descending ? $token : $offset;
         $response['load-next'] = $descending ? $offset : $token;
@@ -340,7 +340,7 @@ class comments implements Interfaces\Api
         }
         //check if owner of activity trying to remove
         $entity = Entities\Factory::build($comment->getEntityGuid());
-        
+
         if ($entity->owner_guid == Core\Session::getLoggedInUserGuid()) {
             $manager->delete($comment, [ 'force' => true ]);
             return Factory::response([]);
