@@ -195,6 +195,7 @@ class Repository
 
             if ($rows) {
                 $comments->setPagingToken(base64_encode($rows->pagingStateToken()));
+                $comments->setLastPage($rows->isLastPage());
             }
         } catch (\Exception $e) {
             error_log($e);

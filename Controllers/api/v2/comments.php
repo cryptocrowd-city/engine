@@ -71,7 +71,12 @@ class comments implements Interfaces\Api
 
         $response['comments'] = Exportable::_($comments);
         $token = (string) $comments->getPagingToken();
-        $offset = count($comments) < $limit ? '' : $comments[count($comments)-1]->getGuid();
+
+        if ($comments->isLastPage()) {
+            $offset = '';
+        } else {
+            $offset = count($comments) <= $limit ? '' : $comments[count($comments) - 1]->getGuid();
+        }
 
         $response['load-previous'] = $descending ? $token : $offset;
         $response['load-next'] = $descending ? $offset : $token;
