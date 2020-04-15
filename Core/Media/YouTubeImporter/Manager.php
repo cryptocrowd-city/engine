@@ -399,6 +399,8 @@ class Manager
 
         @file_get_contents($subscribeUrl, false, $context);
 
+        $this->logger->info("[YouTubeImporter] " . $http_response_header);
+
         return preg_match('200', $http_response_header[0]) === 1;
     }
 
