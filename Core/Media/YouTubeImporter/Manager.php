@@ -472,6 +472,10 @@ class Manager
 
         // cache this
         $token = $this->config->get('google')['youtube']['oauth_token'];
+
+        if (is_string($token)) {
+            $token = json_decode($token);
+        }
         if (!$this->cacher->get(self::CACHE_KEY)) {
             $this->cacher->set(self::CACHE_KEY, $token);
         }
