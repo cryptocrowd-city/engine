@@ -67,6 +67,7 @@ class User extends \ElggUser
         $this->attributes['kite_ref_ts'] = 0;
         $this->attributes['kite_state'] = 'unknown';
         $this->attributes['disable_autoplay_videos'] = 0;
+        $this->attributes['dob'] = 0;
         $this->attributes['yt_channels'] = [];
         $this->attributes['auto_import_yt_videos'] = false;
 
@@ -949,7 +950,6 @@ class User extends \ElggUser
 
         $export['hide_share_buttons'] = $this->getHideShareButtons();
         $export['disable_autoplay_videos'] = $this->getDisableAutoplayVideos();
-        $export['yt_channels'] = $this->getYouTubeChannels();
 
         return $export;
     }
@@ -1447,9 +1447,9 @@ class User extends \ElggUser
     }
 
     /**
-    * Returns if the user's YouTube videos should be auto-imported
-    * @return bool
-    */
+     * Returns if the user's YouTube videos should be auto-imported
+     * @return bool
+     */
     public function getAutoImportYouTubeVideos()
     {
         return (bool) $this->attributes['auto_import_yt_videos'] ?? false;
