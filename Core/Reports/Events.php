@@ -55,25 +55,24 @@ class Events
      * Returns a readable format for a given ban reason, converting
      * tree indices to their text counterparts.
      *
-     * e.g. with the default config, an index of 3 returns "Illegal"
-     * an index of 1.3 returns "Illegal (Extortion)"
+     * e.g. with the default config, an index of 1 returns "Illegal"
+     * an index of 1.3 returns "Illegal / Extortion"
      *
      * @param string $index - the given ban reason index
-     * @return string the first reason in the ban reason tree, or
+     * @return string the match from the ban reason tree, or
      *  if text is in the reason field, it will return that.
      */
     public function getBanReasons($reason): string
     {
-        $banReasons = Di::_()->get('Config')->get('ban_reasons');
+        $banReasons = Di::_()->get('Config')->get('report_reasons');
         $splitReason = preg_split("/\./", $reason);
         if (is_numeric($reason) && isset($splitReason[1])) {
-            $index = $splitReason[0];
             $subIndex = $splitReason[1];
-            return $banReasons[$index]['label']
-                .$banReasons[$index]['reasons'][$subIndex];
+            return $banReasons[$reason - 1]['label']
+                .' / '.$banReasons[$reason - 1]['reasons'][$subIndex - 1]['label'];
         }
         if (is_numeric($reason) && isset($splitReason[0])) {
-            return $banReasons[$splitReason[0]]['label'];
+            return $banReasons[$reason - 1]['label'];
         }
         return $reason;
     }

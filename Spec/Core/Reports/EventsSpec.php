@@ -24,42 +24,87 @@ class EventsSpec extends ObjectBehavior
         $this->dispatcher = $dispatcher;
         $this->config = $config;
         $this->banReasons = [
-            1 => [
-                'label' => 'Illegal ',
-                'reasons' => [
-                    1 => '(Terrorism)',
-                    2 => '(Paedophilia)',
-                    3 => '(Extortion)',
-                    4 => '(Fraud)',
-                    5 => '(Revenge porn)',
-                    6 => '(Sex trafficking)'
-                ],
+            [
+              'value' => 1,
+              'label' => 'Illegal',
+              'hasMore' => true,
+              'reasons' => [
+                [ 'value' => 1, 'label' => 'Terrorism' ],
+                [ 'value' => 2, 'label' => 'Paedophilia' ],
+                [ 'value' => 3, 'label' => 'Extortion' ],
+                [ 'value' => 4, 'label' => 'Fraud' ],
+                [ 'value' => 5, 'label' => 'Revenge Porn' ],
+                [ 'value' => 6, 'label' => 'Sex trafficking' ],
+              ],
             ],
-            2 => [
-                'label' => 'Should be marked as explicit ',
-                'reasons' => [
-                    1 => 'for nudity',
-                    2 => 'for pornography',
-                    3 => 'for profanity',
-                    4 => 'for violence and gore',
-                    5 => 'for race, religion or gender',
-                ]
+            [
+              'value' => 2,
+              'label' => 'NSFW (not safe for work)',
+              'hasMore' => true,
+              'reasons' => [ // Explicit reasons
+                [ 'value' => 1, 'label' => 'Nudity' ],
+                [ 'value' => 2, 'label' => 'Pornography' ],
+                [ 'value' => 3, 'label' => 'Profanity' ],
+                [ 'value' => 4, 'label' => 'Violance and Gore' ],
+                [ 'value' => 5, 'label' => 'Race, Religion, Gender' ],
+              ],
             ],
-            3 => [ 'label' => 'Encourages or incites violence' ],
-            4 => [ 'label' => 'Harassment' ],
-            5 => [ 'label' => 'Contains personal and confidential info' ],
-            6 => [ 'label' => 'Maliciously targets users (@name, links, images or videos)' ],
-            7 => [ 'label' => 'Impersonates someone in a misleading or deceptive manner' ],
-            8 => [ 'label' => 'Is spam'],
-            9 => [ 'label' => '' ],
-            10 => [ 'label' => 'Copyright infringement' ],
-            11 => [ 'label' => 'Another reason' ],
-            12 => [ 'label' => 'Incorrect use of hashtags' ],
-            13 => [ 'label' => 'Malware' ],
-            14 => [ 'label' => '' ],
-            15 => [ 'label' => 'Trademark infringement' ],
-            16 => [ 'label' => 'Token manipulation' ],
-        ];
+            [
+              'value' => 3,
+              'label' => 'Encourages or incites violence',
+              'hasMore' => false,
+            ],
+            [
+              'value' => 4,
+              'label' => 'Harassment',
+              'hasMore' => false,
+            ],
+            [
+              'value' => 5,
+              'label' => 'Personal and confidential information',
+              'hasMore' => false,
+            ],
+            [
+              'value' => 7,
+              'label' => 'Impersonates',
+              'hasMore' => false,
+            ],
+            [
+              'value' => 8,
+              'label' => 'Spam',
+              'hasMore' => false,
+            ],
+            [
+              'value' => 10,
+              'label' => 'Infringes my copyright',
+              'hasMore' => true,
+            ],
+            [
+              'value' => 12,
+              'label' => 'Incorrect use of hashtags',
+              'hasMore' => false,
+            ],
+            [
+              'value' => 13,
+              'label' => 'Malware',
+              'hasMore' => false,
+            ],
+            [
+              'value' => 15,
+              'label' => 'Trademark infringement',
+              'hasMore' => false,
+            ],
+            [
+              'value' => 16,
+              'label' => 'Token manipulation',
+              'hasMore' => false,
+            ],
+            [ 'value' => 11,
+             'label' => 'Another reason',
+             'hasMore' => true,
+            ],
+          ]
+        ;
     }
 
     public function it_is_initializable()
@@ -78,16 +123,16 @@ class EventsSpec extends ObjectBehavior
 
     public function it_should_discern_ban_reason_text()
     {
-        Di::_()->get('Config')->set('ban_reasons', $this->banReasons);
+        Di::_()->get('Config')->set('report_reasons', $this->banReasons);
 
         $this->getBanReasons(1)
-            ->shouldReturn("Illegal ");
+            ->shouldReturn("Illegal");
         
         $this->getBanReasons("1.3")
-            ->shouldReturn("Illegal (Extortion)");
+            ->shouldReturn("Illegal / Extortion");
                 
         $this->getBanReasons("2.3")
-            ->shouldReturn("Should be marked as explicit for profanity");
+            ->shouldReturn("NSFW (not safe for work) / Profanity");
 
         $this->getBanReasons("3")
             ->shouldReturn("Encourages or incites violence");
