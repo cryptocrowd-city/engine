@@ -99,9 +99,10 @@ class EventsSpec extends ObjectBehavior
               'label' => 'Token manipulation',
               'hasMore' => false,
             ],
-            [ 'value' => 11,
-             'label' => 'Another reason',
-             'hasMore' => true,
+            [
+              'value' => 11,
+              'label' => 'Another reason',
+              'hasMore' => true,
             ],
           ]
         ;
@@ -136,6 +137,9 @@ class EventsSpec extends ObjectBehavior
 
         $this->getBanReasons("3")
             ->shouldReturn("Encourages or incites violence");
+
+        $this->getBanReasons("8")
+            ->shouldReturn("Spam");
 
         $this->getBanReasons("because reasons")
             ->shouldReturn("because reasons");

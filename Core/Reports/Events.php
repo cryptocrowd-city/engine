@@ -66,13 +66,31 @@ class Events
     {
         $banReasons = Di::_()->get('Config')->get('report_reasons');
         $splitReason = preg_split("/\./", $reason);
-        if (is_numeric($reason) && isset($splitReason[1])) {
-            $subIndex = $splitReason[1];
-            return $banReasons[$reason - 1]['label']
-                .' / '.$banReasons[$reason - 1]['reasons'][$subIndex - 1]['label'];
-        }
+
         if (is_numeric($reason) && isset($splitReason[0])) {
-            return $banReasons[$reason - 1]['label'];
+            // get filter out matching reason and re-index array from 0.
+            $reasonObject = array_values(
+                array_filter(
+                $banReasons,
+                function ($r) use ($splitReason) {
+                    return (string) $r['value'] === $splitReason[0];
+                }
+            )
+            );
+            // start string with matching label
+            $reasonString = $reasonObject[0]['label'];
+            // if has more, and the reason supplied requests more (e.g. 1.1)
+            if ($reasonObject[0]['hasMore'] && isset($splitReason[1])) {
+                // filter for sub-reasons.
+                $subReasonObject = array_values(array_filter(
+                    $reasonObject[0]['reasons'],
+                    function ($sub) use ($splitReason) {
+                        return (string) $sub['value'] === $splitReason[1];
+                    }
+                ));
+                $reasonString .= ' / '.$subReasonObject[0]['label'];
+            }
+            return $reasonString;
         }
         return $reason;
     }
