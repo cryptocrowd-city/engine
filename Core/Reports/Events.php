@@ -69,14 +69,12 @@ class Events
 
         if (is_numeric($reason) && isset($splitReason[0])) {
             // get filter out matching reason and re-index array from 0.
-            $reasonObject = array_values(
-                array_filter(
+            $reasonObject = array_values(array_filter(
                 $banReasons,
                 function ($r) use ($splitReason) {
                     return (string) $r['value'] === $splitReason[0];
                 }
-            )
-            );
+            ));
             // start string with matching label
             $reasonString = $reasonObject[0]['label'];
             // if has more, and the reason supplied requests more (e.g. 1.1)
