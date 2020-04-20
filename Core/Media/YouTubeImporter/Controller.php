@@ -42,6 +42,40 @@ class Controller
     }
 
     /**
+     * Disconnects a YouTube account from a user
+     * Called by v3/media/youtube-importer/oauth
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
+    public function disconnectAccount(ServerRequest $request): JsonResponse
+    {
+        $channelId = $request->getQueryParams()['channelId'];
+
+        if (!isset($channelId)) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'Missing channelId',
+            ]);
+        }
+
+        /** @var User $user */
+        $user = Session::getLoggedinUser();
+
+        try {
+            $this->manager->disconnect($user, $channelId);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        return new JsonResponse([
+            'status' => 'success',
+        ]);
+    }
+
+    /**
      * Receives an access code and requests a token.
      * Called by v3/media/youtube-importer/oauth/redirect
      * @param ServerRequest $request

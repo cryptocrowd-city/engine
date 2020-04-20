@@ -101,6 +101,27 @@ class Manager
     }
 
     /**
+     * Disconnects a YouTube account from a User
+     * @param User $user
+     * @param string $channelId
+     * @return void
+     * @throws \Minds\Exceptions\StopEventException
+     */
+    public function disconnect(User $user, string $channelId): void
+    {
+        // filter out the particular element, if found
+        $channels = array_filter($user->getYouTubeChannels(), function ($value) use ($channelId) {
+            return $value['id'] !== $channelId;
+        });
+
+        $user->setYouTubeChannels($channels);
+
+        $this->save
+            ->setEntity($user)
+            ->save();
+    }
+
+    /**
      * Receives the access token and save to yt_connected
      * @param User $user
      * @param string $code
@@ -466,7 +487,7 @@ class Manager
         // TODO redirect URI should be to our youtube importer page for better UX
         // add redirect URI
         $client->setRedirectUri($this->config->get('site_url')
-            . 'api/v3/media/youtube-importer/oauth/redirect');
+            . 'api/v3/media/youtube-importer/account/redirect');
 
         $client->setAccessType('offline');
 

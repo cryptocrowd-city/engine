@@ -26,13 +26,19 @@ class Routes extends ModuleRoutes
             ->do(function (Route $route) {
                 // Requests OAuth token
                 $route->get(
-                    'oauth',
+                    'account',
                     Ref::_('Media\YouTubeImporter\Controller', 'getToken')
                 );
 
                 // Requests OAuth token
+                $route->delete(
+                    'account',
+                    Ref::_('Media\YouTubeImporter\Controller', 'disconnectAccount')
+                );
+
+                // Requests OAuth token
                 $route->get(
-                    'oauth/redirect',
+                    'account/redirect',
                     Ref::_('Media\YouTubeImporter\Controller', 'receiveAccessCode')
                 );
 
