@@ -20,6 +20,7 @@ use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
 use Minds\Entities\EntitiesFactory;
 use Minds\Entities\User;
 use Minds\Entities\Video;
+use Pubsubhubbub\Subscriber\Subscriber;
 use Zend\Diactoros\Response\JsonResponse;
 
 /**
@@ -63,6 +64,9 @@ class Manager
     /** @var EntitiesFactory */
     protected $entitiesBuilder;
 
+    /** @var Subscriber */
+    protected $subscriber;
+
     /** @var Logger */
     protected $logger;
 
@@ -77,8 +81,10 @@ class Manager
         $config = null,
         $assets = null,
         $entitiesBuilder = null,
+        $subscriber = null,
         $logger = null
-    ) {
+    )
+    {
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
         $this->config = $config ?: Di::_()->get('Config');
         $this->cacher = $cacher ?: Di::_()->get('Cache');
@@ -89,6 +95,7 @@ class Manager
         $this->client = $client ?: $this->buildClient();
         $this->videoAssets = $assets ?: new VideoAssets();
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
+        $this->subscriber = $subscriber ?: new Subscriber('https://pubsubhubbub.appspot.com/subscribe', $this->config->get('site_url') . 'api/v3/media/youtube-importer/hook');
         $this->logger = $logger ?: Di::_()->get('Logger');
     }
 
@@ -154,12 +161,13 @@ class Manager
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
             if (count(array_filter($channels, function ($value) use ($channel) {
-                return $value['id'] === $channel['id'];
-            })) === 0) {
+                    return $value['id'] === $channel['id'];
+                })) === 0) {
                 $channels[] = [
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],
                     'connected' => time(),
+                    'auto_import' => false,
                 ];
             }
         }
@@ -398,6 +406,7 @@ class Manager
 
     /**
      * (Un)Subscribes from YouTube's push notifications
+     * @param User $user
      * @param string $channelId
      * @param bool $subscribe
      * @return bool returns true if it succeeds
@@ -409,32 +418,37 @@ class Manager
             throw new UnregisteredChannelException();
         }
 
-        $subscribeUrl = 'https://pubsubhubbub.appspot.com/subscribe';
         $topicUrl = "https://www.youtube.com/xml/feeds/videos.xml?channel_id={$channelId}";
-        $callbackUrl = $this->config->get('site_url') . 'api/v3/media/youtube-importer/hook';
 
-        $data = [
-            'hub.mode' => $subscribe ? 'subscribe' : 'unsubscribe',
-            'hub.callback' => $callbackUrl,
-            'hub.lease_seconds' => 60 * 60 * 24 * 365,
-            'hub.topic' => $topicUrl,
-        ];
+        // update the channel if the value changed
+        $channels = $user->getYouTubeChannels();
+        $i = 0;
+        $found = false;
+        $updated = false;
+        while (!$found && $i < count($channels)) {
+            if ($channels[$i]['id'] === $channelId) {
+                $found = true;
+                if ($channels[$i]['auto_import'] === $subscribe) {
+                    return true;
+                }
+                $updated = $subscribe ? $this->subscriber->subscribe($topicUrl) !== false : $this->subscriber->unsubscribe($topicUrl) !== false;
 
-        $opts = ['http' =>
-            [
-                'method' => 'POST',
-                'header' => 'Content-type: application/x-www-form-urlencoded',
-                'content' => http_build_query($data),
-            ],
-        ];
+                // if the subscription was correctly updated
+                if ($updated) {
+                    // update and save channel
+                    $channels[$i]['auto_import'] = $subscribe;
 
-        $context = stream_context_create($opts);
+                    $user->setYouTubeChannels($channels);
 
-        @file_get_contents($subscribeUrl, false, $context);
+                    $this->save
+                        ->setEntity($user)
+                        ->save();
+                }
+            }
+            $i++;
+        }
 
-        $this->logger->info("[YouTubeImporter] " . $http_response_header);
-
-        return preg_match('200', $http_response_header[0]) === 1;
+        return $updated;
     }
 
     /**
@@ -532,7 +546,7 @@ class Manager
     private function validateChannel(User $user, string $channelId): bool
     {
         return count(array_filter($user->getYouTubeChannels(), function ($value) use ($channelId) {
-            return $value['id'] === $channelId;
-        })) !== 0;
+                return $value['id'] === $channelId;
+            })) !== 0;
     }
 }

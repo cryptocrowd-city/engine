@@ -21,6 +21,7 @@ use Minds\Entities\User;
 use Minds\Entities\Video;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use Pubsubhubbub\Subscriber\Subscriber;
 
 class ManagerSpec extends ObjectBehavior
 {
@@ -54,6 +55,9 @@ class ManagerSpec extends ObjectBehavior
     /** @var EntitiesBuilder */
     protected $entitiesBuilder;
 
+    /** @var Subscriber */
+    protected $subscriber;
+
     /** @var Logger */
     protected $logger;
 
@@ -68,6 +72,7 @@ class ManagerSpec extends ObjectBehavior
         Call $call,
         VideoAssets $videoAssets,
         EntitiesBuilder $entitiesBuilder,
+        Subscriber $subscriber,
         Logger $logger
     ) {
         $this->repository = $repository;
@@ -81,6 +86,7 @@ class ManagerSpec extends ObjectBehavior
         $this->client = $client;
         $this->videoAssets = $videoAssets;
         $this->entitiesBuilder = $entitiesBuilder;
+        $this->subscriber = $subscriber;
 
         $this->beConstructedWith(
             $repository,
@@ -93,6 +99,7 @@ class ManagerSpec extends ObjectBehavior
             $config,
             $videoAssets,
             $entitiesBuilder,
+            $subscriber,
             $logger
         );
     }
