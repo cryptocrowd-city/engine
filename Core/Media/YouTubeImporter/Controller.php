@@ -107,7 +107,7 @@ class Controller
 
         // redirect back to the URL
         // TODO this should redirect to an URL with the youtube importer opened
-        header('Location: ' . filter_var($this->config->get('site_url'), FILTER_SANITIZE_URL));
+        header('Location: ' . filter_var($this->config->get('site_url') . 'settings/canary/other/youtube-migration/connect', FILTER_SANITIZE_URL));
         exit;
     }
 
