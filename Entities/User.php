@@ -1404,6 +1404,24 @@ class User extends \ElggUser
     }
 
     /**
+     * @return bool
+     */
+    public function getDateOfBirth()
+    {
+        return $this->dob;
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setDateOfBirth(string $value)
+    {
+        $this->dob = $value;
+        return $this;
+    }
+
+    /**
      * Returns channel mode value.
      *
      * @return int channel mode
