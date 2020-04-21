@@ -54,6 +54,7 @@ class Provider extends DiProvider
                 'pay',
                 'onboarding-reminder',
                 'boost-rotator',
+                'yt-importer',
             ];
         });
 
