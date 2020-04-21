@@ -8,6 +8,7 @@ namespace Minds\Core\Media\YouTubeImporter;
 use Minds\Api\Exportable;
 use Minds\Core\Config\Config;
 use Minds\Core\Di\Di;
+use Minds\Core\Router\Exceptions\UnauthorizedException;
 use Minds\Core\Session;
 use Minds\Entities\User;
 use Zend\Diactoros\Response\JsonResponse;
@@ -85,6 +86,14 @@ class Controller
     {
         $token = null;
         $code = $request->getQueryParams()['code'];
+        $updateMindsToken = $request->getQueryParams()['update_minds_token'];
+
+        /** @var User $user */
+        $user = Session::getLoggedinUser();
+
+        if (isset($updateMindsToken) && !$user->isAdmin()) {
+            throw new UnauthorizedException();
+        }
 
         if (!isset($code)) {
             return new JsonResponse([
@@ -93,10 +102,8 @@ class Controller
             ]);
         }
 
-        /** @var User $user */
-        $user = Session::getLoggedinUser();
 
-        $this->manager->fetchToken($user, $code);
+        $this->manager->fetchToken($user, $code, (bool) $updateMindsToken);
 
         // redirect back to the URL
         // TODO this should redirect to an URL with the youtube importer opened

@@ -94,9 +94,15 @@ class Manager
 
     /**
      * Connects to a channel
+     * @param bool $getMindsToken
+     * @return string
      */
-    public function connect(): string
+    public function connect(bool $getMindsToken = false): string
     {
+        if ($getMindsToken) {
+            $this->client->setRedirectUri($this->config->get('site_url')
+                . 'api/v3/media/youtube-importer/account/redirect?update_minds_token=true');
+        }
         return $this->client->createAuthUrl();
     }
 
@@ -125,10 +131,16 @@ class Manager
      * Receives the access token and save to yt_connected
      * @param User $user
      * @param string $code
+     * @param bool $updateMindsToken
      */
-    public function fetchToken(User $user, string $code): void
+    public function fetchToken(User $user, string $code, bool $updateMindsToken): void
     {
         $token = $this->client->fetchAccessTokenWithAuthCode($code);
+
+        if ($updateMindsToken) {
+            $this->cacher->set(self::CACHE_KEY, $token);
+            return;
+        }
 
         $youtube = new \Google_Service_YouTube($this->client);
 
@@ -492,14 +504,15 @@ class Manager
         $client->setAccessType('offline');
 
         // cache this
-        $token = $this->config->get('google')['youtube']['oauth_token'];
-
-        if (is_string($token)) {
-            $token = json_decode($token);
-        }
-        if (!$this->cacher->get(self::CACHE_KEY)) {
-            $this->cacher->set(self::CACHE_KEY, $token);
-        }
+        //        $token = $this->config->get('google')['youtube']['oauth_token'];
+        //
+        //        if (is_string($token)) {
+        //            $token = json_decode($token);
+        //        }
+        $token = $this->cacher->get(self::CACHE_KEY);
+        //        if (!$this->cacher->get(self::CACHE_KEY)) {
+        //            $this->cacher->set(self::CACHE_KEY, $token);
+        //        }
 
         // if we have an access token and it's expired, fetch a new token
         $expiryTime = $token['created'] + $token['expires_in'];
