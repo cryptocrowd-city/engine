@@ -83,8 +83,7 @@ class Manager
         $entitiesBuilder = null,
         $subscriber = null,
         $logger = null
-    )
-    {
+    ) {
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
         $this->config = $config ?: Di::_()->get('Config');
         $this->cacher = $cacher ?: Di::_()->get('Cache');
@@ -161,8 +160,8 @@ class Manager
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
             if (count(array_filter($channels, function ($value) use ($channel) {
-                    return $value['id'] === $channel['id'];
-                })) === 0) {
+                return $value['id'] === $channel['id'];
+            })) === 0) {
                 $channels[] = [
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],
@@ -546,7 +545,7 @@ class Manager
     private function validateChannel(User $user, string $channelId): bool
     {
         return count(array_filter($user->getYouTubeChannels(), function ($value) use ($channelId) {
-                return $value['id'] === $channelId;
-            })) !== 0;
+            return $value['id'] === $channelId;
+        })) !== 0;
     }
 }
