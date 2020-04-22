@@ -102,7 +102,6 @@ class Controller
             ]);
         }
 
-
         $this->manager->fetchToken($user, $code, (bool) $updateMindsToken);
 
         // redirect back to the URL
@@ -204,6 +203,18 @@ class Controller
         return new JsonResponse([
             'status' => 'success',
         ]);
+    }
+
+    public function cancel(ServerRequest $request): JsonResponse
+    {
+        if (!isset($params['videoId'])) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'You must provide a videoId',
+            ]);
+        }
+
+        $videoId = $params['videoId'];
     }
 
     /**

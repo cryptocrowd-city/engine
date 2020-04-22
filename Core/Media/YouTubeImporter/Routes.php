@@ -53,6 +53,11 @@ class Routes extends ModuleRoutes
                     'videos/import',
                     Ref::_('Media\YouTubeImporter\Controller', 'import')
                 );
+                // cancels a video import
+                $route->cancel(
+                    'videos/import',
+                    Ref::_('Media\YouTubeImporter\Controller', 'cancel')
+                );
 
                 // Subscribe to a channel
                 $route->post(

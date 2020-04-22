@@ -14,6 +14,7 @@ use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Log\Logger;
 use Minds\Core\Media\Assets\Video as VideoAssets;
+use Minds\Core\Media\Repository as MediaRepository;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
@@ -35,6 +36,9 @@ class Manager
 
     /** @var Repository */
     protected $repository;
+
+    /** @var MediaRepository */
+    protected $mediaRepository;
 
     /** @var Google_Client */
     protected $client;
@@ -68,6 +72,7 @@ class Manager
 
     public function __construct(
         $repository = null,
+        $mediaRepository = null,
         $client = null,
         $queueDelegate = null,
         $entityDelegate = null,
@@ -80,6 +85,7 @@ class Manager
         $logger = null
     ) {
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
+        $this->mediaRepository = $mediaRepository ?: Di::_()->get('Media\Repository');
         $this->config = $config ?: Di::_()->get('Config');
         $this->cacher = $cacher ?: Di::_()->get('Cache');
         $this->queueDelegate = $queueDelegate ?: new QueueDelegate();
@@ -416,7 +422,29 @@ class Manager
     }
 
     /**
+     * @param User $user
+     * @param string $videoId
+     * @return bool
+     * @throws \Exception
+     */
+    public function cancel(User $user, string $videoId): bool
+    {
+        $response = $this->repository->getList([
+            'youtube_id' => $videoId,
+            'limit' => 1,
+        ])->toArray();
+
+        $deleted = false;
+        if (count($response) > 0 && $response[0]->getOwnerGUID() === $user->getGUID()) {
+            $deleted = $this->mediaRepository->delete($response[0]->getGUID());
+        }
+
+        return $deleted;
+    }
+
+    /**
      * (Un)Subscribes from YouTube's push notifications
+     * @param User $user
      * @param string $channelId
      * @param bool $subscribe
      * @return bool returns true if it succeeds
