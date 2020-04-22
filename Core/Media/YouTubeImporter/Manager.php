@@ -260,6 +260,7 @@ class Manager
                 ])->toArray();
 
                 $ytVideo = (new YTVideo())
+                    ->setYoutubeCreationDate(strtotime($item['snippet']['publishedAt']))
                     ->setDuration($this->parseISO8601($videoResponse['items'][0]['contentDetails']['duration']))
                     ->setLikes($videoData['statistics']['likeCount'])
                     ->setDislikes($videoData['statistics']['dislikeCount'])

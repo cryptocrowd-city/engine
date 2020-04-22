@@ -16,6 +16,8 @@ use Minds\Traits\MagicAttributes;
  * @method YTVideo setVideoId(string $value)
  * @method string getChannelId()
  * @method YTVideo setChannelId(string $value)
+ * @method string getYoutubeCreationDate()
+ * @method YTVideo setYoutubeCreationDate(string $value)
  * @method Video getEntity()
  * @method YTVideo setEntity(Video $value)
  * @method string getOwnerGuid()
@@ -51,6 +53,10 @@ class YTVideo
     protected $videoId;
     /** @var string */
     protected $channelId;
+    /** @var string */
+    protected $youtubeUrl;
+    /** @var string */
+    protected $youtubeCreationDate;
     /** @var Video */
     protected $entity;
     /** @var string */
@@ -78,11 +84,18 @@ class YTVideo
     /** @var string */
     protected $thumbnail;
 
+    public function getYoutubeUrl(): string
+    {
+        return "https://www.youtube.com/watch?v={$this->getVideoId()}";
+    }
+
     public function export()
     {
         $export = [
             'video_id' => $this->videoId,
             'channel_id' => $this->channelId,
+            'youtubeUrl' => $this->youtubeUrl,
+            'youtubeCreationDate' => $this->getYoutubeUrl(),
             'entity' => $this->entity ? $this->entity->export() : null,
             'status' => $this->status,
             'title' => $this->title,
