@@ -28,6 +28,16 @@ use Minds\Traits\MagicAttributes;
  * @method YTVideo setTitle(string $value)
  * @method string getDescription()
  * @method YTVideo setDescription(string $value)
+ * @method string getDuration()
+ * @method YTVideo setDuration(string $value)
+ * @method string getLikes()
+ * @method YTVideo setLikes(string $value)
+ * @method string getDislikes()
+ * @method YTVideo setDislikes(string $value)
+ * @method string getFavorites()
+ * @method YTVideo setFavorites(string $value)
+ * @method string getViews()
+ * @method YTVideo setViews(string $value)
  * @method array getFormat()
  * @method YTVideo setFormat(string $value)
  * @method string getThumbnail()
@@ -53,6 +63,16 @@ class YTVideo
     protected $title;
     /** @var string */
     protected $description;
+    /** @var int */
+    protected $duration;
+    /** @var string */
+    protected $likes;
+    /** @var string */
+    protected $dislikes;
+    /** @var string */
+    protected $favorites;
+    /** @var string */
+    protected $views;
     /** @var array */
     protected $format;
     /** @var string */
@@ -67,6 +87,11 @@ class YTVideo
             'status' => $this->status,
             'title' => $this->title,
             'description' => $this->description,
+            'duration' => $this->duration,
+            'likeCount' => $this->likes,
+            'dislikeCount' => $this->dislikes,
+            'favoriteCount' => $this->favorites,
+            'viewCount' => $this->views,
             'thumbnail' => $this->thumbnail,
             'ownerGuid' => $this->ownerGuid,
             'owner' => $this->owner ? $this->owner->export() : null,
