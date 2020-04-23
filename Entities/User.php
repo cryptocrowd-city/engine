@@ -950,10 +950,6 @@ class User extends \ElggUser
         $export['hide_share_buttons'] = $this->getHideShareButtons();
         $export['disable_autoplay_videos'] = $this->getDisableAutoplayVideos();
 
-        if ($this->isPublicDateOfBirth()) {
-            $export['dob'] = $this->getDateOfBirth();
-        }
-
         return $export;
     }
 
