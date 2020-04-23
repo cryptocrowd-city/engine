@@ -205,6 +205,11 @@ class Controller
         ]);
     }
 
+    /**
+     * Cancels a video import
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
     public function cancel(ServerRequest $request): JsonResponse
     {
         if (!isset($params['videoId'])) {
@@ -215,6 +220,11 @@ class Controller
         }
 
         $videoId = $params['videoId'];
+
+        return new JsonResponse([
+            'status' => 'status',
+            'done' => $this->manager->cancel(Session::getLoggedinUser(), $videoId)
+        ]);
     }
 
     /**
