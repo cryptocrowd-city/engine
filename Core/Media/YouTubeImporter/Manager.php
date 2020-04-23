@@ -238,10 +238,9 @@ class Manager
             $videos->setPagingToken($playlistResponse->getNextPageToken());
 
             // get all IDs so we can do a single query call
-            $videoIds = [];
-            foreach ($playlistResponse['items'] as $item) {
-                $videoIds[] = $item['snippet']['resourceId']['videoId'];
-            }
+            $videoIds = array_map(function ($item) {
+                return $item['snippet']['resourceId']['videoId'];
+            }, $playlistResponse['items']);
 
             // get data on all returned videos
             $videoResponse = $youtube->videos->listVideos('contentDetails,statistics', ['id' => implode(',', $videoIds)]);
