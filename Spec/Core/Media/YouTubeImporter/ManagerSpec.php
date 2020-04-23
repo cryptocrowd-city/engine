@@ -10,6 +10,7 @@ use Minds\Core\Entities\Actions\Save;
 use Minds\Core\EntitiesBuilder;
 use Minds\Core\Log\Logger;
 use Minds\Core\Media\Assets\Video as VideoAssets;
+use Minds\Core\Media\Repository as MediaRepository;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
@@ -26,6 +27,9 @@ class ManagerSpec extends ObjectBehavior
 {
     /** @var Repository */
     protected $repository;
+
+    /** @var MediaRepository */
+    protected $mediaRepository;
 
     /** @var \Google_Client */
     protected $client;
@@ -59,6 +63,7 @@ class ManagerSpec extends ObjectBehavior
 
     public function let(
         Repository $repository,
+        MediaRepository $mediaRepository,
         \Google_Client $client,
         QueueDelegate $queueDelegate,
         EntityCreatorDelegate $entityDelegate,
@@ -71,6 +76,7 @@ class ManagerSpec extends ObjectBehavior
         Logger $logger
     ) {
         $this->repository = $repository;
+        $this->mediaRepository = $mediaRepository;
         $this->config = $config;
         $this->cacher = $cacher;
         $this->queueDelegate = $queueDelegate;
@@ -84,6 +90,7 @@ class ManagerSpec extends ObjectBehavior
 
         $this->beConstructedWith(
             $repository,
+            $mediaRepository,
             $client,
             $queueDelegate,
             $entityDelegate,
