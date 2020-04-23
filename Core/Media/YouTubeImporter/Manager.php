@@ -14,6 +14,7 @@ use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Log\Logger;
 use Minds\Core\Media\Assets\Video as VideoAssets;
+use Minds\Core\Media\Repository as MediaRepository;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
@@ -35,6 +36,9 @@ class Manager
 
     /** @var Repository */
     protected $repository;
+
+    /** @var MediaRepository */
+    protected $mediaRepository;
 
     /** @var Google_Client */
     protected $client;
@@ -68,6 +72,7 @@ class Manager
 
     public function __construct(
         $repository = null,
+        $mediaRepository = null,
         $client = null,
         $queueDelegate = null,
         $entityDelegate = null,
@@ -80,6 +85,7 @@ class Manager
         $logger = null
     ) {
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
+        $this->mediaRepository = $mediaRepository ?: Di::_()->get('Media\Repository');
         $this->config = $config ?: Di::_()->get('Config');
         $this->cacher = $cacher ?: Di::_()->get('Cache');
         $this->queueDelegate = $queueDelegate ?: new QueueDelegate();
@@ -231,8 +237,20 @@ class Manager
 
             $videos->setPagingToken($playlistResponse->getNextPageToken());
 
+            // get all IDs so we can do a single query call
+            $videoIds = array_map(function ($item) {
+                return $item['snippet']['resourceId']['videoId'];
+            }, $playlistResponse['items']);
+
+            // get data on all returned videos
+            $videoResponse = $youtube->videos->listVideos('contentDetails,statistics', ['id' => implode(',', $videoIds)]);
+
+            // build video entities
             foreach ($playlistResponse['items'] as $item) {
                 $youtubeId = $item['snippet']['resourceId']['videoId'];
+                $videoData = array_filter($videoResponse['items'], function ($item) use ($youtubeId) {
+                    return $item['id'] === $youtubeId;
+                })[0];
 
                 // try to find it in our db
                 $response = $this->repository->getList([
@@ -240,7 +258,14 @@ class Manager
                     'limit' => 1,
                 ])->toArray();
 
-                $ytVideo = new YTVideo();
+                $ytVideo = (new YTVideo())
+                    ->setYoutubeCreationDate(strtotime($item['snippet']['publishedAt']))
+                    ->setDuration($this->parseISO8601($videoResponse['items'][0]['contentDetails']['duration']))
+                    ->setLikes($videoData['statistics']['likeCount'])
+                    ->setDislikes($videoData['statistics']['dislikeCount'])
+                    ->setFavorites($videoData['statistics']['favoriteCount'])
+                    ->setViews($videoData['statistics']['viewCount']);
+
                 if (count($response) > 0) {
                     /** @var Video $video */
                     $video = $response[0];
@@ -397,7 +422,29 @@ class Manager
     }
 
     /**
+     * @param User $user
+     * @param string $videoId
+     * @return bool
+     * @throws \Exception
+     */
+    public function cancel(User $user, string $videoId): bool
+    {
+        $response = $this->repository->getList([
+            'youtube_id' => $videoId,
+            'limit' => 1,
+        ])->toArray();
+
+        $deleted = false;
+        if (count($response) > 0 && $response[0]->getOwnerGUID() === $user->getGUID()) {
+            $deleted = $this->mediaRepository->delete($response[0]->getGUID());
+        }
+
+        return $deleted;
+    }
+
+    /**
      * (Un)Subscribes from YouTube's push notifications
+     * @param User $user
      * @param string $channelId
      * @param bool $subscribe
      * @return bool returns true if it succeeds
@@ -503,16 +550,7 @@ class Manager
 
         $client->setAccessType('offline');
 
-        // cache this
-        //        $token = $this->config->get('google')['youtube']['oauth_token'];
-        //
-        //        if (is_string($token)) {
-        //            $token = json_decode($token);
-        //        }
         $token = $this->cacher->get(self::CACHE_KEY);
-        //        if (!$this->cacher->get(self::CACHE_KEY)) {
-        //            $this->cacher->set(self::CACHE_KEY, $token);
-        //        }
 
         // if we have an access token and it's expired, fetch a new token
         $expiryTime = $token['created'] + $token['expires_in'];
@@ -534,5 +572,15 @@ class Manager
         return count(array_filter($user->getYouTubeChannels(), function ($value) use ($channelId) {
             return $value['id'] === $channelId;
         })) !== 0;
+    }
+
+    /**
+     * returns duration in seconds
+     * @param string $duration
+     * @return int
+     */
+    private function parseISO8601(string $duration): int
+    {
+        return (new \DateTime('@0'))->add(new \DateInterval($duration))->getTimestamp();
     }
 }
