@@ -421,30 +421,29 @@ class Manager
 
         // update the channel if the value changed
         $channels = $user->getYouTubeChannels();
-        $i = 0;
-        $found = false;
         $updated = false;
-        while (!$found && $i < count($channels)) {
-            if ($channels[$i]['id'] === $channelId) {
-                $found = true;
-                if ($channels[$i]['auto_import'] === $subscribe) {
+
+        foreach ($channels as $channel) {
+            if ($channel['id'] === $channelId) {
+                if ($channel['auto_import'] === $subscribe) {
                     return true;
                 }
+
                 $updated = $subscribe ? $this->subscriber->subscribe($topicUrl) !== false : $this->subscriber->unsubscribe($topicUrl) !== false;
 
                 // if the subscription was correctly updated
                 if ($updated) {
                     // update and save channel
-                    $channels[$i]['auto_import'] = $subscribe;
+                    $channel['auto_import'] = $subscribe;
 
-                    $user->setYouTubeChannels($channels);
+                    $user->updateYouTubeChannel($channel);
 
                     $this->save
                         ->setEntity($user)
                         ->save();
                 }
+                break;
             }
-            $i++;
         }
 
         return $updated;
