@@ -277,7 +277,7 @@ class channel implements Interfaces\Api
                     $owner->setNsfw($nsfw);
                 }
 
-                if (isset($_POST['tags']) && $_POST['tags']) {
+                if (isset($_POST['tags']) && is_array($_POST['tags'])) {
                     $update['tags'] = json_encode($_POST['tags']);
                     $owner->$field = $update['tags'];
                 }
