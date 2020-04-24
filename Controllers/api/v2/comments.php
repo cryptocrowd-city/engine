@@ -50,6 +50,9 @@ class comments implements Interfaces\Api
         if ($loadPrevious === 'null') {
             $loadPrevious = null;
         }
+        if ($loadNext === 'null') {
+            $loadNext = null;
+        }
 
         $descending = $loadNext ? false : true;
         $focusedUrn = $_GET['focused_urn'] ?? null;
