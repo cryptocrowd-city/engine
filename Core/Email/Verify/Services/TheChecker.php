@@ -60,7 +60,8 @@ class TheChecker
 
 
         if ($response['result'] !== 'deliverable') {
-            error_log('TheChecker | not-deliverable'
+            error_log(
+                'TheChecker | not-deliverable'
                 .', result: '.$response['result']
                 .', for email: '.$response['email']
                 .', with reason: '.$response['reason']

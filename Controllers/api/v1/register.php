@@ -123,7 +123,8 @@ class register implements Interfaces\Api, Interfaces\ApiIgnorePam
                 'user' => $user->export(),
             ];
         } catch (\Exception $e) {
-            error_log("RegistrationError | username: ".$_POST['username']
+            error_log(
+                "RegistrationError | username: ".$_POST['username']
                 .", email:".$_POST['email']
                 .", signupParentId".$user->signupParentId
             );
