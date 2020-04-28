@@ -97,6 +97,7 @@ class Manager
      */
     public function connect(): string
     {
+        $this->configClientAuth(false);
         return $this->client->createAuthUrl();
     }
 
@@ -129,7 +130,7 @@ class Manager
     public function fetchToken(User $user, string $code): void
     {
         // We use the user's access token only this time to get channel details
-        $this->client->setDeveloperKey('');
+        $this->configClientAuth(false);
         $this->client->fetchAccessTokenWithAuthCode($code);
 
         $youtube = new \Google_Service_YouTube($this->client);
@@ -195,6 +196,8 @@ class Manager
         if (isset($opts['status']) && in_array($opts['status'], ['queued', 'completed'], true)) {
             return $this->repository->getList($opts);
         }
+
+        $this->configClientAuth(true);
 
         $youtube = new \Google_Service_YouTube($this->client);
 
@@ -510,14 +513,12 @@ class Manager
 
     /**
      * Creates new instance of Google_Client and adds client_id and secret
+     * @param bool $useDevKey
      * @return Google_Client
      */
-    private function buildClient(): Google_Client
+    private function buildClient(bool $useDevKey = true): Google_Client
     {
         $client = new Google_Client();
-
-        // set auth config
-        $client->setDeveloperKey($this->config->get('google')['youtube']['api_key']);
 
         // add scopes
         $client->addScope(\Google_Service_YouTube::YOUTUBE_READONLY);
@@ -528,6 +529,24 @@ class Manager
         $client->setAccessType('offline');
 
         return $client;
+    }
+
+    /**
+     * Configures the Google Client to either use a developer key or a client id / secret
+     * @param $useDevKey
+     */
+    private function configClientAuth($useDevKey)
+    {
+        // set auth config
+        if ($useDevKey) {
+            $this->client->setDeveloperKey($this->config->get('google')['youtube']['api_key']);
+            $this->client->setClientId('');
+            $this->client->setClientSecret('');
+        } else {
+            $this->client->setDeveloperKey('');
+            $this->client->setClientId($this->config->get('google')['youtube']['client_id']);
+            $this->client->setClientSecret($this->config->get('google')['youtube']['client_secret']);
+        }
     }
 
     /**
