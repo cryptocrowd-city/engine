@@ -8,7 +8,6 @@ namespace Minds\Core\Media\YouTubeImporter;
 use Google_Client;
 use Minds\Common\Repository\Response;
 use Minds\Core\Config\Config;
-use Minds\Core\Data\cache\abstractCacher;
 use Minds\Core\Data\Call;
 use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
@@ -21,7 +20,6 @@ use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
 use Minds\Entities\EntitiesFactory;
 use Minds\Entities\User;
 use Minds\Entities\Video;
-use Zend\Diactoros\Response\JsonResponse;
 
 /**
  * YouTube Importer Manager
@@ -45,9 +43,6 @@ class Manager
 
     /** @var Config */
     protected $config;
-
-    /** @var abstractCacher */
-    protected $cacher;
 
     /** @var QueueDelegate */
     protected $queueDelegate;
@@ -77,7 +72,6 @@ class Manager
         $queueDelegate = null,
         $entityDelegate = null,
         $save = null,
-        $cacher = null,
         $call = null,
         $config = null,
         $assets = null,
@@ -87,7 +81,6 @@ class Manager
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
         $this->mediaRepository = $mediaRepository ?: Di::_()->get('Media\Repository');
         $this->config = $config ?: Di::_()->get('Config');
-        $this->cacher = $cacher ?: Di::_()->get('Cache');
         $this->queueDelegate = $queueDelegate ?: new QueueDelegate();
         $this->entityDelegate = $entityDelegate ?: new EntityCreatorDelegate();
         $this->save = $save ?: new Save();
@@ -100,15 +93,11 @@ class Manager
 
     /**
      * Connects to a channel
-     * @param bool $getMindsToken
      * @return string
      */
-    public function connect(bool $getMindsToken = false): string
+    public function connect(): string
     {
-        if ($getMindsToken) {
-            $this->client->setRedirectUri($this->config->get('site_url')
-                . 'api/v3/media/youtube-importer/account/redirect?update_minds_token=true');
-        }
+        $this->configClientAuth(false);
         return $this->client->createAuthUrl();
     }
 
@@ -137,25 +126,19 @@ class Manager
      * Receives the access token and save to yt_connected
      * @param User $user
      * @param string $code
-     * @param bool $updateMindsToken
      */
-    public function fetchToken(User $user, string $code, bool $updateMindsToken): void
+    public function fetchToken(User $user, string $code): void
     {
-        $token = $this->client->fetchAccessTokenWithAuthCode($code);
-
-        if ($updateMindsToken) {
-            $this->cacher->set(self::CACHE_KEY, $token);
-            return;
-        }
+        // We use the user's access token only this time to get channel details
+        $this->configClientAuth(false);
+        $this->client->fetchAccessTokenWithAuthCode($code);
 
         $youtube = new \Google_Service_YouTube($this->client);
 
-        // We use the user's access token only this time to get channel details
         $channelsResponse = $youtube->channels->listChannels('id, snippet', [
             'mine' => 'true',
         ]);
 
-        // TODO: refactor this into a delegate
         $channels = $user->getYouTubeChannels();
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
@@ -214,8 +197,7 @@ class Manager
             return $this->repository->getList($opts);
         }
 
-        // Use Minds' access token
-        $this->client->setAccessToken($this->cacher->get(self::CACHE_KEY));
+        $this->configClientAuth(true);
 
         $youtube = new \Google_Service_YouTube($this->client);
 
@@ -531,34 +513,40 @@ class Manager
 
     /**
      * Creates new instance of Google_Client and adds client_id and secret
+     * @param bool $useDevKey
      * @return Google_Client
      */
-    private function buildClient(): Google_Client
+    private function buildClient(bool $useDevKey = true): Google_Client
     {
         $client = new Google_Client();
-        // set auth config
-        $client->setClientId($this->config->get('google')['youtube']['client_id']);
-        $client->setClientSecret($this->config->get('google')['youtube']['client_secret']);
 
         // add scopes
         $client->addScope(\Google_Service_YouTube::YOUTUBE_READONLY);
 
-        // TODO redirect URI should be to our youtube importer page for better UX
-        // add redirect URI
         $client->setRedirectUri($this->config->get('site_url')
             . 'api/v3/media/youtube-importer/account/redirect');
 
         $client->setAccessType('offline');
 
-        $token = $this->cacher->get(self::CACHE_KEY);
-
-        // if we have an access token and it's expired, fetch a new token
-        $expiryTime = $token['created'] + $token['expires_in'];
-        if ($expiryTime >= time()) {
-            $this->cacher->set(self::CACHE_KEY, $client->refreshToken($token['refresh_token']));
-        }
-
         return $client;
+    }
+
+    /**
+     * Configures the Google Client to either use a developer key or a client id / secret
+     * @param $useDevKey
+     */
+    private function configClientAuth($useDevKey)
+    {
+        // set auth config
+        if ($useDevKey) {
+            $this->client->setDeveloperKey($this->config->get('google')['youtube']['api_key']);
+            $this->client->setClientId('');
+            $this->client->setClientSecret('');
+        } else {
+            $this->client->setDeveloperKey('');
+            $this->client->setClientId($this->config->get('google')['youtube']['client_id']);
+            $this->client->setClientSecret($this->config->get('google')['youtube']['client_secret']);
+        }
     }
 
     /**

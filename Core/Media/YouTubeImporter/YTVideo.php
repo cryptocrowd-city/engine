@@ -94,8 +94,8 @@ class YTVideo
         $export = [
             'video_id' => $this->videoId,
             'channel_id' => $this->channelId,
-            'youtubeUrl' => $this->youtubeUrl,
-            'youtubeCreationDate' => $this->getYoutubeUrl(),
+            'youtubeUrl' => $this->getYoutubeUrl(),
+            'youtubeCreationDate' => $this->youtubeCreationDate,
             'entity' => $this->entity ? $this->entity->export() : null,
             'status' => $this->status,
             'title' => $this->title,
