@@ -37,9 +37,6 @@ class ManagerSpec extends ObjectBehavior
     /** @var Config */
     protected $config;
 
-    /** @var abstractCacher */
-    protected $cacher;
-
     /** @var QueueDelegate */
     protected $queueDelegate;
 
@@ -68,7 +65,6 @@ class ManagerSpec extends ObjectBehavior
         QueueDelegate $queueDelegate,
         EntityCreatorDelegate $entityDelegate,
         Save $save,
-        abstractCacher $cacher,
         Config $config,
         Call $call,
         VideoAssets $videoAssets,
@@ -78,7 +74,6 @@ class ManagerSpec extends ObjectBehavior
         $this->repository = $repository;
         $this->mediaRepository = $mediaRepository;
         $this->config = $config;
-        $this->cacher = $cacher;
         $this->queueDelegate = $queueDelegate;
         $this->entityDelegate = $entityDelegate;
         $this->save = $save;
@@ -95,7 +90,6 @@ class ManagerSpec extends ObjectBehavior
             $queueDelegate,
             $entityDelegate,
             $save,
-            $cacher,
             $call,
             $config,
             $videoAssets,
