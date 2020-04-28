@@ -86,14 +86,9 @@ class Controller
     {
         $token = null;
         $code = $request->getQueryParams()['code'];
-        $updateMindsToken = $request->getQueryParams()['update_minds_token'];
 
         /** @var User $user */
         $user = Session::getLoggedinUser();
-
-        if (isset($updateMindsToken) && !$user->isAdmin()) {
-            throw new UnauthorizedException();
-        }
 
         if (!isset($code)) {
             return new JsonResponse([
@@ -102,7 +97,7 @@ class Controller
             ]);
         }
 
-        $this->manager->fetchToken($user, $code, (bool) $updateMindsToken);
+        $this->manager->fetchToken($user, $code);
 
         // redirect back to the URL
         // TODO this should redirect to an URL with the youtube importer opened
