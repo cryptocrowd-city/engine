@@ -186,6 +186,7 @@ class Manager
                 'lt' => null,
                 'gt' => null,
             ],
+            'statistics' => true,
         ], $opts);
 
         if (!$this->validateChannel($opts['user'], $opts['youtube_channel_id'])) {
@@ -197,147 +198,63 @@ class Manager
             return $this->repository->getList($opts);
         }
 
-        $this->configClientAuth(true);
+        $videos = $this->getYouTubeVideos($opts);
 
-        $youtube = new \Google_Service_YouTube($this->client);
+        /** @var YTVideo $video */
+        foreach ($videos as $YTVideo) {
+            // try to find it in our db
+            $response = $this->repository->getList([
+                'youtube_id' => $YTVideo->getVideoId(),
+                'limit' => 1,
+            ])->toArray();
 
-        // get channel
-        $channelsResponse = $youtube->channels->listChannels('contentDetails', [
-            'id' => $opts['youtube_channel_id'],
-        ]);
+            if (count($response) > 0) {
+                /** @var Video $video */
+                $video = $response[0];
 
-        $videos = new Response();
-
-        foreach ($channelsResponse['items'] as $channel) {
-            $uploadsListId = $channel['contentDetails']['relatedPlaylists']['uploads'];
-
-            // get videos
-            $playlistResponse = $youtube->playlistItems->listPlaylistItems('snippet', [
-                'playlistId' => $uploadsListId,
-                'maxResults' => 50,
-            ]);
-
-            $videos->setPagingToken($playlistResponse->getNextPageToken());
-
-            // get all IDs so we can do a single query call
-            $videoIds = array_map(function ($item) {
-                return $item['snippet']['resourceId']['videoId'];
-            }, $playlistResponse['items']);
-
-            // get data on all returned videos
-            $videoResponse = $youtube->videos->listVideos('contentDetails,statistics', ['id' => implode(',', $videoIds)]);
-
-            // build video entities
-            foreach ($playlistResponse['items'] as $item) {
-                $youtubeId = $item['snippet']['resourceId']['videoId'];
-                $videoData = array_filter($videoResponse['items'], function ($item) use ($youtubeId) {
-                    return $item['id'] === $youtubeId;
-                })[0];
-
-                // try to find it in our db
-                $response = $this->repository->getList([
-                    'youtube_id' => $youtubeId,
-                    'limit' => 1,
-                ])->toArray();
-
-                $ytVideo = (new YTVideo())
-                    ->setYoutubeCreationDate(strtotime($item['snippet']['publishedAt']))
-                    ->setDuration($this->parseISO8601($videoResponse['items'][0]['contentDetails']['duration']))
-                    ->setLikes($videoData['statistics']['likeCount'])
-                    ->setDislikes($videoData['statistics']['dislikeCount'])
-                    ->setFavorites($videoData['statistics']['favoriteCount'])
-                    ->setViews($videoData['statistics']['viewCount']);
-
-                if (count($response) > 0) {
-                    /** @var Video $video */
-                    $video = $response[0];
-
-                    $ytVideo
-                        ->setEntity($video)
-                        ->setOwnerGuid($video->owner_guid)
-                        ->setOwner($video->getOwnerEntity())
-                        ->setStatus($video->getTranscodingStatus())
-                        ->setThumbnail($video->getIconUrl())
-                        ->setVideoId($video->getYoutubeId())
-                        ->setChannelId($video->getYoutubeChannelId())
-                        ->setTitle($video->getTitle())
-                        ->setDescription($video->getDescription());
-                } else {
-                    $thumbnail = $this->config->get('cdn_url') . 'api/v2/media/proxy?src=' . urlencode($item['snippet']['thumbnails']->getHigh()['url']);
-
-                    $ytVideo
-                        ->setVideoId($item['snippet']['resourceId']['videoId'])
-                        ->setChannelId($item['snippet']['channelId'])
-                        ->setDescription($item['snippet']['description'])
-                        ->setTitle($item['snippet']['title'])
-                        ->setThumbnail($thumbnail);
-                }
-                $videos[] = $ytVideo;
+                $YTVideo
+                    ->setEntity($video)
+                    ->setOwnerGuid($video->owner_guid)
+                    ->setOwner($video->getOwnerEntity())
+                    ->setStatus($video->getTranscodingStatus());
             }
         }
+
         return $videos;
     }
 
     /**
      * Initiates video import (uses Repository - queues for transcoding)
      * @param YTVideo $ytVideo
-     * @throws \IOException
-     * @throws \InvalidParameterException
      * @throws UnregisteredChannelException
+     * @throws \Exception
      */
     public function import(YTVideo $ytVideo): void
     {
         if (!$this->validateChannel($ytVideo->getOwner(), $ytVideo->getChannelId())) {
             throw new UnregisteredChannelException();
         }
-        // get and decode the data
-        parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $ytVideo->getVideoId()), $info);
 
-        $videoData = json_decode($info['player_response'], true);
+        $videos = [$ytVideo];
 
-        // get video details
-        $videoDetails = $videoData['videoDetails'];
-
-        // get streaming formats
-        $streamingDataFormats = $videoData['streamingData']['formats'];
-
-        // validate length
-        $this->videoAssets->validate(['length' => $videoDetails['lengthSeconds'] / 60]);
-
-        // find best suitable format
-        $format = [];
-        $i = 0;
-
-        $length = count(static::PREFERRED_QUALITIES);
-        while (count($format) === 0 && $i < $length) {
-            foreach ($streamingDataFormats as $f) {
-                if ($f['qualityLabel'] === static::PREFERRED_QUALITIES[$i]) {
-                    $format = $f;
-                }
-            }
-
-            $i++;
+        // if video ID is "all", we need to get all youtube videos
+        if ($ytVideo->getVideoId() === 'all') {
+            $videos = $this->getYouTubeVideos([
+                'statistics' => false,
+            ]);
         }
 
-        // create the video
-        $video = new Video();
+        foreach ($videos as $video) {
+            // try to find it in our db
+            $response = $this->repository->getList([
+                'youtube_id' => $video->getVideoId(),
+                'limit' => 1,
+            ])->toArray();
 
-        $video->patch([
-            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
-            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
-            'batch_guid' => 0,
-            'access_id' => 0,
-            'owner_guid' => $ytVideo->getOwnerGuid(),
-            'full_hd' => $ytVideo->getOwner()->isPro(),
-            'youtube_id' => $ytVideo->getVideoId(),
-            'youtube_channel_id' => $ytVideo->getChannelId(),
-            'transcoding_status' => 'queued',
-            'chosen_format_url' => $format['url'],
-        ]);
-
-        // check if we're below the threshold
-        if ($this->getOwnersEligibility([$ytVideo->getOwner()->guid])[$ytVideo->getOwner()->guid] < $this->getThreshold()) {
-            $this->queue($video);
+            // only import it if it's not been imported already
+            if (count($response) === 0) {
+                $this->importVideo($video);
+            }
         }
     }
 
@@ -509,6 +426,164 @@ class Manager
     public function getOwnersEligibility(array $ownerGuids): array
     {
         return $this->repository->getOwnersEligibility($ownerGuids);
+    }
+
+    /**
+     * Returns a list of YouTube videos
+     * @param array $opts
+     * @return Response
+     * @throws \Exception
+     */
+    private function getYouTubeVideos(array $opts): Response
+    {
+        $opts = array_merge([
+            'limit' => 50,
+            'offset' => 0,
+            'user_guid' => null,
+            'youtube_id' => null,
+            'youtube_channel_id' => null,
+            'status' => null,
+            'time_created' => [
+                'lt' => null,
+                'gt' => null,
+            ],
+            'statistics' => false,
+        ], $opts);
+
+
+        $this->configClientAuth(true);
+
+        $youtube = new \Google_Service_YouTube($this->client);
+
+        // get channel
+        $channelsResponse = $youtube->channels->listChannels('contentDetails', [
+            'id' => $opts['youtube_channel_id'],
+        ]);
+
+        $videos = new Response();
+
+        foreach ($channelsResponse['items'] as $channel) {
+            $uploadsListId = $channel['contentDetails']['relatedPlaylists']['uploads'];
+
+            // get videos
+            $playlistOpts = [
+                'playlistId' => $uploadsListId,
+                'maxResults' => 50,
+            ];
+
+            if ($opts['offset']) {
+                $playlistOpts['pageToken'] = $opts['offset'];
+            }
+
+            // get playlists
+            $playlistResponse = $youtube->playlistItems->listPlaylistItems('snippet', $playlistOpts);
+
+            $videos->setPagingToken($playlistResponse->getNextPageToken());
+
+            // get all IDs so we can do a single query call
+            $videoIds = array_map(function ($item) {
+                return $item['snippet']['resourceId']['videoId'];
+            }, $playlistResponse['items']);
+
+            // parts of the resource we'll query
+            $parts = 'contentDetails';
+
+            if ($opts['statistics']) {
+                $parts .= ',statistics';
+            }
+
+            // get data on all returned videos
+            $videoResponse = $youtube->videos->listVideos($parts, ['id' => implode(',', $videoIds)]);
+
+            // build video entities
+            foreach ($playlistResponse['items'] as $item) {
+                $youtubeId = $item['snippet']['resourceId']['videoId'];
+
+                $thumbnail = $this->config->get('cdn_url') . 'api/v2/media/proxy?src=' . urlencode($item['snippet']['thumbnails']->getHigh()['url']);
+
+                $ytVideo = (new YTVideo())
+                    ->setVideoId($item['snippet']['resourceId']['videoId'])
+                    ->setChannelId($item['snippet']['channelId'])
+                    ->setDescription($item['snippet']['description'])
+                    ->setTitle($item['snippet']['title'])
+                    ->setThumbnail($thumbnail)
+                    ->setYoutubeCreationDate(strtotime($item['snippet']['publishedAt']))
+                    ->setDuration($this->parseISO8601($videoResponse['items'][0]['contentDetails']['duration']));
+
+                if ($opts['statistics']) {
+                    $stats = array_filter($videoResponse['items'], function ($item) use ($youtubeId) {
+                        return $item['id'] === $youtubeId;
+                    })[0];
+
+                    $ytVideo->setLikes((int) $stats['statistics']['likeCount'])
+                        ->setDislikes((int) $stats['statistics']['dislikeCount'])
+                        ->setFavorites((int) $stats['statistics']['favoriteCount'])
+                        ->setViews((int) $stats['statistics']['viewCount']);
+                }
+
+                $videos[] = $ytVideo;
+            }
+        }
+        return $videos;
+    }
+
+    /**
+     * Imports a YouTube video
+     * @param YTVideo $ytVideo
+     * @return void
+     * @throws \Exception
+     */
+    private function importVideo(YTVideo $ytVideo): void
+    {
+        // get and decode the data
+        parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $ytVideo->getVideoId()), $info);
+
+        $videoData = json_decode($info['player_response'], true);
+
+        // get video details
+        $videoDetails = $videoData['videoDetails'];
+
+        // get streaming formats
+        $streamingDataFormats = $videoData['streamingData']['formats'];
+
+        // validate length
+        $this->videoAssets->validate(['length' => $videoDetails['lengthSeconds'] / 60]);
+
+        // find best suitable format
+        $format = [];
+        $i = 0;
+
+        $length = count(static::PREFERRED_QUALITIES);
+        while (count($format) === 0 && $i < $length) {
+            foreach ($streamingDataFormats as $f) {
+                if ($f['qualityLabel'] === static::PREFERRED_QUALITIES[$i]) {
+                    $format = $f;
+                }
+            }
+
+            $i++;
+        }
+
+        // create the video
+        $video = new Video();
+
+        $video->patch([
+            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
+            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
+            'batch_guid' => 0,
+            'access_id' => 0,
+            'owner_guid' => $ytVideo->getOwnerGuid(),
+            'full_hd' => $ytVideo->getOwner()->isPro(),
+            'youtube_id' => $ytVideo->getVideoId(),
+            'youtube_channel_id' => $ytVideo->getChannelId(),
+            'transcoding_status' => 'queued',
+            'chosen_format_url' => $format['url'],
+        ]);
+
+        // check if we're below the threshold
+        if ($this->getOwnersEligibility([$ytVideo->getOwner()->guid])[$ytVideo->getOwner()->guid] < $this->getThreshold()) {
+            $this->queue($video);
+        }
     }
 
     /**

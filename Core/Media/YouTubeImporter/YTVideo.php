@@ -30,16 +30,16 @@ use Minds\Traits\MagicAttributes;
  * @method YTVideo setTitle(string $value)
  * @method string getDescription()
  * @method YTVideo setDescription(string $value)
- * @method string getDuration()
- * @method YTVideo setDuration(string $value)
- * @method string getLikes()
- * @method YTVideo setLikes(string $value)
- * @method string getDislikes()
- * @method YTVideo setDislikes(string $value)
- * @method string getFavorites()
- * @method YTVideo setFavorites(string $value)
- * @method string getViews()
- * @method YTVideo setViews(string $value)
+ * @method int getDuration()
+ * @method YTVideo setDuration(int $value)
+ * @method int getLikes()
+ * @method YTVideo setLikes(int $value)
+ * @method int getDislikes()
+ * @method YTVideo setDislikes(int $value)
+ * @method int getFavorites()
+ * @method YTVideo setFavorites(int $value)
+ * @method int getViews()
+ * @method YTVideo setViews(int $value)
  * @method array getFormat()
  * @method YTVideo setFormat(string $value)
  * @method string getThumbnail()
@@ -91,7 +91,7 @@ class YTVideo
 
     public function export()
     {
-        $export = [
+        return [
             'video_id' => $this->videoId,
             'channel_id' => $this->channelId,
             'youtubeUrl' => $this->getYoutubeUrl(),
@@ -109,7 +109,5 @@ class YTVideo
             'ownerGuid' => $this->ownerGuid,
             'owner' => $this->owner ? $this->owner->export() : null,
         ];
-
-        return $export;
     }
 }
