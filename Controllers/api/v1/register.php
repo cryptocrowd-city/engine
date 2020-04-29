@@ -37,7 +37,7 @@ class register implements Interfaces\Api, Interfaces\ApiIgnorePam
     public function post($pages)
     {
         if (!isset($_POST['username']) || !isset($_POST['password']) || !isset($_POST['username']) || !isset($_POST['email'])) {
-            return Factory::response(['status' => 'Please fill out all the fields']);
+            return Factory::response(['status' => 'error', 'message' => 'Please fill out all the fields']);
         }
 
         if (!$_POST['username'] || !$_POST['password'] || !$_POST['username'] || !$_POST['email']) {
