@@ -20,6 +20,8 @@ use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
 use Minds\Entities\EntitiesFactory;
 use Minds\Entities\User;
 use Minds\Entities\Video;
+use Pubsubhubbub\Subscriber\Subscriber;
+use Zend\Diactoros\Response\JsonResponse;
 
 /**
  * YouTube Importer Manager
@@ -62,6 +64,9 @@ class Manager
     /** @var EntitiesFactory */
     protected $entitiesBuilder;
 
+    /** @var Subscriber */
+    protected $subscriber;
+
     /** @var Logger */
     protected $logger;
 
@@ -76,6 +81,7 @@ class Manager
         $config = null,
         $assets = null,
         $entitiesBuilder = null,
+        $subscriber = null,
         $logger = null
     ) {
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
@@ -88,6 +94,7 @@ class Manager
         $this->client = $client ?: $this->buildClient();
         $this->videoAssets = $assets ?: new VideoAssets();
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
+        $this->subscriber = $subscriber ?: new Subscriber('https://pubsubhubbub.appspot.com/subscribe', $this->config->get('site_url') . 'api/v3/media/youtube-importer/hook');
         $this->logger = $logger ?: Di::_()->get('Logger');
     }
 
@@ -149,6 +156,7 @@ class Manager
                     'id' => $channel['id'],
                     'title' => $channel['snippet']['title'],
                     'connected' => time(),
+                    'auto_import' => false,
                 ];
             }
         }
@@ -321,6 +329,7 @@ class Manager
     }
 
     /**
+     * Cancels a video import
      * @param User $user
      * @param string $videoId
      * @return bool
@@ -343,7 +352,6 @@ class Manager
 
     /**
      * (Un)Subscribes from YouTube's push notifications
-     * @param User $user
      * @param string $channelId
      * @param bool $subscribe
      * @return bool returns true if it succeeds
@@ -355,32 +363,36 @@ class Manager
             throw new UnregisteredChannelException();
         }
 
-        $subscribeUrl = 'https://pubsubhubbub.appspot.com/subscribe';
         $topicUrl = "https://www.youtube.com/xml/feeds/videos.xml?channel_id={$channelId}";
-        $callbackUrl = $this->config->get('site_url') . 'api/v3/media/youtube-importer/hook';
 
-        $data = [
-            'hub.mode' => $subscribe ? 'subscribe' : 'unsubscribe',
-            'hub.callback' => $callbackUrl,
-            'hub.lease_seconds' => 60 * 60 * 24 * 365,
-            'hub.topic' => $topicUrl,
-        ];
+        // update the channel if the value changed
+        $channels = $user->getYouTubeChannels();
+        $updated = false;
 
-        $opts = ['http' =>
-            [
-                'method' => 'POST',
-                'header' => 'Content-type: application/x-www-form-urlencoded',
-                'content' => http_build_query($data),
-            ],
-        ];
+        foreach ($channels as $channel) {
+            if ($channel['id'] === $channelId) {
+                if ($channel['auto_import'] === $subscribe) {
+                    return true;
+                }
 
-        $context = stream_context_create($opts);
+                $updated = $subscribe ? $this->subscriber->subscribe($topicUrl) !== false : $this->subscriber->unsubscribe($topicUrl) !== false;
 
-        @file_get_contents($subscribeUrl, false, $context);
+                // if the subscription was correctly updated
+                if ($updated) {
+                    // update and save channel
+                    $channel['auto_import'] = $subscribe;
 
-        $this->logger->info("[YouTubeImporter] " . $http_response_header);
+                    $user->updateYouTubeChannel($channel);
 
-        return preg_match('200', $http_response_header[0]) === 1;
+                    $this->save
+                        ->setEntity($user)
+                        ->save();
+                }
+                break;
+            }
+        }
+
+        return $updated;
     }
 
     /**
@@ -437,7 +449,7 @@ class Manager
     private function getYouTubeVideos(array $opts): Response
     {
         $opts = array_merge([
-            'limit' => 50,
+            'limit' => 12,
             'offset' => 0,
             'user_guid' => null,
             'youtube_id' => null,
@@ -468,7 +480,7 @@ class Manager
             // get videos
             $playlistOpts = [
                 'playlistId' => $uploadsListId,
-                'maxResults' => 50,
+                'maxResults' => $opts['limit'],
             ];
 
             if ($opts['offset']) {

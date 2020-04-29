@@ -1467,6 +1467,24 @@ class User extends \ElggUser
     }
 
     /**
+     * Updates or add a YouTube channel
+     * @param array $channel
+     */
+    public function updateYouTubeChannel(array $channel)
+    {
+        $updated = array_walk($this->attributes['yt_channels'], function (&$item) use ($channel) {
+            if ($item['id'] === $channel['id']) {
+                $item = array_replace($item, $channel);
+            }
+        });
+
+        // if it didn't update, this means it's not there, so we'll add it
+        if (!$updated) {
+            array_push($this->attributes['yt_channels'], $channel);
+        }
+    }
+
+    /**
      * Returns if the user's YouTube videos should be auto-imported
      * @return bool
      */
