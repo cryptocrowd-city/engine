@@ -4,7 +4,6 @@ namespace Spec\Minds\Core\Media\YouTubeImporter;
 
 use Minds\Common\Repository\Response;
 use Minds\Core\Config\Config;
-use Minds\Core\Data\cache\abstractCacher;
 use Minds\Core\Data\Call;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\EntitiesBuilder;
@@ -17,7 +16,6 @@ use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
 use Minds\Core\Media\YouTubeImporter\Manager;
 use Minds\Core\Media\YouTubeImporter\Repository;
 use Minds\Core\Media\YouTubeImporter\YTVideo;
-use Minds\Entities\EntitiesFactory;
 use Minds\Entities\User;
 use Minds\Entities\Video;
 use PhpSpec\ObjectBehavior;
@@ -36,9 +34,6 @@ class ManagerSpec extends ObjectBehavior
 
     /** @var Config */
     protected $config;
-
-    /** @var abstractCacher */
-    protected $cacher;
 
     /** @var QueueDelegate */
     protected $queueDelegate;
@@ -68,7 +63,6 @@ class ManagerSpec extends ObjectBehavior
         QueueDelegate $queueDelegate,
         EntityCreatorDelegate $entityDelegate,
         Save $save,
-        abstractCacher $cacher,
         Config $config,
         Call $call,
         VideoAssets $videoAssets,
@@ -78,7 +72,6 @@ class ManagerSpec extends ObjectBehavior
         $this->repository = $repository;
         $this->mediaRepository = $mediaRepository;
         $this->config = $config;
-        $this->cacher = $cacher;
         $this->queueDelegate = $queueDelegate;
         $this->entityDelegate = $entityDelegate;
         $this->save = $save;
@@ -95,7 +88,6 @@ class ManagerSpec extends ObjectBehavior
             $queueDelegate,
             $entityDelegate,
             $save,
-            $cacher,
             $call,
             $config,
             $videoAssets,
@@ -111,6 +103,20 @@ class ManagerSpec extends ObjectBehavior
 
     public function it_should_return_auth_url()
     {
+        $this->config->get('google')
+            ->shouldBeCalled()
+            ->willReturn([
+                'youtube' => [
+                    'client_id' => 'client_id',
+                    'client_secret' => 'client_secret',
+                ],
+            ]);
+        $this->client->setDeveloperKey('')
+            ->shouldBeCalled();
+        $this->client->setClientId('client_id')
+            ->shouldBeCalled();
+        $this->client->setClientSecret('client_secret')
+            ->shouldBeCalled();
         $this->client->createAuthUrl()
             ->shouldBeCalled()
             ->willReturn('url');
