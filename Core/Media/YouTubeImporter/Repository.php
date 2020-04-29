@@ -127,6 +127,7 @@ class Repository
             }
 
             $response = new Response($this->entitiesBuilder->get(['guid' => $guids]));
+            $response->setPagingToken((int) $opts['offset'] + (int) $opts['limit']);
         } catch (\Exception $e) {
             error_log('[YouTubeImporter\Repository]' . $e->getMessage());
         }
