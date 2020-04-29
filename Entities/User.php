@@ -951,6 +951,8 @@ class User extends \ElggUser
         $export['hide_share_buttons'] = $this->getHideShareButtons();
         $export['disable_autoplay_videos'] = $this->getDisableAutoplayVideos();
 
+        $export['yt_channels'] = $this->getYouTubeChannels();
+
         return $export;
     }
 

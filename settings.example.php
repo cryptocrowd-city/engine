@@ -254,8 +254,7 @@ $CONFIG->set('google', [
     ],
 
     'youtube' => [
-        'client_id' => '{{yt-client-id}}',
-        'secret' => '{{yt-secret}}',
+        'api_key' => '{{yt-api-key}}',
         'max_daily_imports' => 10
     ]
 ]);

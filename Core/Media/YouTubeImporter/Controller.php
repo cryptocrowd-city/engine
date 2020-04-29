@@ -86,14 +86,9 @@ class Controller
     {
         $token = null;
         $code = $request->getQueryParams()['code'];
-        $updateMindsToken = $request->getQueryParams()['update_minds_token'];
 
         /** @var User $user */
         $user = Session::getLoggedinUser();
-
-        if (isset($updateMindsToken) && !$user->isAdmin()) {
-            throw new UnauthorizedException();
-        }
 
         if (!isset($code)) {
             return new JsonResponse([
@@ -102,12 +97,11 @@ class Controller
             ]);
         }
 
-
-        $this->manager->fetchToken($user, $code, (bool) $updateMindsToken);
+        $this->manager->fetchToken($user, $code);
 
         // redirect back to the URL
         // TODO this should redirect to an URL with the youtube importer opened
-        header('Location: ' . filter_var($this->config->get('site_url') . 'settings/canary/other/youtube-migration/connect', FILTER_SANITIZE_URL));
+        header('Location: ' . filter_var($this->config->get('site_url') . 'settings/canary/other/youtube-migration/dashboard/available?status=setup', FILTER_SANITIZE_URL));
         exit;
     }
 
@@ -203,6 +197,28 @@ class Controller
 
         return new JsonResponse([
             'status' => 'success',
+        ]);
+    }
+
+    /**
+     * Cancels a video import
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
+    public function cancel(ServerRequest $request): JsonResponse
+    {
+        if (!isset($params['videoId'])) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'You must provide a videoId',
+            ]);
+        }
+
+        $videoId = $params['videoId'];
+
+        return new JsonResponse([
+            'status' => 'status',
+            'done' => $this->manager->cancel(Session::getLoggedinUser(), $videoId)
         ]);
     }
 

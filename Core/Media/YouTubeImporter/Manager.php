@@ -8,12 +8,12 @@ namespace Minds\Core\Media\YouTubeImporter;
 use Google_Client;
 use Minds\Common\Repository\Response;
 use Minds\Core\Config\Config;
-use Minds\Core\Data\cache\abstractCacher;
 use Minds\Core\Data\Call;
 use Minds\Core\Di\Di;
 use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Log\Logger;
 use Minds\Core\Media\Assets\Video as VideoAssets;
+use Minds\Core\Media\Repository as MediaRepository;
 use Minds\Core\Media\YouTubeImporter\Delegates\EntityCreatorDelegate;
 use Minds\Core\Media\YouTubeImporter\Delegates\QueueDelegate;
 use Minds\Core\Media\YouTubeImporter\Exceptions\UnregisteredChannelException;
@@ -37,14 +37,14 @@ class Manager
     /** @var Repository */
     protected $repository;
 
+    /** @var MediaRepository */
+    protected $mediaRepository;
+
     /** @var Google_Client */
     protected $client;
 
     /** @var Config */
     protected $config;
-
-    /** @var abstractCacher */
-    protected $cacher;
 
     /** @var QueueDelegate */
     protected $queueDelegate;
@@ -72,11 +72,11 @@ class Manager
 
     public function __construct(
         $repository = null,
+        $mediaRepository = null,
         $client = null,
         $queueDelegate = null,
         $entityDelegate = null,
         $save = null,
-        $cacher = null,
         $call = null,
         $config = null,
         $assets = null,
@@ -85,8 +85,8 @@ class Manager
         $logger = null
     ) {
         $this->repository = $repository ?: Di::_()->get('Media\YouTubeImporter\Repository');
+        $this->mediaRepository = $mediaRepository ?: Di::_()->get('Media\Repository');
         $this->config = $config ?: Di::_()->get('Config');
-        $this->cacher = $cacher ?: Di::_()->get('Cache');
         $this->queueDelegate = $queueDelegate ?: new QueueDelegate();
         $this->entityDelegate = $entityDelegate ?: new EntityCreatorDelegate();
         $this->save = $save ?: new Save();
@@ -100,15 +100,11 @@ class Manager
 
     /**
      * Connects to a channel
-     * @param bool $getMindsToken
      * @return string
      */
-    public function connect(bool $getMindsToken = false): string
+    public function connect(): string
     {
-        if ($getMindsToken) {
-            $this->client->setRedirectUri($this->config->get('site_url')
-                . 'api/v3/media/youtube-importer/account/redirect?update_minds_token=true');
-        }
+        $this->configClientAuth(false);
         return $this->client->createAuthUrl();
     }
 
@@ -137,25 +133,19 @@ class Manager
      * Receives the access token and save to yt_connected
      * @param User $user
      * @param string $code
-     * @param bool $updateMindsToken
      */
-    public function fetchToken(User $user, string $code, bool $updateMindsToken): void
+    public function fetchToken(User $user, string $code): void
     {
-        $token = $this->client->fetchAccessTokenWithAuthCode($code);
-
-        if ($updateMindsToken) {
-            $this->cacher->set(self::CACHE_KEY, $token);
-            return;
-        }
+        // We use the user's access token only this time to get channel details
+        $this->configClientAuth(false);
+        $this->client->fetchAccessTokenWithAuthCode($code);
 
         $youtube = new \Google_Service_YouTube($this->client);
 
-        // We use the user's access token only this time to get channel details
         $channelsResponse = $youtube->channels->listChannels('id, snippet', [
             'mine' => 'true',
         ]);
 
-        // TODO: refactor this into a delegate
         $channels = $user->getYouTubeChannels();
         foreach ($channelsResponse['items'] as $channel) {
             // only add the channel if it's not already registered
@@ -204,6 +194,7 @@ class Manager
                 'lt' => null,
                 'gt' => null,
             ],
+            'statistics' => true,
         ], $opts);
 
         if (!$this->validateChannel($opts['user'], $opts['youtube_channel_id'])) {
@@ -215,129 +206,63 @@ class Manager
             return $this->repository->getList($opts);
         }
 
-        // Use Minds' access token
-        $this->client->setAccessToken($this->cacher->get(self::CACHE_KEY));
+        $videos = $this->getYouTubeVideos($opts);
 
-        $youtube = new \Google_Service_YouTube($this->client);
+        /** @var YTVideo $video */
+        foreach ($videos as $YTVideo) {
+            // try to find it in our db
+            $response = $this->repository->getList([
+                'youtube_id' => $YTVideo->getVideoId(),
+                'limit' => 1,
+            ])->toArray();
 
-        // get channel
-        $channelsResponse = $youtube->channels->listChannels('contentDetails', [
-            'id' => $opts['youtube_channel_id'],
-        ]);
+            if (count($response) > 0) {
+                /** @var Video $video */
+                $video = $response[0];
 
-        $videos = new Response();
-
-        foreach ($channelsResponse['items'] as $channel) {
-            $uploadsListId = $channel['contentDetails']['relatedPlaylists']['uploads'];
-
-            // get videos
-            $playlistResponse = $youtube->playlistItems->listPlaylistItems('snippet', [
-                'playlistId' => $uploadsListId,
-                'maxResults' => 50,
-            ]);
-
-            $videos->setPagingToken($playlistResponse->getNextPageToken());
-
-            foreach ($playlistResponse['items'] as $item) {
-                $youtubeId = $item['snippet']['resourceId']['videoId'];
-
-                // try to find it in our db
-                $response = $this->repository->getList([
-                    'youtube_id' => $youtubeId,
-                    'limit' => 1,
-                ])->toArray();
-
-                $ytVideo = new YTVideo();
-                if (count($response) > 0) {
-                    /** @var Video $video */
-                    $video = $response[0];
-
-                    $ytVideo
-                        ->setEntity($video)
-                        ->setOwnerGuid($video->owner_guid)
-                        ->setOwner($video->getOwnerEntity())
-                        ->setStatus($video->getTranscodingStatus())
-                        ->setThumbnail($video->getIconUrl())
-                        ->setVideoId($video->getYoutubeId())
-                        ->setChannelId($video->getYoutubeChannelId())
-                        ->setTitle($video->getTitle())
-                        ->setDescription($video->getDescription());
-                } else {
-                    $thumbnail = $this->config->get('cdn_url') . 'api/v2/media/proxy?src=' . urlencode($item['snippet']['thumbnails']->getHigh()['url']);
-
-                    $ytVideo
-                        ->setVideoId($item['snippet']['resourceId']['videoId'])
-                        ->setChannelId($item['snippet']['channelId'])
-                        ->setDescription($item['snippet']['description'])
-                        ->setTitle($item['snippet']['title'])
-                        ->setThumbnail($thumbnail);
-                }
-                $videos[] = $ytVideo;
+                $YTVideo
+                    ->setEntity($video)
+                    ->setOwnerGuid($video->owner_guid)
+                    ->setOwner($video->getOwnerEntity())
+                    ->setStatus($video->getTranscodingStatus());
             }
         }
+
         return $videos;
     }
 
     /**
      * Initiates video import (uses Repository - queues for transcoding)
      * @param YTVideo $ytVideo
-     * @throws \IOException
-     * @throws \InvalidParameterException
      * @throws UnregisteredChannelException
+     * @throws \Exception
      */
     public function import(YTVideo $ytVideo): void
     {
         if (!$this->validateChannel($ytVideo->getOwner(), $ytVideo->getChannelId())) {
             throw new UnregisteredChannelException();
         }
-        // get and decode the data
-        parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $ytVideo->getVideoId()), $info);
 
-        $videoData = json_decode($info['player_response'], true);
+        $videos = [$ytVideo];
 
-        // get video details
-        $videoDetails = $videoData['videoDetails'];
-
-        // get streaming formats
-        $streamingDataFormats = $videoData['streamingData']['formats'];
-
-        // validate length
-        $this->videoAssets->validate(['length' => $videoDetails['lengthSeconds'] / 60]);
-
-        // find best suitable format
-        $format = [];
-        $i = 0;
-
-        $length = count(static::PREFERRED_QUALITIES);
-        while (count($format) === 0 && $i < $length) {
-            foreach ($streamingDataFormats as $f) {
-                if ($f['qualityLabel'] === static::PREFERRED_QUALITIES[$i]) {
-                    $format = $f;
-                }
-            }
-
-            $i++;
+        // if video ID is "all", we need to get all youtube videos
+        if ($ytVideo->getVideoId() === 'all') {
+            $videos = $this->getYouTubeVideos([
+                'statistics' => false,
+            ]);
         }
 
-        // create the video
-        $video = new Video();
+        foreach ($videos as $video) {
+            // try to find it in our db
+            $response = $this->repository->getList([
+                'youtube_id' => $video->getVideoId(),
+                'limit' => 1,
+            ])->toArray();
 
-        $video->patch([
-            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
-            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
-            'batch_guid' => 0,
-            'access_id' => 0,
-            'owner_guid' => $ytVideo->getOwnerGuid(),
-            'full_hd' => $ytVideo->getOwner()->isPro(),
-            'youtube_id' => $ytVideo->getVideoId(),
-            'youtube_channel_id' => $ytVideo->getChannelId(),
-            'transcoding_status' => 'queued',
-            'chosen_format_url' => $format['url'],
-        ]);
-
-        // check if we're below the threshold
-        if ($this->getOwnersEligibility([$ytVideo->getOwner()->guid])[$ytVideo->getOwner()->guid] < $this->getThreshold()) {
-            $this->queue($video);
+            // only import it if it's not been imported already
+            if (count($response) === 0) {
+                $this->importVideo($video);
+            }
         }
     }
 
@@ -404,8 +329,29 @@ class Manager
     }
 
     /**
-     * (Un)Subscribes from YouTube's push notifications
+     * Cancels a video import
      * @param User $user
+     * @param string $videoId
+     * @return bool
+     * @throws \Exception
+     */
+    public function cancel(User $user, string $videoId): bool
+    {
+        $response = $this->repository->getList([
+            'youtube_id' => $videoId,
+            'limit' => 1,
+        ])->toArray();
+
+        $deleted = false;
+        if (count($response) > 0 && $response[0]->getOwnerGUID() === $user->getGUID()) {
+            $deleted = $this->mediaRepository->delete($response[0]->getGUID());
+        }
+
+        return $deleted;
+    }
+
+    /**
+     * (Un)Subscribes from YouTube's push notifications
      * @param string $channelId
      * @param bool $subscribe
      * @return bool returns true if it succeeds
@@ -495,44 +441,199 @@ class Manager
     }
 
     /**
+     * Returns a list of YouTube videos
+     * @param array $opts
+     * @return Response
+     * @throws \Exception
+     */
+    private function getYouTubeVideos(array $opts): Response
+    {
+        $opts = array_merge([
+            'limit' => 12,
+            'offset' => 0,
+            'user_guid' => null,
+            'youtube_id' => null,
+            'youtube_channel_id' => null,
+            'status' => null,
+            'time_created' => [
+                'lt' => null,
+                'gt' => null,
+            ],
+            'statistics' => false,
+        ], $opts);
+
+
+        $this->configClientAuth(true);
+
+        $youtube = new \Google_Service_YouTube($this->client);
+
+        // get channel
+        $channelsResponse = $youtube->channels->listChannels('contentDetails', [
+            'id' => $opts['youtube_channel_id'],
+        ]);
+
+        $videos = new Response();
+
+        foreach ($channelsResponse['items'] as $channel) {
+            $uploadsListId = $channel['contentDetails']['relatedPlaylists']['uploads'];
+
+            // get videos
+            $playlistOpts = [
+                'playlistId' => $uploadsListId,
+                'maxResults' => $opts['limit'],
+            ];
+
+            if ($opts['offset']) {
+                $playlistOpts['pageToken'] = $opts['offset'];
+            }
+
+            // get playlists
+            $playlistResponse = $youtube->playlistItems->listPlaylistItems('snippet', $playlistOpts);
+
+            $videos->setPagingToken($playlistResponse->getNextPageToken());
+
+            // get all IDs so we can do a single query call
+            $videoIds = array_map(function ($item) {
+                return $item['snippet']['resourceId']['videoId'];
+            }, $playlistResponse['items']);
+
+            // parts of the resource we'll query
+            $parts = 'contentDetails';
+
+            if ($opts['statistics']) {
+                $parts .= ',statistics';
+            }
+
+            // get data on all returned videos
+            $videoResponse = $youtube->videos->listVideos($parts, ['id' => implode(',', $videoIds)]);
+
+            // build video entities
+            foreach ($playlistResponse['items'] as $item) {
+                $youtubeId = $item['snippet']['resourceId']['videoId'];
+
+                $thumbnail = $this->config->get('cdn_url') . 'api/v2/media/proxy?src=' . urlencode($item['snippet']['thumbnails']->getHigh()['url']);
+
+                $ytVideo = (new YTVideo())
+                    ->setVideoId($item['snippet']['resourceId']['videoId'])
+                    ->setChannelId($item['snippet']['channelId'])
+                    ->setDescription($item['snippet']['description'])
+                    ->setTitle($item['snippet']['title'])
+                    ->setThumbnail($thumbnail)
+                    ->setYoutubeCreationDate(strtotime($item['snippet']['publishedAt']))
+                    ->setDuration($this->parseISO8601($videoResponse['items'][0]['contentDetails']['duration']));
+
+                if ($opts['statistics']) {
+                    $stats = array_filter($videoResponse['items'], function ($item) use ($youtubeId) {
+                        return $item['id'] === $youtubeId;
+                    })[0];
+
+                    $ytVideo->setLikes((int) $stats['statistics']['likeCount'])
+                        ->setDislikes((int) $stats['statistics']['dislikeCount'])
+                        ->setFavorites((int) $stats['statistics']['favoriteCount'])
+                        ->setViews((int) $stats['statistics']['viewCount']);
+                }
+
+                $videos[] = $ytVideo;
+            }
+        }
+        return $videos;
+    }
+
+    /**
+     * Imports a YouTube video
+     * @param YTVideo $ytVideo
+     * @return void
+     * @throws \Exception
+     */
+    private function importVideo(YTVideo $ytVideo): void
+    {
+        // get and decode the data
+        parse_str(file_get_contents("https://youtube.com/get_video_info?video_id=" . $ytVideo->getVideoId()), $info);
+
+        $videoData = json_decode($info['player_response'], true);
+
+        // get video details
+        $videoDetails = $videoData['videoDetails'];
+
+        // get streaming formats
+        $streamingDataFormats = $videoData['streamingData']['formats'];
+
+        // validate length
+        $this->videoAssets->validate(['length' => $videoDetails['lengthSeconds'] / 60]);
+
+        // find best suitable format
+        $format = [];
+        $i = 0;
+
+        $length = count(static::PREFERRED_QUALITIES);
+        while (count($format) === 0 && $i < $length) {
+            foreach ($streamingDataFormats as $f) {
+                if ($f['qualityLabel'] === static::PREFERRED_QUALITIES[$i]) {
+                    $format = $f;
+                }
+            }
+
+            $i++;
+        }
+
+        // create the video
+        $video = new Video();
+
+        $video->patch([
+            'title' => isset($videoDetails['title']) ? $videoDetails['title'] : '',
+            'description' => isset($videoDetails['description']) ? $videoDetails['description'] : '',
+            'batch_guid' => 0,
+            'access_id' => 0,
+            'owner_guid' => $ytVideo->getOwnerGuid(),
+            'full_hd' => $ytVideo->getOwner()->isPro(),
+            'youtube_id' => $ytVideo->getVideoId(),
+            'youtube_channel_id' => $ytVideo->getChannelId(),
+            'transcoding_status' => 'queued',
+            'chosen_format_url' => $format['url'],
+        ]);
+
+        // check if we're below the threshold
+        if ($this->getOwnersEligibility([$ytVideo->getOwner()->guid])[$ytVideo->getOwner()->guid] < $this->getThreshold()) {
+            $this->queue($video);
+        }
+    }
+
+    /**
      * Creates new instance of Google_Client and adds client_id and secret
+     * @param bool $useDevKey
      * @return Google_Client
      */
-    private function buildClient(): Google_Client
+    private function buildClient(bool $useDevKey = true): Google_Client
     {
         $client = new Google_Client();
-        // set auth config
-        $client->setClientId($this->config->get('google')['youtube']['client_id']);
-        $client->setClientSecret($this->config->get('google')['youtube']['client_secret']);
 
         // add scopes
         $client->addScope(\Google_Service_YouTube::YOUTUBE_READONLY);
 
-        // TODO redirect URI should be to our youtube importer page for better UX
-        // add redirect URI
         $client->setRedirectUri($this->config->get('site_url')
             . 'api/v3/media/youtube-importer/account/redirect');
 
         $client->setAccessType('offline');
 
-        // cache this
-        //        $token = $this->config->get('google')['youtube']['oauth_token'];
-        //
-        //        if (is_string($token)) {
-        //            $token = json_decode($token);
-        //        }
-        $token = $this->cacher->get(self::CACHE_KEY);
-        //        if (!$this->cacher->get(self::CACHE_KEY)) {
-        //            $this->cacher->set(self::CACHE_KEY, $token);
-        //        }
-
-        // if we have an access token and it's expired, fetch a new token
-        $expiryTime = $token['created'] + $token['expires_in'];
-        if ($expiryTime >= time()) {
-            $this->cacher->set(self::CACHE_KEY, $client->refreshToken($token['refresh_token']));
-        }
-
         return $client;
+    }
+
+    /**
+     * Configures the Google Client to either use a developer key or a client id / secret
+     * @param $useDevKey
+     */
+    private function configClientAuth($useDevKey)
+    {
+        // set auth config
+        if ($useDevKey) {
+            $this->client->setDeveloperKey($this->config->get('google')['youtube']['api_key']);
+            $this->client->setClientId('');
+            $this->client->setClientSecret('');
+        } else {
+            $this->client->setDeveloperKey('');
+            $this->client->setClientId($this->config->get('google')['youtube']['client_id']);
+            $this->client->setClientSecret($this->config->get('google')['youtube']['client_secret']);
+        }
     }
 
     /**
@@ -546,5 +647,15 @@ class Manager
         return count(array_filter($user->getYouTubeChannels(), function ($value) use ($channelId) {
             return $value['id'] === $channelId;
         })) !== 0;
+    }
+
+    /**
+     * returns duration in seconds
+     * @param string $duration
+     * @return int
+     */
+    private function parseISO8601(string $duration): int
+    {
+        return (new \DateTime('@0'))->add(new \DateInterval($duration))->getTimestamp();
     }
 }
