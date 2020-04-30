@@ -158,7 +158,7 @@ class Repository
                 'aggs' => [
                     'counts' => [
                         'terms' => [
-                            'field' => 'transcoding_status.keyword',
+                            'field' => 'transcoding_status',
                         ],
                     ],
                 ],
@@ -169,10 +169,14 @@ class Repository
         $prepared->query($query);
         $result = $this->client->request($prepared);
 
-        $response = [];
+        $response = [
+            'queued' => 0,
+            'transferring' => 0
+        ];
         if ($result['aggregations']['counts']['buckets']) {
             foreach ($result['aggregations']['counts']['buckets'] as $bucket) {
-                $key = $bucket['key'];
+                $key = $bucket['key'] === 'queued' ? 'queued' : 'transferring';
+
                 $response[$key] = $bucket['doc_count'];
             }
         }
