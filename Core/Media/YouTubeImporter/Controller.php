@@ -8,7 +8,6 @@ namespace Minds\Core\Media\YouTubeImporter;
 use Minds\Api\Exportable;
 use Minds\Core\Config\Config;
 use Minds\Core\Di\Di;
-use Minds\Core\Router\Exceptions\UnauthorizedException;
 use Minds\Core\Session;
 use Minds\Entities\User;
 use Zend\Diactoros\Response\JsonResponse;
@@ -122,6 +121,7 @@ class Controller
         }
 
         $channelId = $queryParams['channelId'];
+        $youtubeId = $queryParams['youtubeId'] ?? null;
 
         $status = $queryParams['status'] ?? null;
 
@@ -132,6 +132,7 @@ class Controller
             $videos = $this->manager->getVideos([
                 'user' => $user,
                 'user_guid' => $user->guid,
+                'youtube_id' => $youtubeId,
                 'youtube_channel_id' => $channelId,
                 'status' => $status,
             ]);
@@ -147,6 +148,19 @@ class Controller
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Returns a count of videos by status
+     * @param ServerRequest $request
+     * @return JsonResponse
+     */
+    public function getCount(ServerRequest $request): JsonResponse
+    {
+        return new JsonResponse([
+            'status' => 'success',
+            'counts' => $this->manager->getCount(Session::getLoggedinUser()),
+        ]);
     }
 
     /**
