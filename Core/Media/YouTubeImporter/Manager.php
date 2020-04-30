@@ -236,6 +236,16 @@ class Manager
     }
 
     /**
+     * Returns videos count by transcoding_status for a user
+     * @param User $user
+     * @return array
+     */
+    public function getCount(User $user): array
+    {
+        return $this->repository->getCount($user);
+    }
+
+    /**
      * Initiates video import (uses Repository - queues for transcoding)
      * @param YTVideo $ytVideo
      * @throws UnregisteredChannelException

@@ -13,6 +13,7 @@ use Minds\Core\Data\ElasticSearch\Prepared\Search;
 use Minds\Core\Di\Di;
 use Minds\Core\EntitiesBuilder;
 use Minds\Entities\Entity;
+use Minds\Entities\User;
 
 /**
  * YouTube Importer Repository
@@ -130,6 +131,50 @@ class Repository
             $response->setPagingToken((int) $opts['offset'] + (int) $opts['limit']);
         } catch (\Exception $e) {
             error_log('[YouTubeImporter\Repository]' . $e->getMessage());
+        }
+
+        return $response;
+    }
+
+    public function getCount(User $user): array
+    {
+        $statuses = ['queued', 'transcoding'];
+
+        $response = ['queued' => 0, 'transcoding' => 0];
+
+        foreach ($statuses as $status) {
+            $query = [
+                'index' => 'minds_badger',
+                'type' => 'object:video',
+                'body' => [
+                    'query' => [
+                        'bool' => [
+                            'filter' => [
+                                [
+                                    'term' => [
+                                        'transcoding_status' => $status,
+                                    ],
+                                ],
+                                [
+                                    'term' => [
+                                        'owner_guid' => $user->getGUID(),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+
+            $prepared = new Count();
+            $prepared->query($query);
+
+            try {
+                $result = $this->client->request($prepared);
+                $response[$status] = $result['count'];
+            } catch (\Exception $e) {
+                error_log('[YouTubeImporter\Repository]' . $e->getMessage());
+            }
         }
 
         return $response;

@@ -48,6 +48,12 @@ class Routes extends ModuleRoutes
                     Ref::_('Media\YouTubeImporter\Controller', 'getVideos')
                 );
 
+                // returns a count of videos by status
+                $route->get(
+                    'videos/count',
+                    Ref::_('Media\YouTubeImporter\Controller', 'getCount')
+                );
+
                 // imports a video
                 $route->post(
                     'videos/import',
