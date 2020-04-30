@@ -122,6 +122,7 @@ class Controller
         }
 
         $channelId = $queryParams['channelId'];
+        $youtubeId = $queryParams['youtubeId'] ?? null;
 
         $status = $queryParams['status'] ?? null;
 
@@ -132,6 +133,7 @@ class Controller
             $videos = $this->manager->getVideos([
                 'user' => $user,
                 'user_guid' => $user->guid,
+                'youtube_id' => $youtubeId,
                 'youtube_channel_id' => $channelId,
                 'status' => $status,
             ]);
