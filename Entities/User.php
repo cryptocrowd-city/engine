@@ -105,30 +105,24 @@ class User extends \ElggUser
      */
     public function addHashtag(string $hashtag): User
     {
-        if (!in_array($hashtag, $this->getHashtags(), true)
-            && count($this->getHashtags()) < 5
-        ) {
-            $this->setHashtags(
-                array_merge($this->getHashtags(), [$hashtag])
-            );
-        }
+        $this->setHashtags(
+            array_merge($this->getHashtags(), [$hashtag])
+        );
         return $this;
     }
 
     /**
      * Removes a hashtag to the tags array by string content.
-     * @param string $hashtag - string of the hashtag e.g. #OpenSource.
+     * @param string $hashtag - string of the hashtag e.g. #OpenSource.f
      * @return User allows chaining.
      */
     public function removeHashtag($hashtag): User
     {
-        if (in_array($hashtag, $this->getHashtags(), true)) {
-            $this->setHashtags(
-                array_values(
-                    array_diff($this->getHashtags(), [$hashtag])
-                )
-            );
-        }
+        $this->setHashtags(
+            array_values(
+                array_diff($this->getHashtags(), [$hashtag])
+            )
+        );
         return $this;
     }
 
