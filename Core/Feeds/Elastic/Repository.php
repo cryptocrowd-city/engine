@@ -18,6 +18,7 @@ class Repository
         '30d' => 2592000,
         '1y' => 31536000,
         'all' => -1,
+        'relevant'=> -1,
     ];
 
     /** @var ElasticsearchClient */
@@ -72,6 +73,7 @@ class Repository
             'pinned_guids' => null,
             'future' => false,
             'exclude' => null,
+            'pending' => false,
         ], $opts);
 
         if (!$opts['type']) {
@@ -88,36 +90,6 @@ class Repository
 
         $type = $opts['type'];
 
-        $body = [
-            '_source' => array_unique([
-                'guid',
-                'owner_guid',
-                '@timestamp',
-                'time_created',
-                'access_id',
-                'moderator_guid',
-                $this->getSourceField($type),
-            ]),
-            'query' => [
-                'function_score' => [
-                    'query' => [
-                        'bool' => [
-                            //'must_not' => [ ],
-                        ],
-                    ],
-                    "score_mode" => "sum",
-                    'functions' => [
-                        [
-                            'filter' => [
-                                'match_all' => (object) [],
-                            ],
-                            'weight' => 1,
-                        ],
-                    ],
-                ],
-            ],
-            'sort' => [],
-        ];
 
         //
 
@@ -145,6 +117,38 @@ class Repository
         }
 
         $algorithm->setPeriod($opts['period']);
+
+        $body = [
+            '_source' => array_unique([
+                'guid',
+                'owner_guid',
+                '@timestamp',
+                'time_created',
+                'access_id',
+                'moderator_guid',
+                $this->getSourceField($type),
+            ]),
+            'query' => [
+                'function_score' => [
+                    'query' => [
+                        'bool' => [
+                            //'must_not' => [ ],
+                        ],
+                    ],
+                    "score_mode" => $algorithm->getScoreMode(),
+                    'functions' => [
+                        [
+                            'filter' => [
+                                'match_all' => (object) [],
+                            ],
+                            'weight' => 1,
+                        ],
+                    ],
+                ],
+            ],
+            'sort' => [],
+        ];
+
 
         //
 
@@ -261,6 +265,14 @@ class Repository
                     'access_id' => [
                         'gt' => 2,
                     ]
+                ]
+            ];
+        }
+
+        if ($opts['pending'] === false) {
+            $body['query']['function_score']['query']['bool']['must_not'][] = [
+                'term' => [
+                    'pending' => true,
                 ]
             ];
         }
@@ -394,6 +406,12 @@ class Repository
                     ],
                 ],
             ];
+        }
+
+        if ($functionScores = $algorithm->getFunctionScores()) {
+            foreach ($functionScores as $functionScore) {
+                $body['query']['function_score']['functions'][] = $functionScore;
+            }
         }
 
         //

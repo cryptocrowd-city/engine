@@ -127,7 +127,6 @@ $CONFIG->set(
   ]
 );
 
-
 /**
  * Other Elgg Settings
  */
@@ -635,3 +634,15 @@ $CONFIG->set('captcha', [
     'jwt_secret' => '{{site-secret}}',
     'bypass_key' => '{{site-secret}}',
 ]);
+
+$CONFIG->set('cypress', [
+    'shared_key' => '{{site-secret}}',
+]);
+
+$CONFIG->set('sendwyre', [
+    'baseUrl' => 'https://pay.sendwyre.com/',
+    'accountId' => '',
+]);
+
+$CONFIG->set('onboarding_modal_timestamp', 0);
+$CONFIG->set('onboarding_v2_timestamp', 0);

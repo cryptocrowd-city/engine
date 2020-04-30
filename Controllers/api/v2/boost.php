@@ -297,7 +297,7 @@ class boost implements Interfaces\Api
                         ]);
                     }
                   
-                    if ($manager->isBoostLimitExceededBy($boost)) {
+                    if ($state !== 'pending' && $manager->isBoostLimitExceededBy($boost)) {
                         $maxDaily = Di::_()->get('Config')->get('max_daily_boost_views') / 1000;
                         return Factory::response([
                             'status' => 'error',
