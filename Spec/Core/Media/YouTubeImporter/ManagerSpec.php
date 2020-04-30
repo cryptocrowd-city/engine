@@ -263,6 +263,22 @@ class ManagerSpec extends ObjectBehavior
         $this->receiveNewVideo($video);
     }
 
+    public function it_should_get_a_count_of_videos(User $user)
+    {
+        $this->repository->getCount($user)
+            ->shouldBeCalled()
+            ->willReturn([
+                'queued' => 3,
+                'transcoding' => 3,
+            ]);
+
+        $this->getCount($user)
+            ->shouldReturn([
+                'queued' => 3,
+                'transcoding' => 3,
+            ]);
+    }
+
 
     public function it_should_get_owners_elegibility()
     {

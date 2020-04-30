@@ -206,7 +206,11 @@ class Manager
             return $this->repository->getList($opts);
         }
 
-        $videos = $this->getYouTubeVideos($opts);
+        if (isset($opts['youtube_id'])) {
+            $videos = $this->getYouTubeVideo($opts);
+        } else {
+            $videos = $this->getYouTubeVideos($opts);
+        }
 
         /** @var YTVideo $video */
         foreach ($videos as $YTVideo) {
@@ -229,6 +233,16 @@ class Manager
         }
 
         return $videos;
+    }
+
+    /**
+     * Returns videos count by transcoding_status for a user
+     * @param User $user
+     * @return array
+     */
+    public function getCount(User $user): array
+    {
+        return $this->repository->getCount($user);
     }
 
     /**
@@ -440,6 +454,62 @@ class Manager
         return $this->repository->getOwnersEligibility($ownerGuids);
     }
 
+    private function buildYouTubeVideoEntity($values): YTVideo
+    {
+        $video = new YTVideo();
+
+        $thumbnail = $this->config->get('cdn_url') . 'api/v2/media/proxy?src=' . urlencode($values['snippet']['thumbnails']->getHigh()['url']);
+
+        if (isset($values['contentDetails'])) {
+            $video
+                ->setVideoId($values['id'])
+                ->setChannelId($values['channelId'])
+                ->setDescription($values['snippet']['description'])
+                ->setTitle($values['snippet']['title'])
+                ->setThumbnail($thumbnail)
+                ->setYoutubeCreationDate(strtotime($values['snippet']['publishedAt']))
+                ->setDuration($this->parseISO8601($values['contentDetails']['duration']));
+
+            if ($values['statistics']) {
+                $video->setLikes((int) $values['statistics']['likeCount'])
+                    ->setDislikes((int) $values['statistics']['dislikeCount'])
+                    ->setFavorites((int) $values['statistics']['favoriteCount'])
+                    ->setViews((int) $values['statistics']['viewCount']);
+            }
+        }
+
+        return $video;
+    }
+
+    private function getYouTubeVideo(array $opts): Response
+    {
+        $opts = array_merge([
+            'youtube_id' => null,
+            'statistics' => false,
+        ], $opts);
+
+        $this->configClientAuth(true);
+
+        $youtube = new \Google_Service_YouTube($this->client);
+
+        $videos = new Response();
+
+        // parts of the resource we'll query
+        $parts = 'snippet,contentDetails';
+
+        if ($opts['statistics']) {
+            $parts .= ',statistics';
+        }
+
+        $response = $youtube->videos->listVideos($parts, ['id' => $opts['youtube_id']]);
+
+        foreach ($response['items'] as $item) {
+            $videos[] = $this->buildYouTubeVideoEntity($item);
+        }
+
+        return $videos;
+    }
+
     /**
      * Returns a list of YouTube videos
      * @param array $opts
@@ -461,7 +531,6 @@ class Manager
             ],
             'statistics' => false,
         ], $opts);
-
 
         $this->configClientAuth(true);
 
@@ -533,7 +602,22 @@ class Manager
                         ->setViews((int) $stats['statistics']['viewCount']);
                 }
 
-                $videos[] = $ytVideo;
+                $currentVideo = array_filter($videoResponse['items'], function ($item) use ($youtubeId) {
+                    return $item['id'] === $youtubeId;
+                })[0];
+
+                $values = [
+                    'id' => $item['snippet']['resourceId']['videoId'],
+                    'channelId' => $item['snippet']['channelId'],
+                    'snippet' => $item['snippet'],
+                    'contentDetails' => $currentVideo['contentDetails'],
+                ];
+
+                if ($opts['statistics']) {
+                    $values['statistics'] = $currentVideo['statistics'];
+                }
+
+                $videos[] = $this->buildYouTubeVideoEntity($values);
             }
         }
         return $videos;
