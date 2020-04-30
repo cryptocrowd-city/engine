@@ -7,6 +7,7 @@ use Minds\Core\Config\Config;
 use Minds\Core\Data\ElasticSearch\Client;
 use Minds\Core\EntitiesBuilder;
 use Minds\Core\Media\YouTubeImporter\Repository;
+use Minds\Entities\User;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -53,6 +54,23 @@ class RepositorySpec extends ObjectBehavior
             'youtube_id' => 'test123',
         ])
             ->shouldReturnAnInstanceOf(Response::class);
+    }
+
+    public function it_should_get_a_count_of_videos_by_status(User $user)
+    {
+        $user->getGUID()
+            ->shouldBeCalled()
+            ->willReturn('1');
+
+        $this->client->request(Argument::any())
+            ->shouldBeCalledTimes(2)
+            ->willReturn(['count' => 3]);
+
+        $this->getCount($user)
+            ->shouldReturn([
+                'queued' => 3,
+                'transcoding' => 3,
+            ]);
     }
 
     public function it_should_get_owners_eligibility()
