@@ -259,10 +259,9 @@ class Manager
      * @param string $filter
      * @return Response
      */
-    public function getSearch(string $query, string $filter): Response
+    public function getSearch(string $query, string $filter, string $type = 'activity'): Response
     {
         $algorithm = 'latest';
-        $type = 'activity';
 
         switch ($filter) {
             case 'top':
