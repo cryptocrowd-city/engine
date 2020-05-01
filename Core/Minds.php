@@ -39,6 +39,7 @@ class Minds extends base
         Discovery\Module::class,
         Monetization\Partners\Module::class,
         Media\YouTubeImporter\Module::class,
+        DismissibleWidgets\Module::class,
     ];
 
     /**
