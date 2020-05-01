@@ -665,6 +665,7 @@ class Manager
             'batch_guid' => 0,
             'access_id' => 0,
             'owner_guid' => $ytVideo->getOwnerGuid(),
+            'container_guid' => $ytVideo->getOwnerGuid(),
             'full_hd' => $ytVideo->getOwner()->isPro(),
             'youtube_id' => $ytVideo->getVideoId(),
             'youtube_channel_id' => $ytVideo->getChannelId(),
