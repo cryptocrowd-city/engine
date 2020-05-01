@@ -538,7 +538,7 @@ class Manager
     {
         $opts = array_merge([
             'limit' => 12,
-            'offset' => 0,
+            'offset' => null,
             'user_guid' => null,
             'youtube_id' => null,
             'youtube_channel_id' => null,
