@@ -326,6 +326,9 @@ class Manager
 
         $this->logger->info("[YouTubeImporter] Initiating upload to S3 ({$video->guid}) \n");
 
+        $video->patch([
+            'access_id' => 2,
+        ]);
         $video->setAssets($this->videoAssets->upload($media, []));
 
         $this->logger->info("[YouTubeImporter] Saving video ({$video->guid}) \n");
