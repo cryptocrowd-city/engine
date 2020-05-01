@@ -138,7 +138,6 @@ class Repository
 
     public function getCount(User $user): array
     {
-
         $query = [
             'index' => 'minds_badger',
             'type' => 'object:video',

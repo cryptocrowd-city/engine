@@ -463,22 +463,28 @@ class Manager
 
         $thumbnail = $this->config->get('cdn_url') . 'api/v2/media/proxy?src=' . urlencode($values['snippet']['thumbnails']->getHigh()['url']);
 
-        if (isset($values['contentDetails'])) {
+        $video
+            ->setVideoId($values['id'])
+            ->setChannelId($values['channelId'])
+            ->setThumbnail($thumbnail);
+
+        if (isset($values['snippet'])) {
             $video
-                ->setVideoId($values['id'])
-                ->setChannelId($values['channelId'])
                 ->setDescription($values['snippet']['description'])
                 ->setTitle($values['snippet']['title'])
-                ->setThumbnail($thumbnail)
-                ->setYoutubeCreationDate(strtotime($values['snippet']['publishedAt']))
-                ->setDuration($this->parseISO8601($values['contentDetails']['duration']));
+                ->setYoutubeCreationDate(strtotime($values['snippet']['publishedAt']));
+        }
 
-            if ($values['statistics']) {
-                $video->setLikes((int) $values['statistics']['likeCount'])
-                    ->setDislikes((int) $values['statistics']['dislikeCount'])
-                    ->setFavorites((int) $values['statistics']['favoriteCount'])
-                    ->setViews((int) $values['statistics']['viewCount']);
-            }
+        if (isset($values['contentDetails'])) {
+            $video
+                ->setDuration($this->parseISO8601($values['contentDetails']['duration']));
+        }
+
+        if ($values['statistics']) {
+            $video->setLikes((int) $values['statistics']['likeCount'])
+                ->setDislikes((int) $values['statistics']['dislikeCount'])
+                ->setFavorites((int) $values['statistics']['favoriteCount'])
+                ->setViews((int) $values['statistics']['viewCount']);
         }
 
         return $video;
@@ -507,7 +513,16 @@ class Manager
         $response = $youtube->videos->listVideos($parts, ['id' => $opts['youtube_id']]);
 
         foreach ($response['items'] as $item) {
-            $videos[] = $this->buildYouTubeVideoEntity($item);
+            $values = [
+                'id' => $item['id'],
+                'channelId' => $item['snippet']['channelId'],
+                'snippet' => $item['snippet'],
+                'contentDetails' => $item['contentDetails'],
+            ];
+            if ($opts['statistics']) {
+                $values['statistics'] = $item['statistics'];
+            }
+            $videos[] = $this->buildYouTubeVideoEntity($values);
         }
 
         return $videos;
@@ -582,28 +597,6 @@ class Manager
             // build video entities
             foreach ($playlistResponse['items'] as $item) {
                 $youtubeId = $item['snippet']['resourceId']['videoId'];
-
-                $thumbnail = $this->config->get('cdn_url') . 'api/v2/media/proxy?src=' . urlencode($item['snippet']['thumbnails']->getHigh()['url']);
-
-                $ytVideo = (new YTVideo())
-                    ->setVideoId($item['snippet']['resourceId']['videoId'])
-                    ->setChannelId($item['snippet']['channelId'])
-                    ->setDescription($item['snippet']['description'])
-                    ->setTitle($item['snippet']['title'])
-                    ->setThumbnail($thumbnail)
-                    ->setYoutubeCreationDate(strtotime($item['snippet']['publishedAt']))
-                    ->setDuration($this->parseISO8601($videoResponse['items'][0]['contentDetails']['duration']));
-
-                if ($opts['statistics']) {
-                    $stats = array_filter($videoResponse['items'], function ($item) use ($youtubeId) {
-                        return $item['id'] === $youtubeId;
-                    })[0];
-
-                    $ytVideo->setLikes((int) $stats['statistics']['likeCount'])
-                        ->setDislikes((int) $stats['statistics']['dislikeCount'])
-                        ->setFavorites((int) $stats['statistics']['favoriteCount'])
-                        ->setViews((int) $stats['statistics']['viewCount']);
-                }
 
                 $currentVideo = array_filter($videoResponse['items'], function ($item) use ($youtubeId) {
                     return $item['id'] === $youtubeId;
