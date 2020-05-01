@@ -170,11 +170,13 @@ class Repository
 
         $response = [
             'queued' => 0,
-            'transferring' => 0
+            'transferring' => 0,
+            'completed' => 0,
         ];
+
         if ($result['aggregations']['counts']['buckets']) {
             foreach ($result['aggregations']['counts']['buckets'] as $bucket) {
-                $key = $bucket['key'] === 'queued' ? 'queued' : 'transferring';
+                $key = in_array($bucket['key'], ['queued', 'completed'], true) ? $bucket['key'] : 'transferring';
 
                 $response[$key] = $bucket['doc_count'];
             }
