@@ -287,16 +287,6 @@ class Activity extends Entity implements MutatableEntityInterface
         $export['time_sent'] = $this->getTimeSent();
         $export['license'] = $this->license;
 
-        $allowedTags = '';
-        if (Di::_()->get('Features\Manager')->has('code-highlight')) {
-            $allowedTags = "<pre><code>";
-        }
-        // sanitize on export.
-        $export['message'] = strip_tags(
-            htmlspecialchars_decode($this->getMessage()),
-            $allowedTags
-        );
-
         if ($this->hide_impressions) {
             $export['hide_impressions'] = $this->hide_impressions;
         }
