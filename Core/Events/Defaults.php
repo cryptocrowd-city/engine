@@ -12,7 +12,6 @@ use Minds\Core\Analytics\Metrics;
 use Minds\Core\Di\Di;
 use Minds\Core\Features\Manager;
 
-
 class Defaults
 {
     private static $_;
