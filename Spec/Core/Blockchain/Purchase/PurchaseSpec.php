@@ -7,7 +7,9 @@ use Minds\Core\Data\Call;
 use Minds\Core\Data\lookup;
 use Minds\Core\Di\Di;
 use Minds\Core\Util\BigNumber;
+use Minds\Core\Wire\SupportTiers\Polyfill;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 
 class PurchaseSpec extends ObjectBehavior
 {
@@ -21,7 +23,7 @@ class PurchaseSpec extends ObjectBehavior
         $this->getUnissuedAmount()->shouldReturnAnInstanceOf(BigNumber::class);
     }
 
-    public function it_should_export(Call $call, lookup $lookup)
+    public function it_should_export(Call $call, lookup $lookup, Polyfill $supportTiersPolyfill)
     {
         Di::_()->bind('Database\Cassandra\Indexes', function ($di) use ($call) {
             return $call->getWrappedObject();
@@ -30,6 +32,13 @@ class PurchaseSpec extends ObjectBehavior
         Di::_()->bind('Database\Cassandra\Data\Lookup', function ($di) use ($lookup) {
             return $lookup->getWrappedObject();
         });
+
+        Di::_()->bind('Wire\SupportTiers\Polyfill', function ($di) use ($supportTiersPolyfill) {
+            return $supportTiersPolyfill->getWrappedObject();
+        });
+
+        $supportTiersPolyfill->process(Argument::cetera())
+            ->willReturn([]);
 
         $this->setUserGuid('123');
         $this->setWalletAddress('0x123');
@@ -51,7 +60,7 @@ class PurchaseSpec extends ObjectBehavior
         $this->jsonSerialize()['user']->shouldBeArray();
     }
 
-    public function it_should_perform_a_full_export(Call $call, lookup $lookup)
+    public function it_should_perform_a_full_export(Call $call, lookup $lookup, Polyfill $supportTiersPolyfill)
     {
         Di::_()->bind('Database\Cassandra\Indexes', function ($di) use ($call) {
             return $call->getWrappedObject();
@@ -60,6 +69,13 @@ class PurchaseSpec extends ObjectBehavior
         Di::_()->bind('Database\Cassandra\Data\Lookup', function ($di) use ($lookup) {
             return $lookup->getWrappedObject();
         });
+
+        Di::_()->bind('Wire\SupportTiers\Polyfill', function ($di) use ($supportTiersPolyfill) {
+            return $supportTiersPolyfill->getWrappedObject();
+        });
+
+        $supportTiersPolyfill->process(Argument::cetera())
+            ->willReturn([]);
 
         $this->setUserGuid('123');
         $this->setWalletAddress('0x123');
