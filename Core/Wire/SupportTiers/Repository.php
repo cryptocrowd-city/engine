@@ -83,8 +83,10 @@ class Repository
             $response[] = $supportTier;
         }
 
-        $response->setPagingToken(base64_encode($rows->pagingStateToken()));
-        $response->setLastPage($rows->isLastPage());
+        if ($rows) {
+            $response->setPagingToken(base64_encode($rows->pagingStateToken()));
+            $response->setLastPage($rows->isLastPage());
+        }
 
         return $response;
     }

@@ -2,12 +2,14 @@
 namespace Minds\Core\Wire\SupportTiers\Delegates;
 
 use Minds\Common\Repository\Response;
+use Minds\Core\Guid;
 use Minds\Core\Wire\SupportTiers\Repository;
 use Minds\Core\Wire\SupportTiers\SupportTier;
 use Minds\Entities\User;
+use Minds\Helpers\Log;
 
 /**
- * Migrate User entity wire_rewards into support tiers
+ * Handle User entity Wire Rewards conversion (back and forth).
  * @package Minds\Core\Wire\SupportTiers\Delegates
  */
 class UserWireRewardsMigrationDelegate
@@ -26,10 +28,90 @@ class UserWireRewardsMigrationDelegate
     }
 
     /**
+     * Migrates a wire_reward structure into a SupportTier Response. If $write is true
+     * it will write them to database.
      * @param User $user
+     * @param bool $write
      * @return Response<SupportTier>
      */
-    public function migrate(User $user): Response
+    public function migrate(User $user, $write = false): Response
     {
+        $wireRewards = $user->getWireRewards();
+
+        if (is_string($wireRewards)) {
+            $wireRewards = json_decode($wireRewards, true);
+        }
+
+        if (!$wireRewards) {
+            return new Response([]);
+        }
+
+        $data = [
+            'tokens' => $wireRewards['rewards']['tokens'] ?: [],
+            'usd' => $wireRewards['rewards']['money'] ?: [],
+        ];
+
+        $response = new Response();
+        $response->setLastPage(true);
+
+        foreach ($data as $currency => $rewards) {
+            foreach ($rewards as $reward) {
+                $supportTier = new SupportTier();
+                $supportTier
+                    ->setEntityGuid((string) $user->guid)
+                    ->setCurrency($currency)
+                    ->setGuid(Guid::build())
+                    ->setAmount((float) $reward['amount'])
+                    ->setName($reward['description'])
+                    ->setDescription('');
+
+                if ($write) {
+                    $this->repository->add($supportTier);
+                }
+
+                $response[] = $supportTier;
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Creates a wire_rewards compatible output based on a SupportTier iterable
+     * @param SupportTier[] $supportTiers
+     * @return array
+     */
+    public function polyfill(iterable $supportTiers = []): array
+    {
+        $polyfill = [
+            'description' => '',
+            'rewards' => [
+                'tokens' => [],
+                'money' => [],
+            ]
+        ];
+
+        foreach ($supportTiers as $supportTier) {
+            $reward = [
+                'amount' => (float) $supportTier->getAmount(),
+                'description' => (string) $supportTier->getName(),
+            ];
+
+            switch ($supportTier->getCurrency()) {
+                case 'tokens':
+                    $polyfill['rewards']['tokens'] = $reward;
+                    break;
+
+                case 'usd':
+                    $polyfill['rewards']['money'] = $reward;
+                    break;
+
+                default:
+                    Log::notice('Unknown support tier currency: ' . json_encode($supportTier));
+                    break;
+            }
+        }
+
+        return $polyfill;
     }
 }

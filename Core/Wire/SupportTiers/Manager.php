@@ -63,7 +63,7 @@ class Manager
         if (!$response->count() && $this->entity instanceof User && $this->entity->getWireRewards()) {
             // If entity is User and there are Wire Rewards set, migrate
             $response = $this->userWireRewardsMigrationDelegate
-                ->migrate($this->entity);
+                ->migrate($this->entity, true);
         }
 
         return $response;
