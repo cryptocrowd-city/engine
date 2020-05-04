@@ -6,7 +6,6 @@ use Minds\Core;
 use Minds\Core\Di\Di;
 use Minds\Core\Queue;
 use Minds\Core\Analytics;
-use Minds\Core\Security\XSS;
 
 /**
  * Activity Entity
