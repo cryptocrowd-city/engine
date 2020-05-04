@@ -6,6 +6,7 @@ use Minds\Core;
 use Minds\Core\Di\Di;
 use Minds\Core\Queue;
 use Minds\Core\Analytics;
+use Minds\Core\Security\XSS;
 
 /**
  * Activity Entity
@@ -285,7 +286,21 @@ class Activity extends Entity implements MutatableEntityInterface
         $export['ownerObj'] = $this->getOwnerObj();
         $export['time_sent'] = $this->getTimeSent();
         $export['license'] = $this->license;
-        $export['message'] = $this->getMessage();
+
+        $allowedTags = '';
+        if (Di::_()->get('Features\Manager')->has('code-highlight')) {
+            $allowedTags = "<pre><code>";
+        }
+        // sanitize on export.
+        $export['message'] = strip_tags(
+            htmlspecialchars_decode($this->getMessage()),
+            $allowedTags
+        );
+
+        if ($this->hide_impressions) {
+            $export['hide_impressions'] = $this->hide_impressions;
+        }
+
         $export['thumbnails'] = $this->getThumbnails();
 
         switch ($this->custom_type) {
