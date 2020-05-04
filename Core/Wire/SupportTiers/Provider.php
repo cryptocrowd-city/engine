@@ -1,11 +1,11 @@
 <?php
-namespace Minds\Core\Channels\SupportTiers;
+namespace Minds\Core\Wire\SupportTiers;
 
 use Minds\Core\Di\Provider as DiProvider;
 
 /**
- * Channels Support Tiers DI Provider
- * @package Minds\Core\Channels\SupportTiers
+ * Wire Support Tiers DI Provider
+ * @package Minds\Core\Wire\SupportTiers
  */
 class Provider extends DiProvider
 {
@@ -14,7 +14,7 @@ class Provider extends DiProvider
      */
     public function register(): void
     {
-        $this->di->bind('Channels\SupportTiers\Manager', function ($di) {
+        $this->di->bind('Wire\SupportTiers\Manager', function ($di) {
             return new Manager();
         });
     }

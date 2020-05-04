@@ -1,15 +1,15 @@
 <?php
-namespace Minds\Core\Channels\SupportTiers;
+namespace Minds\Core\Wire\SupportTiers;
 
 use Minds\Traits\MagicAttributes;
 
 /**
  * Repository::getList() options
- * @package Minds\Core\Channels\SupportTiers
- * @method string getUserGuid()
- * @method RepositoryGetListOptions setUserGuid(string $userGuid)
- * @method string getPaymentMethod()
- * @method RepositoryGetListOptions setPaymentMethod(string $paymentMethod)
+ * @package Minds\Core\Wire\SupportTiers
+ * @method string getEntityGuid()
+ * @method RepositoryGetListOptions setEntityGuid(string $entityGuid)
+ * @method string getCurrency()
+ * @method RepositoryGetListOptions setCurrency(string $currency)
  * @method string getGuid()
  * @method RepositoryGetListOptions setGuid(string $guid)
  * @method string getOffset()
@@ -22,10 +22,10 @@ class RepositoryGetListOptions
     use MagicAttributes;
 
     /** @var string */
-    protected $userGuid;
+    protected $entityGuid;
 
     /** @var string */
-    protected $paymentMethod;
+    protected $currency;
 
     /** @var string */
     protected $guid;

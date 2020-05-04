@@ -1,11 +1,11 @@
 <?php
-namespace Minds\Core\Channels\SupportTiers;
+namespace Minds\Core\Wire\SupportTiers;
 
 use Minds\Interfaces\ModuleInterface;
 
 /**
- * Channels Support Tiers Module
- * @package Minds\Core\Channels\SupportTiers
+ * Wire Support Tiers Module
+ * @package Minds\Core\Wire\SupportTiers
  */
 class Module implements ModuleInterface
 {

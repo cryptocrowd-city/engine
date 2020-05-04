@@ -1,14 +1,14 @@
 <?php
-namespace Minds\Core\Channels\SupportTiers\Delegates;
+namespace Minds\Core\Wire\SupportTiers\Delegates;
 
 use Minds\Common\Repository\Response;
-use Minds\Core\Channels\SupportTiers\Repository;
-use Minds\Core\Channels\SupportTiers\SupportTier;
+use Minds\Core\Wire\SupportTiers\Repository;
+use Minds\Core\Wire\SupportTiers\SupportTier;
 use Minds\Entities\User;
 
 /**
  * Migrate User entity wire_rewards into support tiers
- * @package Minds\Core\Channels\SupportTiers\Delegates
+ * @package Minds\Core\Wire\SupportTiers\Delegates
  */
 class UserWireRewardsMigrationDelegate
 {
@@ -31,7 +31,5 @@ class UserWireRewardsMigrationDelegate
      */
     public function migrate(User $user): Response
     {
-        $usd = $user->getWireRewards()['rewards']['money'] ?? [];
-        $tokens = $user->getWireRewards()['rewards']['tokens'] ?? [];
     }
 }

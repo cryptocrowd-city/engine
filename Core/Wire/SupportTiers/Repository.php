@@ -1,5 +1,5 @@
 <?php
-namespace Minds\Core\Channels\SupportTiers;
+namespace Minds\Core\Wire\SupportTiers;
 
 use Cassandra\Bigint;
 use Cassandra\Decimal;
@@ -9,8 +9,8 @@ use Minds\Core\Data\Cassandra\Prepared\Custom;
 use Minds\Core\Di\Di;
 
 /**
- * Channels Support Tiers Repository
- * @package Minds\Core\Channels\SupportTiers
+ * Wire Support Tiers Repository
+ * @package Minds\Core\Wire\SupportTiers
  */
 class Repository
 {
@@ -34,18 +34,18 @@ class Repository
      */
     public function getList(RepositoryGetListOptions $opts): Response
     {
-        $cql = 'SELECT * FROM user_support_tiers';
+        $cql = 'SELECT * FROM wire_support_tiers';
         $where = [];
         $values = [];
 
-        if ($opts->getUserGuid()) {
-            $where[] = 'user_guid = ?';
-            $values[] = (string) $opts->getUserGuid();
+        if ($opts->getEntityGuid()) {
+            $where[] = 'entity_guid = ?';
+            $values[] = (string) $opts->getEntityGuid();
         }
 
-        if ($opts->getPaymentMethod()) {
-            $where[] = 'payment_method = ?';
-            $values[] = (string) $opts->getPaymentMethod();
+        if ($opts->getCurrency()) {
+            $where[] = 'currency = ?';
+            $values[] = (string) $opts->getCurrency();
         }
 
         if ($opts->getGuid()) {
@@ -73,8 +73,8 @@ class Repository
             $supportTier = new SupportTier();
 
             $supportTier
-                ->setUserGuid((string) $row['user_guid']->value())
-                ->setPaymentMethod($row['payment_method'])
+                ->setEntityGuid((string) $row['entity_guid']->value())
+                ->setCurrency($row['currency'])
                 ->setGuid((string) $row['guid']->value())
                 ->setAmount((string) $row['amount']->value())
                 ->setName($row['name'])
@@ -96,10 +96,10 @@ class Repository
      */
     public function add(SupportTier $supportTier): bool
     {
-        $cql = 'INSERT INTO user_support_tiers (user_guid, payment_method, guid, amount, name, description) VALUES (?, ?, ?, ?, ?, ?)';
+        $cql = 'INSERT INTO wire_support_tiers (entity_guid, currency, guid, amount, name, description) VALUES (?, ?, ?, ?, ?, ?)';
         $values = [
-            new Bigint($supportTier->getUserGuid()),
-            (string) $supportTier->getPaymentMethod(),
+            new Bigint($supportTier->getEntityGuid()),
+            (string) $supportTier->getCurrency(),
             new Bigint($supportTier->getGuid()),
             new Decimal($supportTier->getAmount()),
             (string) $supportTier->getName(),
@@ -129,9 +129,9 @@ class Repository
      */
     public function delete(SupportTier $supportTier): bool
     {
-        $cql = 'DELETE FROM user_support_tiers WHERE user_guid = ? AND payment_method = ? AND guid = ?';
+        $cql = 'DELETE FROM wire_support_tiers WHERE entity_guid = ? AND currency = ? AND guid = ?';
         $values = [
-            new Bigint($supportTier->getUserGuid()),
+            new Bigint($supportTier->getEntityGuid()),
             (string) $supportTier->getPaymentMethod(),
             new Bigint($supportTier->getGuid()),
         ];
@@ -143,15 +143,15 @@ class Repository
     }
 
     /**
-     * Deletes all support tiers from a channel
+     * Deletes all support tiers from an entity
      * @param SupportTier $supportTier
      * @return bool
      */
     public function deleteAll(SupportTier $supportTier): bool
     {
-        $cql = 'DELETE FROM user_support_tiers WHERE user_guid = ?';
+        $cql = 'DELETE FROM wire_support_tiers WHERE entity_guid = ?';
         $values = [
-            new Bigint($supportTier->getUserGuid()),
+            new Bigint($supportTier->getEntityGuid()),
         ];
 
         $prepared = new Custom();

@@ -1,5 +1,5 @@
 <?php
-namespace Minds\Core\Channels\SupportTiers;
+namespace Minds\Core\Wire\SupportTiers;
 
 use JsonSerializable;
 use Minds\Helpers\Urn;
@@ -7,11 +7,11 @@ use Minds\Traits\MagicAttributes;
 
 /**
  * Support Tier Entity
- * @package Minds\Core\Channels\SupportTiers
- * @method string getUserGuid()
- * @method SupportTier setUserGuid(string $userGuid)
- * @method string getPaymentMethod()
- * @method SupportTier setPaymentMethod(string $paymentMethod)
+ * @package Minds\Core\Wire\SupportTiers
+ * @method string getEntityGuid()
+ * @method SupportTier setEntityGuid(string $entityGuid)
+ * @method string getCurrency()
+ * @method SupportTier setCurrency(string $currency)
  * @method string getGuid()
  * @method SupportTier setGuid(string $guid)
  * @method float getAmount()
@@ -26,10 +26,10 @@ class SupportTier implements JsonSerializable
     use MagicAttributes;
 
     /** @var string */
-    protected $userGuid;
+    protected $entityGuid;
 
     /** @var string */
-    protected $paymentMethod;
+    protected $currency;
 
     /** @var string */
     protected $guid;
@@ -51,18 +51,18 @@ class SupportTier implements JsonSerializable
     {
         $urn = null;
 
-        if ($this->userGuid && $this->paymentMethod && $this->guid) {
+        if ($this->entityGuid && $this->currency && $this->guid) {
             $urn = Urn::build('support-tier', [
-                $this->userGuid,
-                $this->paymentMethod,
+                $this->entityGuid,
+                $this->currency,
                 $this->guid,
             ]);
         }
 
         return [
             'urn' => $urn,
-            'user_guid' => $this->userGuid,
-            'payment_method' => $this->paymentMethod,
+            'entity_guid' => $this->entityGuid,
+            'currency' => $this->currency,
             'guid' => $this->guid,
             'amount' => $this->amount,
             'name' => $this->name,

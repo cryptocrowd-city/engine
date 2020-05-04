@@ -1579,12 +1579,12 @@ CREATE TABLE minds.feature_toggles_cache_ns (
     PRIMARY KEY (environment, feature_name)
 );
 
-CREATE TABLE minds.user_support_tiers (
-    user_guid bigint,
-    payment_method text,
+CREATE TABLE minds.wire_support_tiers (
+    entity_guid bigint,
+    currency text,
     guid bigint,
     amount decimal,
     name text,
     description text,
-    PRIMARY KEY (user_guid, payment_method, guid)
+    PRIMARY KEY (entity_guid, currency, guid)
 );
