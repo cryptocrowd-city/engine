@@ -1578,3 +1578,13 @@ CREATE TABLE minds.feature_toggles_cache_ns (
     stale_at timestamp,
     PRIMARY KEY (environment, feature_name)
 );
+
+CREATE TABLE minds.user_support_tiers (
+    user_guid bigint,
+    payment_method text,
+    guid bigint,
+    amount decimal,
+    name text,
+    description text,
+    PRIMARY KEY (user_guid, payment_method, guid)
+);
