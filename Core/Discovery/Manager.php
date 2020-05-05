@@ -283,7 +283,7 @@ class Manager
                     case 'videos':
                         $type = 'object:video';
                         break;
-                    case 'all' || '':
+                    case '':
                         $type = '';
                         break;
                 }
