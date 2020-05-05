@@ -34,7 +34,7 @@ class Urn
             } else {
                 return [];
             }
-        } elseif ($fragments[0] ?? null !== 'urn') {
+        } elseif (($fragments[0] ?? null) !== 'urn') {
             if ($strict) {
                 throw new Exception('Invalid URN');
             } else {

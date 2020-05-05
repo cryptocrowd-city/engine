@@ -41,7 +41,7 @@ class Repository
 
         if ($opts->getEntityGuid()) {
             $where[] = 'entity_guid = ?';
-            $values[] = (string) $opts->getEntityGuid();
+            $values[] = new Bigint((string) $opts->getEntityGuid());
         }
 
         if ($opts->getCurrency()) {
@@ -51,11 +51,11 @@ class Repository
 
         if ($opts->getGuid()) {
             $where[] = 'guid = ?';
-            $values[] = (string) $opts->getGuid();
+            $values[] = new Bigint((string) $opts->getGuid());
         }
 
         if ($where) {
-            $cql .= ' ' . implode(' AND ', $where);
+            $cql .= ' WHERE ' . implode(' AND ', $where);
         }
 
         $cqlOpts = [
@@ -135,7 +135,7 @@ class Repository
         $cql = 'DELETE FROM wire_support_tiers WHERE entity_guid = ? AND currency = ? AND guid = ?';
         $values = [
             new Bigint($supportTier->getEntityGuid()),
-            (string) $supportTier->getPaymentMethod(),
+            (string) $supportTier->getCurrency(),
             new Bigint($supportTier->getGuid()),
         ];
 

@@ -101,9 +101,10 @@ class Manager
     /**
      * Creates a new Support Tier
      * @param SupportTier $supportTier
-     * @return bool
+     * @return SupportTier|null
+     * @throws \Minds\Exceptions\StopEventException
      */
-    public function create(SupportTier $supportTier): bool
+    public function create(SupportTier $supportTier): ?SupportTier
     {
         $supportTier
             ->setGuid($this->guidBuilder->build());
@@ -116,15 +117,16 @@ class Manager
                 ->sync($this->entity);
         }
 
-        return $success;
+        return $success ? $supportTier : null;
     }
 
     /**
      * Updates a Support Tier
      * @param SupportTier $supportTier
-     * @return bool
+     * @return SupportTier|null
+     * @throws \Minds\Exceptions\StopEventException
      */
-    public function update(SupportTier $supportTier): bool
+    public function update(SupportTier $supportTier): ?SupportTier
     {
         $success = $this->repository->update($supportTier);
 
@@ -134,13 +136,14 @@ class Manager
                 ->sync($this->entity);
         }
 
-        return $success;
+        return $success ? $supportTier : null;
     }
 
     /**
      * Deletes a Support Tier
      * @param SupportTier $supportTier
      * @return bool
+     * @throws \Minds\Exceptions\StopEventException
      */
     public function delete(SupportTier $supportTier): bool
     {

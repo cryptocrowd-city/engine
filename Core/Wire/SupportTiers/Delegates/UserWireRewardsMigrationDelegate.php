@@ -91,7 +91,7 @@ class UserWireRewardsMigrationDelegate
      */
     public function sync(User $user): void
     {
-        $polyfill = [
+        $wireRewards = [
             'description' => '',
             'rewards' => [
                 'tokens' => [],
@@ -99,6 +99,7 @@ class UserWireRewardsMigrationDelegate
             ]
         ];
 
+        /** @var SupportTier[] $supportTiers */
         $supportTiers = $this->repository->getList(
             (new RepositoryGetListOptions())
                 ->setEntityGuid((string) $user->guid)
@@ -113,11 +114,11 @@ class UserWireRewardsMigrationDelegate
 
             switch ($supportTier->getCurrency()) {
                 case 'tokens':
-                    $polyfill['rewards']['tokens'][] = $reward;
+                    $wireRewards['rewards']['tokens'][] = $reward;
                     break;
 
                 case 'usd':
-                    $polyfill['rewards']['money'][] = $reward;
+                    $wireRewards['rewards']['money'][] = $reward;
                     break;
 
                 default:
@@ -125,6 +126,9 @@ class UserWireRewardsMigrationDelegate
                     break;
             }
         }
+
+        $user
+            ->setWireRewards($wireRewards);
 
         $this->saveAction
             ->setEntity($user)
