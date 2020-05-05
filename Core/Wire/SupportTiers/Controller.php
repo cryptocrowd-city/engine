@@ -71,7 +71,7 @@ class Controller
         $currentUser = $request->getAttribute('_user');
         $body = $request->getParsedBody();
         $currency = $body['currency'] ?? '';
-        $amount = (float) $body['amount'];
+        $amount = round((float) $body['amount'], 6);
         $name = $body['name'] ?? '';
 
         if (!$currency) {

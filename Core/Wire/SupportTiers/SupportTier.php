@@ -64,7 +64,7 @@ class SupportTier implements JsonSerializable
             'entity_guid' => $this->entityGuid,
             'currency' => $this->currency,
             'guid' => $this->guid,
-            'amount' => $this->amount,
+            'amount' => (string) $this->amount,
             'name' => $this->name,
             'description' => $this->description,
         ];

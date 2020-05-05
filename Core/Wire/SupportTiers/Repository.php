@@ -3,7 +3,6 @@ namespace Minds\Core\Wire\SupportTiers;
 
 use Cassandra\Bigint;
 use Cassandra\Decimal;
-use Exception;
 use Minds\Common\Repository\Response;
 use Minds\Core\Data\Cassandra\Client;
 use Minds\Core\Data\Cassandra\Prepared\Custom;
@@ -77,7 +76,7 @@ class Repository
                 ->setEntityGuid((string) $row['entity_guid']->value())
                 ->setCurrency($row['currency'])
                 ->setGuid((string) $row['guid']->value())
-                ->setAmount((string) $row['amount']->value())
+                ->setAmount($row['amount']->toDouble())
                 ->setName($row['name'])
                 ->setDescription($row['description']);
 
@@ -104,7 +103,7 @@ class Repository
             new Bigint($supportTier->getEntityGuid()),
             (string) $supportTier->getCurrency(),
             new Bigint($supportTier->getGuid()),
-            new Decimal($supportTier->getAmount()),
+            new Decimal((string) $supportTier->getAmount()),
             (string) $supportTier->getName(),
             (string) $supportTier->getDescription(),
         ];
