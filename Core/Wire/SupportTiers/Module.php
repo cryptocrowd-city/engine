@@ -16,5 +16,8 @@ class Module implements ModuleInterface
     {
         // DI Provider
         (new Provider())->register();
+
+        // Routes
+        (new Routes())->register();
     }
 }

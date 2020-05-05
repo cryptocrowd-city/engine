@@ -4,6 +4,7 @@ namespace Minds\Core\Wire\SupportTiers\Delegates;
 use Minds\Common\Repository\Response;
 use Minds\Core\Guid;
 use Minds\Core\Wire\SupportTiers\Repository;
+use Minds\Core\Wire\SupportTiers\RepositoryGetListOptions;
 use Minds\Core\Wire\SupportTiers\SupportTier;
 use Minds\Entities\User;
 use Minds\Helpers\Log;
@@ -78,10 +79,10 @@ class UserWireRewardsMigrationDelegate
 
     /**
      * Creates a wire_rewards compatible output based on a SupportTier iterable
-     * @param SupportTier[] $supportTiers
+     * @param User $user
      * @return array
      */
-    public function polyfill(iterable $supportTiers = []): array
+    public function sync(User $user): array
     {
         $polyfill = [
             'description' => '',
@@ -90,6 +91,12 @@ class UserWireRewardsMigrationDelegate
                 'money' => [],
             ]
         ];
+
+        $supportTiers = $this->repository->getList(
+            (new RepositoryGetListOptions())
+                ->setEntityGuid((string) $user->guid)
+                ->setLimit(5000)
+        );
 
         foreach ($supportTiers as $supportTier) {
             $reward = [

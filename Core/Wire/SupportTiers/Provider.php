@@ -14,6 +14,10 @@ class Provider extends DiProvider
      */
     public function register(): void
     {
+        $this->di->bind('Wire\SupportTiers\Controller', function ($di) {
+            return new Controller();
+        });
+
         $this->di->bind('Wire\SupportTiers\Manager', function ($di) {
             return new Manager();
         });

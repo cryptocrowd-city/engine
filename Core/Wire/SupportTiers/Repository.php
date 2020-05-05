@@ -3,6 +3,7 @@ namespace Minds\Core\Wire\SupportTiers;
 
 use Cassandra\Bigint;
 use Cassandra\Decimal;
+use Exception;
 use Minds\Common\Repository\Response;
 use Minds\Core\Data\Cassandra\Client;
 use Minds\Core\Data\Cassandra\Prepared\Custom;
