@@ -99,11 +99,11 @@ class UserWireRewardsMigrationDelegate
 
             switch ($supportTier->getCurrency()) {
                 case 'tokens':
-                    $polyfill['rewards']['tokens'] = $reward;
+                    $polyfill['rewards']['tokens'][] = $reward;
                     break;
 
                 case 'usd':
-                    $polyfill['rewards']['money'] = $reward;
+                    $polyfill['rewards']['money'][] = $reward;
                     break;
 
                 default:

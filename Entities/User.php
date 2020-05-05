@@ -958,9 +958,13 @@ class User extends \ElggUser
             $export['wire_rewards'] = json_decode($export['wire_rewards']);
         }
 
+        $export['support_tiers'] = Core\Di\Di::_()->get('Wire\SupportTiers\Manager')
+            ->setEntity($this)
+            ->getAll();
+
         $export['original_wire_rewards'] = $export['wire_rewards'];
         $export['wire_rewards'] = Core\Di\Di::_()->get('Wire\SupportTiers\Polyfill')
-            ->process($this);
+            ->process($export['support_tiers']);
 
         if (is_string($export['feature_flags'])) {
             $export['feature_flags'] = json_decode($export['feature_flags']);

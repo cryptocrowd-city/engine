@@ -31,26 +31,16 @@ class Polyfill
     }
 
     /**
-     * Transforms Support Tiers into a wire_rewards compatible output. Migrates if needed.
-     * @param User $user
+     * Transforms a Support Tiers iterable into a wire_rewards compatible output.
+     * @param SupportTier[] $supportTiers
      * @return array
-     * @throws Exception
      */
-    public function process(User $user): array
+    public function process(iterable $supportTiers): array
     {
-        if (!$user) {
+        if (!$supportTiers) {
             return [];
         }
 
-        try {
-            return $this->userWireRewardsMigrationDelegate->polyfill(
-                $this->manager
-                    ->setEntity($user)
-                    ->getAll()
-            );
-        } catch (Exception $e) {
-            Log::warning($e);
-            return $user->getWireRewards();
-        }
+        return $this->userWireRewardsMigrationDelegate->polyfill($supportTiers);
     }
 }
