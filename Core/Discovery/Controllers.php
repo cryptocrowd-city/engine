@@ -57,7 +57,7 @@ class Controllers
         $queryParams = $request->getQueryParams();
         $query = $queryParams['q'] ?? null;
         $filter = $queryParams['algorithm'] ?? 'latest';
-        $type = $queryParams['type'] ?? null;
+        $type = $queryParams['type'] ?? '';
         $entities = $this->manager->getSearch($query, $filter, $type);
 
         return new JsonResponse([
