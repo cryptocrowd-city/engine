@@ -537,7 +537,6 @@ class newsfeed implements Interfaces\Api
                         ]);
                     }
 
-                    $activity = $activityMutation->getMutatedEntity();
                     $activity->setExportContext(true);
                     
                     return Factory::response([
