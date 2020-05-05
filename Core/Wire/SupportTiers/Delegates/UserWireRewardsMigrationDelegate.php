@@ -2,6 +2,7 @@
 namespace Minds\Core\Wire\SupportTiers\Delegates;
 
 use Minds\Common\Repository\Response;
+use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Guid;
 use Minds\Core\Wire\SupportTiers\Repository;
 use Minds\Core\Wire\SupportTiers\RepositoryGetListOptions;
@@ -18,14 +19,19 @@ class UserWireRewardsMigrationDelegate
     /** @var Repository */
     protected $repository;
 
+    /** @var Save */
+    protected $saveAction;
+
     /**
      * UserWireRewardsMigrationDelegate constructor.
      * @param $repository
      */
     public function __construct(
-        $repository = null
+        $repository = null,
+        $saveAction = null
     ) {
         $this->repository = $repository ?: new Repository();
+        $this->saveAction = $saveAction ?: new Save();
     }
 
     /**
@@ -80,9 +86,10 @@ class UserWireRewardsMigrationDelegate
     /**
      * Creates a wire_rewards compatible output based on a SupportTier iterable
      * @param User $user
-     * @return array
+     * @return void
+     * @throws \Minds\Exceptions\StopEventException
      */
-    public function sync(User $user): array
+    public function sync(User $user): void
     {
         $polyfill = [
             'description' => '',
@@ -119,6 +126,8 @@ class UserWireRewardsMigrationDelegate
             }
         }
 
-        return $polyfill;
+        $this->saveAction
+            ->setEntity($user)
+            ->save();
     }
 }
