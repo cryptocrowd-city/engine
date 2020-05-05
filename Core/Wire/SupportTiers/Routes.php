@@ -22,7 +22,7 @@ class Routes extends ModuleRoutes
             ->do(function (Route $route) {
                 $route->get(
                     '/:guid',
-                    Ref::_('Wire\SupportTiers\Controller', 'getList')
+                    Ref::_('Wire\SupportTiers\Controller', 'getAll')
                 );
 
                 $route
