@@ -65,7 +65,7 @@ class banners implements Interfaces\FS
                 }
             } else {
                 $featuresManager = new FeaturesManager;
-                if( $featuresManager->has('channels')) {
+                if ($featuresManager->has('channels')) {
                     $content = file_get_contents(
                         Core\Config::build()->path . 'engine/' . $this->getSeededBannerPath($entity->guid)
                     );
