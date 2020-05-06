@@ -12,6 +12,19 @@ use Minds\Entities;
 use Minds\Interfaces;
 use Minds\Helpers\File;
 
+define('DEFAULT_BANNER_PATHS', [
+    'Assets/banners/0.jpg',
+    'Assets/banners/1.jpg',
+    'Assets/banners/2.jpg',
+    'Assets/banners/3.jpg',
+    'Assets/banners/4.jpg',
+    'Assets/banners/5.jpg',
+    'Assets/banners/6.jpg',
+    'Assets/banners/7.jpg',
+    'Assets/banners/8.jpg',
+    'Assets/banners/9.jpg',
+]);
+
 class banners implements Interfaces\FS
 {
     public function get($pages)
@@ -49,6 +62,10 @@ class banners implements Interfaces\FS
                     $f = Core\Di\Di::_()->get('Storage')->open($filepath, 'read');
                     $content = $f->read();
                 }
+            } else {
+                $content = file_get_contents(
+                    Core\Config::build()->path . 'engine/' . $this->getSeededBannerPath($entity->guid)
+                );
             }
             break;
           case "group":
@@ -110,5 +127,16 @@ class banners implements Interfaces\FS
         header("Cache-Control: public");
         echo $content;
         exit;
+    }
+
+    /**
+     * Derives the seeded banner path for the user.
+     *
+     * @param string $guid - guid
+     * @return string - banner path.
+     */
+    private function getSeededBannerPath(string $guid = '0'): string
+    {
+        return DEFAULT_BANNER_PATHS[$guid % count(DEFAULT_BANNER_PATHS)];
     }
 }
