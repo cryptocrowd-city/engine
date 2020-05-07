@@ -4,7 +4,7 @@ namespace Minds\Core\Wire\SupportTiers;
 use Exception;
 use Minds\Core\Di\Di;
 use Minds\Core\EntitiesBuilder;
-use Minds\Core\Router\Exceptions\ApiUserException;
+use Minds\Exceptions\UserErrorException;
 use Minds\Helpers\Urn;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
@@ -49,7 +49,7 @@ class Controller
             $request->getAttribute('_user');
 
         if (!$entity) {
-            throw new ApiUserException('No entity', 400);
+            throw new UserErrorException('No entity', 400);
         }
 
         $this->manager->setEntity($entity);
@@ -64,7 +64,7 @@ class Controller
      * Creates a new Support Tier
      * @param ServerRequest $request
      * @return JsonResponse
-     * @throws ApiUserException
+     * @throws UserErrorException
      */
     public function create(ServerRequest $request): JsonResponse
     {
@@ -75,11 +75,11 @@ class Controller
         $name = $body['name'] ?? '';
 
         if (!$currency) {
-            throw new ApiUserException('Invalid currency', 400);
+            throw new UserErrorException('Invalid currency', 400);
         } elseif (!$amount || $amount <= 0) {
-            throw new ApiUserException('Invalid amount', 400);
+            throw new UserErrorException('Invalid amount', 400);
         } elseif (!is_string($name) || strlen($name) === 0) {
-            throw new ApiUserException('Invalid name', 400);
+            throw new UserErrorException('Invalid name', 400);
         }
 
         $supportTier = new SupportTier();
@@ -103,7 +103,7 @@ class Controller
      * Updates a Support Tier
      * @param ServerRequest $request
      * @return JsonResponse
-     * @throws ApiUserException
+     * @throws UserErrorException
      * @throws Exception
      */
     public function update(ServerRequest $request): JsonResponse
@@ -112,16 +112,16 @@ class Controller
         $urn = Urn::parse($request->getAttribute('parameters')['urn'], 'support-tier');
 
         if (!$urn || count($urn) !== 3) {
-            throw new ApiUserException('Invalid URN', 400);
+            throw new UserErrorException('Invalid URN', 400);
         } elseif ($urn[0] !== (string) $currentUser->guid) {
-            throw new ApiUserException('You are not authorized', 403);
+            throw new UserErrorException('You are not authorized', 403);
         }
 
         $body = $request->getParsedBody();
         $name = $body['name'] ?? '';
 
         if (!is_string($name) || strlen($name) === 0) {
-            throw new ApiUserException('Invalid name', 400);
+            throw new UserErrorException('Invalid name', 400);
         }
 
         $supportTier = $this->manager->get(
@@ -132,7 +132,7 @@ class Controller
         );
 
         if (!$supportTier) {
-            throw new ApiUserException('Unknown Support Tier');
+            throw new UserErrorException('Unknown Support Tier');
         }
 
         $supportTier
@@ -152,7 +152,7 @@ class Controller
      * Deletes a Support Tier
      * @param ServerRequest $request
      * @return JsonResponse
-     * @throws ApiUserException
+     * @throws UserErrorException
      */
     public function delete(ServerRequest $request): JsonResponse
     {
@@ -160,9 +160,9 @@ class Controller
         $urn = Urn::parse($request->getAttribute('parameters')['urn'], 'support-tier');
 
         if (!$urn || count($urn) !== 3) {
-            throw new ApiUserException('Invalid URN', 400);
+            throw new UserErrorException('Invalid URN', 400);
         } elseif ($urn[0] !== (string) $currentUser->guid) {
-            throw new ApiUserException('You are not authorized', 403);
+            throw new UserErrorException('You are not authorized', 403);
         }
 
         $supportTier = new SupportTier();
