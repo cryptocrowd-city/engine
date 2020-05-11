@@ -358,9 +358,25 @@ class Manager
      * @param string $filter
      * @return Response
      */
-    public function getSearch(string $query, string $filter, string $type = ''): Response
+    public function getSearch(string $query, string $filter, string $type = 'activity'): Response
     {
         $algorithm = 'latest';
+
+        switch ($type) {
+            case 'blogs':
+                $type = 'object:blog';
+                break;
+            case 'images':
+                $type = 'object:image';
+                break;
+            case 'videos':
+                $type = 'object:video';
+                break;
+            default:
+                $type = 'activity';
+                break;
+        }
+
         switch ($filter) {
             case 'top':
                 $algorithm = 'topV2';
@@ -371,21 +387,6 @@ class Manager
             case 'groups':
                 $type = 'group';
                 break;
-            default:
-                switch ($type) {
-                    case 'blogs':
-                        $type = 'object:blog';
-                        break;
-                    case 'images':
-                        $type = 'object:image';
-                        break;
-                    case 'videos':
-                        $type = 'object:video';
-                        break;
-                    case '':
-                        $type = '';
-                        break;
-                }
         }
 
         $elasticEntities = new Core\Feeds\Elastic\Entities();
