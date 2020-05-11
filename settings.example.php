@@ -127,7 +127,6 @@ $CONFIG->set(
   ]
 );
 
-
 /**
  * Other Elgg Settings
  */
@@ -251,6 +250,11 @@ $CONFIG->set('google', [
             'key_path' => __DIR__ . '/.auth/analytics.json',
         ],
         'ads' => '', // get it from https://ga-dev-tools.appspot.com/account-explorer/
+    ],
+
+    'youtube' => [
+        'api_key' => '{{yt-api-key}}',
+        'max_daily_imports' => 10
     ]
 ]);
 

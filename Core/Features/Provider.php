@@ -51,10 +51,14 @@ class Provider extends DiProvider
                 'settings',
                 'channels',
                 'ux-2020',
+                'code-highlight',
                 'pay',
                 'channels',
                 'onboarding-reminder',
                 'boost-rotator',
+                'yt-importer',
+                'settings-referrals',
+                'channels-shop',
             ];
         });
 

@@ -68,7 +68,9 @@ class User extends \ElggUser
         $this->attributes['kite_state'] = 'unknown';
         $this->attributes['disable_autoplay_videos'] = 0;
         $this->attributes['dob'] = 0;
+        $this->attributes['yt_channels'] = [];
         $this->attributes['public_dob'] = 0;
+        $this->attributes['dismissed_widgets'] = [];
 
         parent::initializeAttributes();
     }
@@ -88,7 +90,8 @@ class User extends \ElggUser
     }
 
     /**
-     * Sets `tags`.
+     * Sets all `tags` - to set an individual tag
+     * use addHashtag or removeHashtag.
      *
      * @return array
      */
@@ -96,6 +99,34 @@ class User extends \ElggUser
     {
         $this->tags = $tags;
 
+        return $this;
+    }
+
+    /**
+     * Adds a hashtag to the tags array.
+     * @param string $hashtag - string of the hashtag e.g. #OpenSource.
+     * @return User allows chaining.
+     */
+    public function addHashtag(string $hashtag): User
+    {
+        $this->setHashtags(
+            array_merge($this->getHashtags(), [$hashtag])
+        );
+        return $this;
+    }
+
+    /**
+     * Removes a hashtag to the tags array by string content.
+     * @param string $hashtag - string of the hashtag e.g. #OpenSource.f
+     * @return User allows chaining.
+     */
+    public function removeHashtag($hashtag): User
+    {
+        $this->setHashtags(
+            array_values(
+                array_diff($this->getHashtags(), [$hashtag])
+            )
+        );
         return $this;
     }
 
@@ -949,6 +980,9 @@ class User extends \ElggUser
 
         $export['hide_share_buttons'] = $this->getHideShareButtons();
         $export['disable_autoplay_videos'] = $this->getDisableAutoplayVideos();
+        $export['dismissed_widgets'] = $this->getDismissedWidgets();
+
+        $export['yt_channels'] = $this->getYouTubeChannels();
 
         return $export;
     }
@@ -1256,6 +1290,7 @@ class User extends \ElggUser
             'btc_address',
             'surge_token',
             'hide_share_buttons',
+            'dismissed_widgets'
         ]);
     }
 
@@ -1463,6 +1498,45 @@ class User extends \ElggUser
     }
 
     /**
+     * Returns the YouTube OAuth Token
+     * @return array
+     */
+    public function getYouTubeChannels()
+    {
+        return $this->attributes['yt_channels'] ?? [];
+    }
+
+    /**
+     * Sets YouTube OAuth Token and when updates the connection timestamp
+     * @param array $channels
+     * @return $this
+     */
+    public function setYouTubeChannels(array $channels)
+    {
+        $this->attributes['yt_channels'] = $channels;
+
+        return $this;
+    }
+
+    /**
+     * Updates or add a YouTube channel
+     * @param array $channel
+     */
+    public function updateYouTubeChannel(array $channel)
+    {
+        $updated = array_walk($this->attributes['yt_channels'], function (&$item) use ($channel) {
+            if ($item['id'] === $channel['id']) {
+                $item = array_replace($item, $channel);
+            }
+        });
+
+        // if it didn't update, this means it's not there, so we'll add it
+        if (!$updated) {
+            array_push($this->attributes['yt_channels'], $channel);
+        }
+    }
+
+    /**
      * Returns btc_address.
      *
      * @return string
@@ -1503,6 +1577,26 @@ class User extends \ElggUser
     public function setSurgeToken(string $token = ''): User
     {
         $this->surge_token = $token;
+        return $this;
+    }
+
+    /**
+     * Return an array of dismissed widgets
+     * @return array
+     */
+    public function getDismissedWidgets(): ?array
+    {
+        return $this->dismissed_widgets;
+    }
+
+    /**
+     * Set dismissed widgets
+     * @param array $dimissedWidgets
+     * @return self
+     */
+    public function setDismissedWidgets(array $dismissedWidgets = []): self
+    {
+        $this->dismissed_widgets = $dismissedWidgets;
         return $this;
     }
 }

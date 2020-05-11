@@ -173,13 +173,15 @@ class Manager
      * @param Transcode $transcode
      * @return void
      */
-    public function add(Transcode $transcode): void
+    public function add(Transcode $transcode, $sendToQueue = true): void
     {
         // Add to repository
         $this->repository->add($transcode);
 
-        // Notify the background queue
-        $this->queueDelegate->onAdd($transcode);
+        if ($sendToQueue) {
+            // Notify the background queue
+            $this->queueDelegate->onAdd($transcode);
+        }
     }
 
     /**
