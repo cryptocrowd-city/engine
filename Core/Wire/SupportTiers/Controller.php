@@ -35,7 +35,7 @@ class Controller
     }
 
     /**
-     * Gets the list of Support Tiers for an entity
+     * Gets a single support tier
      * @param ServerRequest $request
      * @return JsonResponse
      * @throws Exception
