@@ -248,7 +248,7 @@ class Manager
 
         foreach ($videoSources as $source) {
             $this->transcoderBridge->addFromYoutube($video, $source);
-            $this->logger->info("[YouTubeImporter] File saved (itag:{$source->getItag()} \n");
+            $this->logger->info("[YouTubeImporter] File saved (itag:{$source->getItag()}) \n");
         }
 
         $video->patch([
@@ -523,6 +523,7 @@ class Manager
             'youtube_id' => $ytVideo->getVideoId(),
             'youtube_channel_id' => $ytVideo->getChannelId(),
             'transcoding_status' => TranscodeStates::QUEUED,
+            'time_created' => $ytVideo->getYoutubeCreationDate()
         ]);
 
         $this->saveVideo($video);
