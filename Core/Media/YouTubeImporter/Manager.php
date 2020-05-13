@@ -342,7 +342,7 @@ class Manager
      * @param string $id
      * @return YTVideo
      */
-    public function getYouTubeVideo(string $id, array $opts): YTVideo
+    public function getYouTubeVideo(string $id, array $opts): ?YTVideo
     {
         $opts = array_merge([
             'statistics' => false,
