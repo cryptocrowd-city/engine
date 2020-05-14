@@ -65,15 +65,10 @@ class UserWireRewardsMigrationDelegate
         usort($data['tokens'], [$this->tierBuilder, 'sortRewards']);
         usort($data['usd'], [$this->tierBuilder, 'sortRewards']);
 
+        $urns = [];
+
         $response = new Response();
         $response->setLastPage(true);
-
-        if ($write) {
-            $this->repository->deleteAll(
-                (new SupportTier())
-                    ->setEntityGuid((string) $user->guid)
-            );
-        }
 
         foreach ($data as $currency => $rewards) {
             $i = 0;
@@ -85,17 +80,33 @@ class UserWireRewardsMigrationDelegate
                 $supportTier
                     ->setEntityGuid((string) $user->guid)
                     ->setCurrency($currency)
-                    ->setGuid($this->tierBuilder->buildGuid((int) $user->guid, $currency, $amount))
+                    ->setGuid($this->tierBuilder->buildGuid($currency, $amount))
                     ->setAmount($amount)
-                    ->setName($this->tierBuilder->buildName($i))
+                    ->setName($reward['name'] ?? $this->tierBuilder->buildName($i))
                     ->setDescription($reward['description'] ?: '');
 
                 if ($write) {
                     $this->repository->add($supportTier);
                 }
 
+                $urns[] = $supportTier->getUrn();
                 $response[] = $supportTier;
                 $i++;
+            }
+        }
+
+        if ($write) {
+            $all = $this->repository->getList(
+                (new RepositoryGetListOptions())
+                    ->setEntityGuid((string) $user->guid)
+            );
+
+            $removedSupportTiers = $all->filter(function (SupportTier $supportTier) use ($urns) {
+                return !in_array($supportTier->getUrn(), $urns, true);
+            });
+
+            foreach ($removedSupportTiers as $supportTier) {
+                $this->repository->delete($supportTier);
             }
         }
 

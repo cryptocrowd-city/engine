@@ -36,9 +36,9 @@ class TierBuilder
      * @param float $amount
      * @return int
      */
-    public function buildGuid(int $baseGuid, string $currency, float $amount): int
+    public function buildGuid(string $currency, float $amount): int
     {
-        $guid = $baseGuid;
+        $guid = 0;
 
         switch ($currency) {
             case 'tokens':
