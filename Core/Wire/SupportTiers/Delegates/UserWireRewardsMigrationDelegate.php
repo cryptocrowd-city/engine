@@ -80,7 +80,7 @@ class UserWireRewardsMigrationDelegate
                 $supportTier
                     ->setEntityGuid((string) $user->guid)
                     ->setCurrency($currency)
-                    ->setGuid($this->tierBuilder->buildGuid($currency, $amount))
+                    ->setGuid(($reward['guid'] ?? '') ?: $this->tierBuilder->buildGuid($currency, $amount))
                     ->setAmount($amount)
                     ->setName(($reward['name'] ?? '') ?: $this->tierBuilder->buildName($i))
                     ->setDescription($reward['description'] ?: '');
@@ -138,6 +138,7 @@ class UserWireRewardsMigrationDelegate
 
         foreach ($supportTiers as $supportTier) {
             $reward = [
+                'guid' => (string) $supportTier->getGuid(),
                 'amount' => (float) $supportTier->getAmount(),
                 'name' => (string) $supportTier->getName(),
                 'description' => (string) $supportTier->getDescription(),
