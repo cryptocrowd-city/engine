@@ -82,7 +82,7 @@ class UserWireRewardsMigrationDelegate
                     ->setCurrency($currency)
                     ->setGuid($this->tierBuilder->buildGuid($currency, $amount))
                     ->setAmount($amount)
-                    ->setName($reward['name'] ?? $this->tierBuilder->buildName($i))
+                    ->setName(($reward['name'] ?? '') ?: $this->tierBuilder->buildName($i))
                     ->setDescription($reward['description'] ?: '');
 
                 if ($write) {
@@ -139,7 +139,8 @@ class UserWireRewardsMigrationDelegate
         foreach ($supportTiers as $supportTier) {
             $reward = [
                 'amount' => (float) $supportTier->getAmount(),
-                'description' => (string) $supportTier->getName(),
+                'name' => (string) $supportTier->getName(),
+                'description' => (string) $supportTier->getDescription(),
             ];
 
             switch ($supportTier->getCurrency()) {
