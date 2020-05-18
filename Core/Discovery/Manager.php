@@ -141,7 +141,7 @@ class Manager
                     'tags' => [
                         'terms' => [
                             'field' => 'tags.keyword',
-                            'min_doc_count' => 1,
+                            'min_doc_count' => 10,
                             'exclude' => $excludeTags,
                             'size' => $opts['limit'],
                             'order' => [
