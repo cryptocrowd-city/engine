@@ -82,9 +82,9 @@ class Manager
 
         $results = array_merge($tagTrends12, $tagTrends24);
 
-        if (count($results) < $opts['limit']) {
+        if (count($results) < $opts['limit'] / 2) {
             $missingCount = $opts['limit'] - count($results);
-            $tagTrendsFallback = $this->getTagTrendsForPeriod(2160 /* 3m */, array_map(function ($trend) {
+            $tagTrendsFallback = $this->getTagTrendsForPeriod(2160 /* 90d */, array_map(function ($trend) {
                 return $trend->getHashtag();
             }, $results), [ 'limit' => $missingCount ]);
 
