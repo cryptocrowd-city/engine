@@ -4,7 +4,7 @@ namespace Minds\Core\Subscriptions\Graph;
 use Minds\Traits\MagicAttributes;
 
 /**
- * Class RepositoryGetOptions
+ * Repository get() method options
  * @package Minds\Core\Subscriptions\Graph
  * @method string getType()
  * @method RepositoryGetOptions setType(string $type)

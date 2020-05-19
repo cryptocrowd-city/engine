@@ -44,7 +44,8 @@ class Controller
      */
     public function getSubscribers(ServerRequest $request): JsonResponse
     {
-        return $this->getByType('subscribers', $request);
+        throw new Exception('Not Implemented');
+        // return $this->getByType('subscribers', $request);
     }
 
     /**

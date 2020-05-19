@@ -7,6 +7,10 @@ use Minds\Core\Data\ElasticSearch\Prepared\Search;
 use Minds\Core\Di\Di;
 use Minds\Core\Feeds\FeedSyncEntity;
 
+/**
+ * Subscriptions Graph Repository
+ * @package Minds\Core\Subscriptions\Graph
+ */
 class Repository
 {
     /** @var Client */
@@ -89,10 +93,5 @@ class Repository
 
             return $feedSyncEntity;
         });
-    }
-
-    public function getSubscribers(RepositoryGetOptions $options): Response
-    {
-        
     }
 }

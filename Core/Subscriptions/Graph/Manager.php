@@ -3,8 +3,11 @@ namespace Minds\Core\Subscriptions\Graph;
 
 use Exception;
 use Minds\Common\Repository\Response;
-use Minds\Core\Feeds\FeedSyncEntity;
 
+/**
+ * Subscriptions Graph Manager
+ * @package Minds\Core\Subscriptions\Graph
+ */
 class Manager
 {
     /** @var Repository */
@@ -25,6 +28,7 @@ class Manager
     }
 
     /**
+     * Sets the current User GUID
      * @param string $userGuid
      * @return Manager
      */
@@ -35,6 +39,7 @@ class Manager
     }
 
     /**
+     * Fetchs a list of connections based on its type
      * @param RepositoryGetOptions $options
      * @return Response
      * @throws Exception
@@ -49,8 +54,9 @@ class Manager
             ->setUserGuid($this->userGuid);
 
         switch ($options->getType()) {
-            case 'subscribers':
-                return $this->repository->getSubscribers($options);
+            // TODO
+            // case 'subscribers':
+            //     return $this->repository->getSubscribers($options);
 
             case 'subscriptions':
                 return $this->repository->getSubscriptions($options);

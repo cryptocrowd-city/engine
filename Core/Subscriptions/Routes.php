@@ -4,6 +4,7 @@ namespace Minds\Core\Subscriptions;
 use Minds\Core\Di\Ref;
 use Minds\Core\Router\ModuleRoutes;
 use Minds\Core\Router\Route;
+use Minds\Exceptions\UserErrorException;
 
 /**
  * Subscriptions Routes
@@ -26,7 +27,9 @@ class Routes extends ModuleRoutes
 
                 $route->get(
                     ':guid/subscribers',
-                    Ref::_('Subscriptions\Graph\Controller', 'getSubscribers')
+                    function() {
+                        throw new UserErrorException('Not implemented');
+                    }
                 );
             });
     }
