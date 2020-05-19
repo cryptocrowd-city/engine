@@ -11,10 +11,6 @@ class Provider extends DiProvider
 {
     public function register()
     {
-        $this->di->bind('Channels\Groups\Controller', function () {
-            return new Controller();
-        });
-
         $this->di->bind('Channels\Groups\Manager', function () {
             return new Manager();
         });
