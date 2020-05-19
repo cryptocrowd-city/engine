@@ -27,7 +27,7 @@ class Routes extends ModuleRoutes
 
                 $route->get(
                     ':guid/subscribers',
-                    function() {
+                    function () {
                         throw new UserErrorException('Not implemented');
                     }
                 );

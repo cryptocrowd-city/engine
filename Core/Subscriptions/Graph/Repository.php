@@ -22,8 +22,7 @@ class Repository
      */
     public function __construct(
         $es = null
-    )
-    {
+    ) {
         $this->es = $es ?: Di::_()->get('Database\ElasticSearch');
     }
 
