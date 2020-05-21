@@ -9,5 +9,4 @@ namespace Minds\Core\I18n\Parsers;
 
 class XmlParsingException extends \InvalidArgumentException
 {
-
 }

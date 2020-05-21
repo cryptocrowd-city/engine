@@ -18,7 +18,8 @@ use Symfony\Component\Translation\Util\XliffUtils;
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  */
-class XliffFileLoader implements LoaderInterface {
+class XliffFileLoader implements LoaderInterface
+{
     /**
      * {@inheritdoc}
      */
@@ -51,7 +52,6 @@ class XliffFileLoader implements LoaderInterface {
     {
         try {
             $dom = XmlParser::loadFile($resource);
-
         } catch (\InvalidArgumentException $e) {
             throw new InvalidResourceException(sprintf('Unable to load "%s": '.$e->getMessage(), $resource), $e->getCode(), $e);
         }

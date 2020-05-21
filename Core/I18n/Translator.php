@@ -22,12 +22,11 @@ class Translator
     /** @var Logger */
     protected $logger;
 
-    function __construct(
+    public function __construct(
         $config = null,
         $translator = null,
         $logger = null
-    )
-    {
+    ) {
         $this->config = $config ?: Di::_()->get('Config');
         $this->translator = $translator ?:
             new SymfonyTranslator('en', null, null, $this->config->get('development_mode'));
