@@ -74,10 +74,6 @@ class Defaults
 
             $export = $event->response() ?: [];
 
-            if ($params['entity']->type != 'activity' && $params['entity']->type != 'group') {
-                return false;
-            }
-
             /** @var Core\Data\cache\abstractCacher $cacher */
             $cacher = Core\Di\Di::_()->get('Cache');
 
