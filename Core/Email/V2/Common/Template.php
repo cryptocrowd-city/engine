@@ -2,6 +2,7 @@
 
 namespace Minds\Core\Email\V2\Common;
 
+use Minds\Core\I18n\Translator;
 use Minds\Core\Markdown\Markdown;
 use Minds\Core\Di\Di;
 
@@ -18,12 +19,18 @@ class Template
     /** @var Markdown */
     protected $markdown;
 
+    /** @var Translator */
+    protected $translator;
+
     /**
      * Constructor.
      *
      * @param Markdown $markdown
+     * @param null $config
+     * @param null $emailStyles
+     * @param null $translator
      */
-    public function __construct($markdown = null, $config = null, $emailStyles = null)
+    public function __construct($markdown = null, $config = null, $emailStyles = null, $translator = null)
     {
         $this->markdown = $markdown ?: new Markdown();
         $this->emailStyles = $emailStyles ?: Di::_()->get('Email\V2\Common\EmailStyles');
@@ -31,9 +38,17 @@ class Template
         $this->data['site_url'] = $this->config->get('site_url') ?: 'https://www.minds.com/';
         $this->data['cdn_assets_url'] = $this->config->get('cdn_assets_url') ?: 'https://cdn-assets.minds.com/front/dist/';
         $this->data['cdn_url'] = $this->config->get('cdn_url') ?: 'https://cdn.minds.com/';
+
+        $this->translator = $translator ?: Di::_()->get('Translator');
+
+        $this->set('translator', $this->translator);
     }
 
-    public function setTemplate($template = 'default')
+    /**
+     * @param string $template
+     * @return $this
+     */
+    public function setTemplate($template = 'default'): Template
     {
         $this->template = $this->findTemplate($template);
         if (!$this->template) {
@@ -43,10 +58,25 @@ class Template
         return $this;
     }
 
-    public function setBody($template, $fromFile = true)
+    /**
+     * @param $template
+     * @param bool $fromFile
+     * @return $this
+     */
+    public function setBody($template, $fromFile = true): Template
     {
         $this->body = $fromFile ? $this->findTemplate($template) : $template;
         $this->loadFromFile = (bool) $fromFile;
+
+        return $this;
+    }
+
+    /**
+     * @param string $locale
+     * @return $this
+     */
+    public function setLocale(string $locale): Template {
+        $this->translator->setLocale($locale);
 
         return $this;
     }
