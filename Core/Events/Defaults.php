@@ -67,11 +67,6 @@ class Defaults
         //Comments count export extender
         Dispatcher::register('export:extender', 'all', function ($event) {
             $params = $event->getParameters();
-
-            if ($params['entity'] instanceof Core\Blogs\Blog) {
-                return;
-            }
-
             $export = $event->response() ?: [];
 
             /** @var Core\Data\cache\abstractCacher $cacher */
