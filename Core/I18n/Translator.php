@@ -36,22 +36,10 @@ class Translator
         $this->loadResources();
     }
 
-    public function loadResources()
-    {
-        $this->translator->addLoader('xlf', new XliffFileLoader());
-        $languages = array_keys($this->config->get('i18n')['languages']);
-        foreach ($languages as $language) {
-            $file = getcwd() . "/translations/messages.{$language}.xliff";
-
-            if (!file_exists($file)) {
-                $this->logger->warn("Localization resource not found ({$file})");
-                continue;
-            }
-
-            $this->translator->addResource('xlf', $file, $language);
-        }
-    }
-
+    /**
+     * Returns the Symfony's Translator instance
+     * @return SymfonyTranslator
+     */
     public function getTranslator(): SymfonyTranslator
     {
         return $this->translator;
@@ -69,8 +57,35 @@ class Translator
         return $this;
     }
 
-    public function translate(?string $id, array $parameters = [], string $domain = null, string $locale = null)
+    /**
+     * Translates a given string
+     * @param string|null $id
+     * @param array $parameters
+     * @param string|null $domain
+     * @param string|null $locale
+     * @return string
+     */
+    public function translate(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
     {
         return $this->translator->trans($id, $parameters, $domain, $locale);
+    }
+
+    /**
+     * Loads translation files
+     */
+    private function loadResources(): void
+    {
+        $this->translator->addLoader('xlf', new XliffFileLoader());
+        $languages = array_keys($this->config->get('i18n')['languages']);
+        foreach ($languages as $language) {
+            $file = getcwd() . "/translations/messages.{$language}.xliff";
+
+            if (!file_exists($file)) {
+                $this->logger->warn("Localization resource not found ({$file})");
+                continue;
+            }
+
+            $this->translator->addResource('xlf', $file, $language);
+        }
     }
 }
