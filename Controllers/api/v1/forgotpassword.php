@@ -62,12 +62,12 @@ class forgotpassword implements Interfaces\Api, Interfaces\ApiIgnorePam
           $template = new Core\Email\V2\Common\Template();
           $translator = $template->getTranslator();
 
-          $subject = $translator->translate('Password reset');
+          $subject = $translator->trans('Password reset');
 
           //prepare the action button
           $actionButton = (new ActionButton())
            ->setPath($link)
-           ->setLabel($translator->translate('Reset Password'));
+           ->setLabel($translator->trans('Reset Password'));
 
           $template
             ->setLocale($user->getLanguage())
@@ -76,8 +76,8 @@ class forgotpassword implements Interfaces\Api, Interfaces\ApiIgnorePam
             ->set('user', $user)
             ->set('username', $user->username)
             ->set('link', $link)
-            ->set('signoff', $translator->translate('Thank you,'))
-            ->set('preheader', $translator->translate('Reset your password by clicking this link.'))
+            ->set('signoff', $translator->trans('Thank you,'))
+            ->set('preheader', $translator->trans('Reset your password by clicking this link.'))
             ->set('title', $subject)
             ->set('actionButton', $actionButton->build());
           $message->setTo($user)

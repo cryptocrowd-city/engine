@@ -53,7 +53,7 @@ class BoostComplete extends EmailCampaign
         $this->template->setLocale($this->user->getLanguage());
         $translator = $this->template->getTranslator();
 
-        $subject = $translator->translate('Boost Completed');
+        $subject = $translator->trans('Boost Completed');
         $this->template->set('title', $subject);
         $this->template->setTemplate('default.tpl');
         $this->template->setBody('./template.tpl');
@@ -65,14 +65,14 @@ class BoostComplete extends EmailCampaign
         $this->template->set('boost', $this->boost);
         $this->template->set('campaign', $this->campaign);
         $this->template->set('topic', $this->topic);
-        $this->template->set('preheader', $translator->translate('Your boost is complete.'));
-        $this->template->set('signoff', $translator->translate('Thank you,'));
+        $this->template->set('preheader', $translator->trans('Your boost is complete.'));
+        $this->template->set('signoff', $translator->trans('Thank you,'));
         $this->template->set('tracking', $trackingQuery);
 
 
         $actionButton = (new ActionButton())
         ->setPath('boost/console?'. $trackingQuery)
-        ->setLabel($translator->translate('View Boost'));
+        ->setLabel($translator->trans('View Boost'));
         $this->template->set('actionButton', $actionButton->build());
 
         $message = new Message();

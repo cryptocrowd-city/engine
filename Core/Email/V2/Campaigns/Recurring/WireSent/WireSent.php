@@ -61,9 +61,9 @@ class WireSent extends EmailCampaign
         $this->template->set('contract', $contract);
         $this->template->set('campaign', $this->campaign);
         $this->template->set('topic', $this->topic);
-        $this->template->set('signoff', $translator->translate('Thank you,'));
-        $this->template->set('title', $translator->translate($this->subject));
-        $this->template->set('preheader', $translator->translate("You've sent a payment on Minds."));
+        $this->template->set('signoff', $translator->trans('Thank you,'));
+        $this->template->set('title', $translator->trans($this->subject));
+        $this->template->set('preheader', $translator->trans("You've sent a payment on Minds."));
         $this->template->set('tracking', http_build_query($tracking));
 
         $message = new Message();

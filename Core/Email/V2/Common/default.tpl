@@ -274,7 +274,7 @@
                       <p
                         <?php echo $emailStyles->getStyles('m-copy'); ?>
                       >
-                        <?= $vars['translator']->translate('Hi') ?> @<?php echo $vars['username'] ?>,
+                        <?= $vars['translator']->trans('Hi') ?> @<?php echo $vars['username'] ?>,
                       </p>
                     </td>
                   </tr>
@@ -374,7 +374,7 @@
                           font-size: 22px;
                         "
                       >
-                        <?= $vars['translator']->translate('Download the Minds app today!') ?>
+                        <?= $vars['translator']->trans('Download the Minds app today!') ?>
                       </td>
                     </tr>
                     <tr>
@@ -556,7 +556,7 @@
                                         >
                                           <div>
                                             <div style="display: inline-block;">
-                                              <?= $vars['translator']->translate('Sent to you from') ?>
+                                              <?= $vars['translator']->trans('Sent to you from') ?>
                                             </div>
                                             <div style="display: inline-block;">
                                               Minds Inc
@@ -608,7 +608,7 @@
                                             href="https://www.minds.com/settings/canary/account/email-notifications"
                                             target="_blank"
                                             >
-                                            <?= $vars['translator']->translate('Manage email settings') ?>
+                                            <?= $vars['translator']->trans('Manage email settings') ?>
                                           </a>
                                         </td>
                                       </tr>

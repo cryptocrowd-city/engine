@@ -6,11 +6,11 @@
 <tr>
     <td>
         <p>
-            <?= $vars['translator']->translate('You received a payment from') ?>
+            <?= $vars['translator']->trans('You received a payment from') ?>
             <a
                 href="<?php echo $vars['site_url']?><?php echo $senderName ?>"
                 <?php echo $emailStyles->getStyles('m-link'); ?>>
-                 @<?php echo $senderName; ?></a> <?= $vars['translator']->translate('as a tip.') ?>
+                 @<?php echo $senderName; ?></a> <?= $vars['translator']->trans('as a tip.') ?>
         </p>
     </td>
 </tr>
@@ -18,11 +18,11 @@
     <td>
         <p>
             <div>
-                <div style="display: inline-block;"><?= $vars['translator']->translate('Transfer date') ?>: </div>
+                <div style="display: inline-block;"><?= $vars['translator']->trans('Transfer date') ?>: </div>
                 <div style="display: inline-block;"><?php echo $wireDate; ?></div>
             </div>
             <div>
-                <div style="display: inline-block;"><?= $vars['translator']->translate('Amount') ?>: </div>
+                <div style="display: inline-block;"><?= $vars['translator']->trans('Amount') ?>: </div>
                 <div style="display: inline-block;"><?php echo $amount; ?></div>
             </div>
         </p>
@@ -31,7 +31,7 @@
 <tr>
     <td>
         <p>
-            <?= $vars['translator']->translate('For any issues, including the recipient not receiving any payment, please contact us at') ?>
+            <?= $vars['translator']->trans('For any issues, including the recipient not receiving any payment, please contact us at') ?>
             <a href="mailto:info@minds.com" <?php echo $emailStyles->getStyles('m-link'); ?>>
                 info@minds.com</a>.
         </p>
