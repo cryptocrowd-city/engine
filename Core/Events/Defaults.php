@@ -70,7 +70,8 @@ class Defaults
 
             $export = $event->response() ?: [];
 
-            if (!($params['entity']->type === 'object' 
+            if (!(
+                $params['entity']->type === 'object'
                 || $params['entity']->type === 'group'
                 || $params['entity']->type === 'activity'
             )) {
