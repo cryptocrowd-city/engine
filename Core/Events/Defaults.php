@@ -67,7 +67,15 @@ class Defaults
         //Comments count export extender
         Dispatcher::register('export:extender', 'all', function ($event) {
             $params = $event->getParameters();
+
             $export = $event->response() ?: [];
+
+            if (!($params['entity']->type === 'object' 
+                || $params['entity']->type === 'group'
+                || $params['entity']->type === 'activity'
+            )) {
+                return false;
+            }
 
             /** @var Core\Data\cache\abstractCacher $cacher */
             $cacher = Core\Di\Di::_()->get('Cache');
