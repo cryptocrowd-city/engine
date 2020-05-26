@@ -114,7 +114,7 @@
             </trans-unit>
             <trans-unit id="28">
                 <source>and submit an appeal to a jury of your peers from the Reported Content section of your settings.</source>
-                <target>y envía una apelación a un jurado formado por tus pares desde la sección Contenido Reportado en Preferencias</target>
+                <target>y envía una apelación a un jurado formado por tus pares desde la sección Contenido Reportado en Preferencias.</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>More can be learned about how the Appeals process works</source>
@@ -126,175 +126,175 @@
             </trans-unit>
             <trans-unit id="31">
                 <source>activity</source>
-                <target>actividad<target>
+                <target>actividad</target>
             </trans-unit>
             <trans-unit id="32">
                 <source>video</source>
-                <target>video<target>
+                <target>video</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>image</source>
-                <target>imágen<target>
+                <target>imágen</target>
             </trans-unit>
             <trans-unit id="34">
                 <source>album</source>
-                <target>album<target>
+                <target>album</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>group</source>
-                <target>grupo<target>
+                <target>grupo</target>
             </trans-unit>
             <trans-unit id="36">
                 <source>Thank you for your purchase! We sincerely appreciate your support. Your tokens have now been issued.</source>
-                <target>¡Gracias por tu compra! Sinceramente apreciamos tu apoyo. Tus tokens han sido emitidos.<target>
+                <target>¡Gracias por tu compra! Sinceramente apreciamos tu apoyo. Tus tokens han sido emitidos.</target>
             </trans-unit>
             <trans-unit id="37">
                 <source>Date</source>
-                <target>Fecha<target>
+                <target>Fecha</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>Token Amount</source>
-                <target>Cantidad de Tokens<target>
+                <target>Cantidad de Tokens</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>Remember, you can manage your subscriptions and payment methods in your billing settings.</source>
-                <target>Recuerda, puedes gestionar tus subscripciones y métodos de pagos en tus preferencias de facturación.<target>
+                <target>Recuerda, puedes gestionar tus subscripciones y métodos de pagos en tus preferencias de facturación.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>For any issues, please contact us at</source>
-                <target>Si tienes algún problema, por favor contáctanos en<target>
+                <target>Si tienes algún problema, por favor contáctanos en</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>Your purchase of Minds Tokens is currently being processed. We will notify you once the transaction is complete.</source>
-                <target>Tu compra de Tokens de Minds está siendo procesada. Te notificaremos una vez la transacción sea completada.<target>
+                <target>Tu compra de Tokens de Minds está siendo procesada. Te notificaremos una vez la transacción sea completada.</target>
             </trans-unit>
             <trans-unit id="42">
                 <source>Boost Completed</source>
-                <target>Tu Boost ha completado<target>
+                <target>Tu Boost ha completado</target>
             </trans-unit>
             <trans-unit id="43">
                 <source>Your boost is complete.</source>
-                <target>Tu boost ha completado.<target>
+                <target>Tu boost ha completado.</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>Thank you,</source>
-                <target>Gracias,<target>
+                <target>Gracias,</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>View Boost</source>
-                <target>Ver Boost<target>
+                <target>Ver Boost</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>Your boost of</source>
-                <target>Tu boost de<target>
-            </trans-unit>
-            <trans-unit id="46">
-                <source>views is complete.</source>
-                <target>vistas ha completado.<target>
+                <target>Tu boost de</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>Please use the link below to reset your password. If you did not request to reset your password, please disregard this email.</source>
-                <target>Por favor usa el vínculo de abajo para reinicializar tu contraseña. Si no solicitaste reinicializar tu contraseña, por favor ignora este mensaje.<target>
+                <source>views is complete.</source>
+                <target>vistas ha completado.</target>
             </trans-unit>
             <trans-unit id="48">
-                <source>Reset your password by clicking this link.</source>
-                <target>Reinicializa tu contraseña haciendo click en este vínculo.<target>
+                <source>Please use the link below to reset your password. If you did not request to reset your password, please disregard this email.</source>
+                <target>Por favor usa el vínculo de abajo para reinicializar tu contraseña. Si no solicitaste reinicializar tu contraseña, por favor ignora este mensaje.</target>
             </trans-unit>
             <trans-unit id="49">
-                <source>Reset Password</source>
-                <target>Reinicializar Contraseña<target>
+                <source>Reset your password by clicking this link.</source>
+                <target>Reinicializa tu contraseña haciendo click en este vínculo.</target>
             </trans-unit>
             <trans-unit id="50">
-                <source>Password reset</source>
-                <target>Reinicialización de contraseña<target>
+                <source>Reset Password</source>
+                <target>Reinicializar Contraseña</target>
             </trans-unit>
             <trans-unit id="51">
-                <source>Here's a free token for your new channel.</source>
-                <target>Aquí tienes un token gratis para tu canal.<target>
+                <source>Password reset</source>
+                <target>Reinicialización de contraseña</target>
             </trans-unit>
             <trans-unit id="52">
-                <source>Make a Post</source>
-                <target>Crea una Publicación<target>
+                <source>Here's a free token for your new channel.</source>
+                <target>Aquí tienes un token gratis para tu canal.</target>
             </trans-unit>
             <trans-unit id="53">
-                <source>You have successfully completed our onboarding process and your channel has been rewarded with one Minds token!</source>
-                <target>Has completado nuestro proceso de inducción exitosamente y tu canal ha sido recompensado con un Token de Minds!<target>
+                <source>Make a Post</source>
+                <target>Crea una Publicación</target>
             </trans-unit>
             <trans-unit id="54">
-                <source>Try making a post and using your token to Boost the post for 1,000 extra views from the community.</source>
-                <target>Intenta crear una publicación y usar tu token para boostearla para obtener 1.000 vistas de la comunidad.<target>
+                <source>You have successfully completed our onboarding process and your channel has been rewarded with one Minds token!</source>
+                <target>Has completado nuestro proceso de inducción exitosamente y tu canal ha sido recompensado con un Token de Minds!</target>
             </trans-unit>
             <trans-unit id="55">
-                <source>In order to provide the best possible experience, it is important to properly setup your channel.</source>
-                <target>Para proveerte de la mejor experiencia posible, es importante que configures tu canal apropiadamente.<target>
+                <source>Try making a post and using your token to Boost the post for 1,000 extra views from the community.</source>
+                <target>Intenta crear una publicación y usar tu token para boostearla para obtener 1.000 vistas de la comunidad.</target>
             </trans-unit>
             <trans-unit id="56">
-                <source>Please take a moment to complete our onboarding process so that you can enjoy all of the different features we have to offer!</source>
-                <target>Por favor tómate un momento para completar nuestro proceso de inducción para que puedas disfrutar de todas las diferentes características que tenemos para ofrecerte!<target>
+                <source>In order to provide the best possible experience, it is important to properly setup your channel.</source>
+                <target>Para proveerte de la mejor experiencia posible, es importante que configures tu canal apropiadamente.</target>
             </trans-unit>
             <trans-unit id="57">
-                <source>Enjoy all of the different features Minds has to offer when you finish setting up your channel</source>
-                <target>Disfruta de todas las diferentes características que Minds tiene para ofrecerte cuando termines de configurar tu canal<target>
+                <source>Please take a moment to complete our onboarding process so that you can enjoy all of the different features we have to offer!</source>
+                <target>Por favor tómate un momento para completar nuestro proceso de inducción para que puedas disfrutar de todas las diferentes características que tenemos para ofrecerte!</target>
             </trans-unit>
             <trans-unit id="58">
-                <source>Complete Setup</source>
-                <target>Terminar de configurar<target>
+                <source>Enjoy all of the different features Minds has to offer when you finish setting up your channel</source>
+                <target>Disfruta de todas las diferentes características que Minds tiene para ofrecerte cuando termines de configurar tu canal</target>
             </trans-unit>
             <trans-unit id="59">
-                <source>We Miss You</source>
-                <target>Te Extrañamos<target>
+                <source>Complete Setup</source>
+                <target>Terminar de configurar</target>
             </trans-unit>
             <trans-unit id="60">
-                <source>We hope to see you again!</source>
-                <target>¡Esperamos verte pronto!<target>
+                <source>We Miss You</source>
+                <target>Te Extrañamos</target>
             </trans-unit>
             <trans-unit id="61">
-                <source>We want you back!</source>
-                <target>¡Te queremos de vuelta!<target>
+                <source>We hope to see you again!</source>
+                <target>¡Esperamos verte pronto!</target>
             </trans-unit>
             <trans-unit id="62">
-                <source>Check-in</source>
-                <target>Preséntate<target>
+                <source>We want you back!</source>
+                <target>¡Te queremos de vuelta!</target>
             </trans-unit>
             <trans-unit id="63">
-                <source>We want you back! Check in with the button below to let us know you are active so we can prioritize your channel in our recommendations to others. Our goal is to provide relevant suggestions without invasive surveillance.</source>
-                <target>¡Te queremos de vuelta! Preséntate con el botón de abajo y dejanos saber que estás activo de manera que podamos priorizar tu canal en nuestras recomendaciones a otros. Nuestra meta es proveer sugerencias relevantes sin vigilancia invasiva.<target>
+                <source>Check-in</source>
+                <target>Preséntate</target>
             </trans-unit>
             <trans-unit id="64">
-                <source>You've received a payment on Minds.</source>
-                <target>Has recibido un pago en Minds.<target>
+                <source>We want you back! Check in with the button below to let us know you are active so we can prioritize your channel in our recommendations to others. Our goal is to provide relevant suggestions without invasive surveillance.</source>
+                <target>¡Te queremos de vuelta! Preséntate con el botón de abajo y dejanos saber que estás activo de manera que podamos priorizar tu canal en nuestras recomendaciones a otros. Nuestra meta es proveer sugerencias relevantes sin vigilancia invasiva.</target>
             </trans-unit>
             <trans-unit id="65">
-                <source>You received a payment from</source>
-                <target>Has recibido un pago de<target>
+                <source>You've received a payment on Minds.</source>
+                <target>Has recibido un pago en Minds.</target>
             </trans-unit>
             <trans-unit id="66">
-                <source>as a tip.</source>
-                <target>como propina.<target>
+                <source>You received a payment from</source>
+                <target>Has recibido un pago de</target>
             </trans-unit>
             <trans-unit id="67">
-                <source>Transfer date</source>
-                <target>Fecha de transferencia<target>
+                <source>as a tip.</source>
+                <target>como propina.</target>
             </trans-unit>
             <trans-unit id="68">
-                <source>Amount</source>
-                <target>Monto<target>
+                <source>Transfer date</source>
+                <target>Fecha de transferencia</target>
             </trans-unit>
             <trans-unit id="69">
-                <source>For any issues, including the recipient not receiving any payment, please contact us at</source>
-                <target>Por cualquier problema, incluyendo el destinatario no recibiendo pago alguno, por favor contáctanos en<target>
+                <source>Amount</source>
+                <target>Monto</target>
             </trans-unit>
             <trans-unit id="70">
-                <source>You've sent a payment on Minds.</source>
-                <target>Has realizado un pago en Minds.<target>
+                <source>For any issues, including the recipient not receiving any payment, please contact us at</source>
+                <target>Por cualquier problema, incluyendo el destinatario no recibiendo pago alguno, por favor contáctanos en</target>
             </trans-unit>
             <trans-unit id="71">
-                <source>Payment sent</source>
-                <target>Pago realizado<target>
+                <source>You've sent a payment on Minds.</source>
+                <target>Has realizado un pago en Minds.</target>
             </trans-unit>
             <trans-unit id="72">
+                <source>Payment sent</source>
+                <target>Pago realizado</target>
+            </trans-unit>
+            <trans-unit id="73">
                 <source>Payment received</source>
-                <target>Pago recibido<target>
+                <target>Pago recibido</target>
             </trans-unit>
 
         </body>
