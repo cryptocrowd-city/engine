@@ -29,7 +29,7 @@ class Translator
     ) {
         $this->config = $config ?: Di::_()->get('Config');
         $this->translator = $translator ?:
-            new SymfonyTranslator('en', null, null, $this->config->get('development_mode'));
+            new SymfonyTranslator('en', null, null, $this->config->get('development_mode') ?? false);
 
         $this->logger = $logger ?: Di::_()->get('Logger');
 
