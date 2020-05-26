@@ -31,9 +31,9 @@ class BoostProvider extends Provider
         $this->di->bind('Boost\Network\Iterator', function ($di) {
             return new Network\Iterator();
         }, ['useFactory' => false]);
-//        $this->di->bind('Boost\Network\Metrics', function ($di) {
-//            return new Network\Metrics(Client::build('MongoDB'));
-//        }, ['useFactory' => false]);
+        $this->di->bind('Boost\Network\Metrics', function ($di) {
+            return new Network\Metrics();
+        }, ['useFactory' => false]);
         $this->di->bind('Boost\Network\Review', function ($di) {
             return new Network\Review();
         }, ['useFactory' => false]);
