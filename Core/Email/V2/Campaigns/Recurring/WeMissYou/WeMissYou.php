@@ -46,14 +46,17 @@ class WeMissYou extends EmailCampaign
             'state' => $this->state,
         ];
 
+        $this->template->setLocale($this->user->getLanguage());
+        $translator = $this->template->getTranslator();
+
         $trackingQuery = http_build_query($tracking);
-        $subject = 'We Miss You';
+        $subject = $translator->translate('We Miss You');
 
         $this->template->setTemplate('default.tpl');
         $this->template->setBody('./template.tpl');
         $this->template->set('title', $subject);
-        $this->template->set('signoff', 'We hope to see you again!');
-        $this->template->set('preheader', 'We want you back!');
+        $this->template->set('signoff', $translator->translate('We hope to see you again!'));
+        $this->template->set('preheader', $translator->translate('We want you back!'));
         $this->template->set('user', $this->user);
         $this->template->set('username', $this->user->username);
         $this->template->set('email', $this->user->getEmail());
@@ -65,7 +68,7 @@ class WeMissYou extends EmailCampaign
 
         $actionButton = (new ActionButton())
         ->setPath('newsfeed/subscribed?'. $trackingQuery)
-        ->setLabel('Check-in');
+        ->setLabel($translator->translate('Check-in'));
 
         $this->template->set('actionButton', $actionButton->build());
 

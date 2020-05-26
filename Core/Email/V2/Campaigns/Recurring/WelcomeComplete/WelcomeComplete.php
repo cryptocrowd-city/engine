@@ -57,7 +57,9 @@ class WelcomeComplete extends EmailCampaign
             'state' => $this->state,
         ];
         $trackingQuery = http_build_query($tracking);
-        $subject = 'Welcome to Minds';
+        $this->template->setLocale($this->user->getLanguage());
+        $translator = $this->template->getTranslator();
+        $subject = $translator->translate('Welcome to Minds');
 
         $this->template->set('title', $subject);
         $this->template->setTemplate('default.tpl');
@@ -69,12 +71,12 @@ class WelcomeComplete extends EmailCampaign
         $this->template->set('campaign', $this->campaign);
         $this->template->set('topic', $this->topic);
         $this->template->set('state', $this->state);
-        $this->template->set('preheader', 'Here\'s a free token for your new channel.');
+        $this->template->set('preheader', $translator->translate("Here's a free token for your new channel."));
         $this->template->set('tracking', $trackingQuery);
 
         $actionButton = (new ActionButton())
         ->setPath('newsfeed/subscribed?'. $trackingQuery)
-        ->setLabel('Make a Post');
+        ->setLabel($translator->translate('Make a Post'));
 
         $this->template->set('actionButton', $actionButton->build());
 

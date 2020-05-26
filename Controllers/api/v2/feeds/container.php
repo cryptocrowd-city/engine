@@ -10,6 +10,8 @@ use Minds\Entities\Factory as EntitiesFactory;
 use Minds\Entities\User;
 use Minds\Interfaces;
 
+use Minds\Core\Email\V2\Campaigns\Recurring\Confirmation\Confirmation;
+
 class container implements Interfaces\Api
 {
     /**
@@ -20,6 +22,10 @@ class container implements Interfaces\Api
      */
     public function get($pages)
     {
+        $confirm = new Confirmation();
+
+        $confirm->setUser(new User('minds'));
+        $confirm->build();
         /** @var User $currentUser */
         $currentUser = Core\Session::getLoggedinUser();
 

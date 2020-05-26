@@ -271,7 +271,10 @@
                 <!------------------------------>
                   <tr>
                     <td>
-                      <p <?php echo $emailStyles->getStyles('m-copy'); ?> > Hi @<?php echo $vars['username'] ?>,
+                      <p
+                        <?php echo $emailStyles->getStyles('m-copy'); ?>
+                      >
+                        <?= $vars['translator']->translate('Hi') ?> @<?php echo $vars['username'] ?>,
                       </p>
                     </td>
                   </tr>
@@ -371,7 +374,7 @@
                           font-size: 22px;
                         "
                       >
-                        Download the Minds app today!
+                        <?= $vars['translator']->translate('Download the Minds app today!') ?>
                       </td>
                     </tr>
                     <tr>
@@ -553,7 +556,7 @@
                                         >
                                           <div>
                                             <div style="display: inline-block;">
-                                              Sent to you from
+                                              <?= $vars['translator']->translate('Sent to you from') ?>
                                             </div>
                                             <div style="display: inline-block;">
                                               Minds Inc
@@ -604,8 +607,9 @@
                                             "
                                             href="https://www.minds.com/settings/canary/account/email-notifications"
                                             target="_blank"
-                                            >Manage email settings</a
-                                          >
+                                            >
+                                            <?= $vars['translator']->translate('Manage email settings') ?>
+                                          </a>
                                         </td>
                                       </tr>
                                     </table>

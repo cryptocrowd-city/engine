@@ -39,6 +39,9 @@ class WireReceived extends EmailCampaign
             'topic' => $this->topic,
         ];
 
+        $this->template->setLocale($this->user->getLanguage());
+        $translator = $this->template->getTranslator();
+
         $timestamp = gettype($this->wire->getTimestamp()) === 'object' ? $this->wire->getTimestamp()->time() : $this->wire->getTimestamp();
         $contract = $this->wire->getMethod() === 'onchain' ? 'wire' : 'offchain:wire';
 
@@ -54,9 +57,9 @@ class WireReceived extends EmailCampaign
         $this->template->set('contract', $contract);
         $this->template->set('campaign', $this->campaign);
         $this->template->set('topic', $this->topic);
-        $this->template->set('signoff', 'Thank you,');
-        $this->template->set('title', $this->subject);
-        $this->template->set('preheader', 'You\'ve received a payment on Minds.');
+        $this->template->set('signoff', $translator->translate('Thank you,'));
+        $this->template->set('title', $translator->translate($this->subject));
+        $this->template->set('preheader', $translator->translate("You've received a payment on Minds."));
         $this->template->set('tracking', http_build_query($tracking));
 
         $message = new Message();

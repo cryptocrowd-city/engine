@@ -75,10 +75,19 @@ class Template
      * @param string $locale
      * @return $this
      */
-    public function setLocale(string $locale): Template {
+    public function setLocale(string $locale): Template
+    {
         $this->translator->setLocale($locale);
 
         return $this;
+    }
+
+    /**
+     * @return Translator
+     */
+    public function getTranslator(): Translator
+    {
+        return $this->translator;
     }
 
     /**
