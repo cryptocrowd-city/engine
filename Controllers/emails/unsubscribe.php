@@ -30,7 +30,7 @@ class unsubscribe extends core\page implements Interfaces\page
                 $manager->unsubscribe($user, [ $campaign ], [ $topic ]);
                 $user->save();
             } else {
-                throw new \Exception('UnsubscribeSaveError');
+                throw new \Exception('UnsubscribeSaveException');
             }
 
             $siteUrl= Core\Config::_()->site_url;
