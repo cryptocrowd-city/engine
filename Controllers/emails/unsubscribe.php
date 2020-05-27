@@ -16,6 +16,9 @@ class unsubscribe extends core\page implements Interfaces\page
     public function get($pages)
     {
         \elgg_set_ignore_access();
+
+        $siteUrl = Core\Config::_()->site_url;
+
         try {
             $campaign = strtolower($pages[2]);
             $topic = strtolower($pages[3]);
@@ -32,8 +35,6 @@ class unsubscribe extends core\page implements Interfaces\page
             } else {
                 throw new \Exception('UnsubscribeSaveException');
             }
-
-            $siteUrl= Core\Config::_()->site_url;
 
             echo <<<HTML
                 <img src="https://d15u56mvtglc6v.cloudfront.net/front/public/assets/logos/medium-production.png" alt="Minds.com" align="middle" width="200px" height="80px"/>
