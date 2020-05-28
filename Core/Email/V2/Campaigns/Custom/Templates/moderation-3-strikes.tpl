@@ -10,7 +10,7 @@
         <p>
             <?= $vars['translator']->trans('If you believe this decision is a mistake, you may') ?>
             <a href="https://www.minds.com" <?php echo $emailStyles->getStyles('m-link'); ?>><?= $vars['translator']->trans('log in here') ?></a>
-            to appeal any of your strikes to a jury of your peers. The jury consists of twelve randomly selected active users of Minds. If the jury votes to overturn our decision, the strike will be removed and the ban will be lifted. You can learn more about our appeal process by reading our <a href="https://www.minds.com/content-policy" target="_blank" <?php echo $emailStyles->getStyles('m-link'); ?>><?= $vars['translator']->trans('Content Policy.') ?></a>.
+            to appeal any of your strikes to a jury of your peers. The jury consists of twelve randomly selected active users of Minds. If the jury votes to overturn our decision, the strike will be removed and the ban will be lifted. You can learn more about our appeal process by reading our <a href="https://www.minds.com/content-policy" target="_blank" <?php echo $emailStyles->getStyles('m-link'); ?>><?= $vars['translator']->trans('Content Policy') ?></a>.
         </p>
     </td>
 </tr>
