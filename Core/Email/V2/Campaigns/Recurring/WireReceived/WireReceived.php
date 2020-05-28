@@ -20,7 +20,6 @@ class WireReceived extends EmailCampaign
     protected $template;
     protected $mailer;
     protected $method;
-    protected $subject = ;
     /* @var Wire */
     protected $wire;
 
