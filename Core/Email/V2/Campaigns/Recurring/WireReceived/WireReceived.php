@@ -1,4 +1,5 @@
 <?php
+
 namespace Minds\Core\Email\V2\Campaigns\Recurring\WireReceived;
 
 use Minds\Core\Email\Campaigns\EmailCampaign;
@@ -15,10 +16,11 @@ class WireReceived extends EmailCampaign
 {
     // TODO code docs
     use MagicAttributes;
+
     protected $template;
     protected $mailer;
     protected $method;
-    protected $subject = 'Payment received';
+    protected $subject = ;
     /* @var Wire */
     protected $wire;
 
@@ -39,8 +41,11 @@ class WireReceived extends EmailCampaign
             'topic' => $this->topic,
         ];
 
+
         $this->template->setLocale($this->user->getLanguage());
         $translator = $this->template->getTranslator();
+
+        $subject = $translator->trans('Payment received');
 
         $timestamp = gettype($this->wire->getTimestamp()) === 'object' ? $this->wire->getTimestamp()->time() : $this->wire->getTimestamp();
         $contract = $this->wire->getMethod() === 'onchain' ? 'wire' : 'offchain:wire';
@@ -58,7 +63,7 @@ class WireReceived extends EmailCampaign
         $this->template->set('campaign', $this->campaign);
         $this->template->set('topic', $this->topic);
         $this->template->set('signoff', $translator->trans('Thank you,'));
-        $this->template->set('title', $translator->trans($this->subject));
+        $this->template->set('title', $subject);
         $this->template->set('preheader', $translator->trans("You've received a payment on Minds."));
         $this->template->set('tracking', http_build_query($tracking));
 
@@ -66,9 +71,9 @@ class WireReceived extends EmailCampaign
         $message->setTo($this->user)
             ->setMessageId(implode(
                 '-',
-                [$this->user->guid, sha1($this->user->getEmail()), sha1($this->campaign.$this->topic.time())]
+                [$this->user->guid, sha1($this->user->getEmail()), sha1($this->campaign . $this->topic . time())]
             ))
-            ->setSubject($this->subject)
+            ->setSubject($subject)
             ->setHtml($this->template);
 
         return $message;
@@ -81,7 +86,7 @@ class WireReceived extends EmailCampaign
         }
     }
 
-    private function getAmountString(Wire $wire) : string
+    private function getAmountString(Wire $wire): string
     {
         $amount = $wire->getAmount();
         if ($wire->getMethod() === 'tokens') {
