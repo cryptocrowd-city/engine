@@ -2,6 +2,7 @@
 
 namespace Minds\Core\Email\V2\Common;
 
+use Minds\Core\Config;
 use Minds\Core\I18n\Translator;
 use Minds\Core\Markdown\Markdown;
 use Minds\Core\Di\Di;
@@ -26,9 +27,9 @@ class Template
      * Constructor.
      *
      * @param Markdown $markdown
-     * @param null $config
-     * @param null $emailStyles
-     * @param null $translator
+     * @param Config $config
+     * @param EmailStyles $emailStyles
+     * @param Translator $translator
      */
     public function __construct($markdown = null, $config = null, $emailStyles = null, $translator = null)
     {
@@ -48,7 +49,7 @@ class Template
      * @param string $template
      * @return $this
      */
-    public function setTemplate($template = 'default'): Template
+    public function setTemplate($template = 'default')
     {
         $this->template = $this->findTemplate($template);
         if (!$this->template) {
@@ -63,7 +64,7 @@ class Template
      * @param bool $fromFile
      * @return $this
      */
-    public function setBody($template, $fromFile = true): Template
+    public function setBody($template, $fromFile = true)
     {
         $this->body = $fromFile ? $this->findTemplate($template) : $template;
         $this->loadFromFile = (bool) $fromFile;
@@ -75,7 +76,7 @@ class Template
      * @param string $locale
      * @return $this
      */
-    public function setLocale(string $locale): Template
+    public function setLocale(string $locale)
     {
         $this->translator->setLocale($locale);
 
@@ -85,7 +86,7 @@ class Template
     /**
      * @return Translator
      */
-    public function getTranslator(): Translator
+    public function getTranslator()
     {
         return $this->translator;
     }

@@ -12,6 +12,11 @@ use Minds\Core\Email\V2\Partials\ActionButton\ActionButton;
 use Minds\Traits\MagicAttributes;
 use Minds\Core\Di\Di;
 
+/**
+ * Class WelcomeComplete
+ * @package Minds\Core\Email\V2\Campaigns\Recurring\WelcomeComplete
+ * @method WelcomeComplete setSuggestions(array $value)
+ */
 class WelcomeComplete extends EmailCampaign
 {
     use MagicAttributes;

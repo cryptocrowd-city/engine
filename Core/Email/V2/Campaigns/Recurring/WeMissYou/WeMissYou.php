@@ -12,6 +12,11 @@ use Minds\Core\Email\V2\Partials\SuggestedChannels\SuggestedChannels;
 use Minds\Core\Email\V2\Partials\ActionButton\ActionButton;
 use Minds\Core\Di\Di;
 
+/**
+ * Class WeMissYou
+ * @package Minds\Core\Email\V2\Campaigns\Recurring\WeMissYou
+ * @method WeMissYou setSuggestions(string $value)
+ */
 class WeMissYou extends EmailCampaign
 {
     use MagicAttributes;
