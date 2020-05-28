@@ -1,5 +1,7 @@
 FROM php:7.3-fpm-alpine3.10
 
+RUN apk add --no-cache --update php-deps make
+
 RUN apk add --no-cache --virtual build-deps \
     libzip-dev \
     zlib-dev \
@@ -14,13 +16,19 @@ RUN apk add --no-cache --virtual build-deps \
     nodejs \
     npm \
     ffmpeg \
+    zlib-dev \
+    icu \
+    g++ \
     && docker-php-ext-install -j$(nproc) bcmath \
     && docker-php-ext-install -j$(nproc) zip \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-install -j$(nproc) exif \
     && docker-php-ext-install -j$(nproc) sockets \
-    && apk del build-deps
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install intl \
+    && apk del build-deps \
+    && apk del php-deps
 
 # PECL Extensions
 RUN apk add --no-cache --virtual build-deps \
