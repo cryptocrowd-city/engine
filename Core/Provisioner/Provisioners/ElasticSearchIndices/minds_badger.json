@@ -2,7 +2,7 @@
   "mappings": {
     "activity:blog": {
       "properties": {
-        "lang": {
+        "language": {
           "type": "keyword"
         },
         "@timestamp": {
@@ -138,7 +138,7 @@
     },
     "comment": {
       "properties": {
-        "lang": {
+        "language": {
           "type": "keyword"
         },
         "@timestamp": {
@@ -286,7 +286,7 @@
     },
     "activity": {
       "properties": {
-        "lang": {
+        "language": {
           "type": "keyword"
         },
         "@timestamp": {
@@ -474,7 +474,7 @@
     },
     "object:video": {
       "properties": {
-        "lang": {
+        "language": {
           "type": "keyword"
         },
         "@timestamp": {
@@ -568,7 +568,7 @@
     },
     "object": {
       "properties": {
-        "lang": {
+        "language": {
           "type": "keyword"
         },
         "@timestamp": {
@@ -686,7 +686,7 @@
     },
     "object:audio": {
       "properties": {
-        "lang": {
+        "language": {
           "type": "keyword"
         },
         "@timestamp": {
@@ -1110,7 +1110,7 @@
     },
     "object:blog": {
       "properties": {
-        "lang": {
+        "language": {
           "type": "keyword"
         },
         "@timestamp": {
@@ -1401,7 +1401,7 @@
     },
     "user": {
       "properties": {
-        "lang": {
+        "language": {
           "type": "keyword"
         },
         "@timestamp": {
@@ -1778,7 +1778,7 @@
     },
     "object:image": {
       "properties": {
-        "lang": {
+        "language": {
           "type": "keyword"
         },
         "@timestamp": {
