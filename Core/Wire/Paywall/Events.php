@@ -28,12 +28,12 @@ class Events
 
             if ($activity->isPaywall() && $activity->owner_guid != $currentUser) {
                 $export['message'] = null;
-                $export['custom_type'] = null;
-                $export['custom_data'] = null;
-                $export['thumbnail_src'] = null;
-                $export['perma_url'] = null;
-                $export['blurb'] = null;
-                $export['title'] = null;
+                // $export['custom_type'] = null;
+                // $export['custom_data'] = null;
+                // $export['thumbnail_src'] = null;
+                // $export['perma_url'] = null;
+                // $export['blurb'] = null;
+                // $export['title'] = null;
 
                 $dirty = true;
             }
@@ -45,12 +45,12 @@ class Events
             ) {
                 $export['remind_object'] = $activity->remind_object;
                 $export['remind_object']['message'] = null;
-                $export['remind_object']['custom_type'] = null;
-                $export['remind_object']['custom_data'] = null;
-                $export['remind_object']['thumbnail_src'] = null;
-                $export['remind_object']['perma_url'] = null;
-                $export['remind_object']['blurb'] = null;
-                $export['remind_object']['title'] = null;
+                // $export['remind_object']['custom_type'] = null;
+                // $export['remind_object']['custom_data'] = null;
+                // $export['remind_object']['thumbnail_src'] = null;
+                // $export['remind_object']['perma_url'] = null;
+                // $export['remind_object']['blurb'] = null;
+                // $export['remind_object']['title'] = null;
 
                 $dirty = true;
             }

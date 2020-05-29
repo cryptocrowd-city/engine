@@ -69,6 +69,37 @@ class thumbnail extends Core\page implements Interfaces\page
                 $contents = $thumbnail->read();
             }
 
+            // TODOOJM isPaywall && userHasNotPaid && notOwner
+            // if ($entity->isPaywall()) {
+            if (true) {
+                $imagick = new \Imagick();
+
+                $imagick->readImageBlob($contents);
+
+                // IF NOT GIF
+                $imagick->blurImage(100,500);
+                $contents = $imagick->getImageBlob();
+
+
+                // IF GIF
+                // https://www.php.net/manual/en/class.imagick.php
+                // then `convert 'imagick.gif[0]' imagick-frame.gif`
+
+                // Try these:
+                // $imagick->setImageFormat('gif');
+
+                // $imagick = $image->coalesceImages();
+                // foreach ($image as $frame) {
+                //     $frame->cropThumbnailImage(90, 90);
+                //     break;
+                // }
+                // $frame->writeImage('frame.gif');
+
+                // $image = $image->deconstructImages();
+                // $image->writeImages($file_dst, true);
+
+            }
+
             try {
                 $contentType = File::getMime($contents);
             } catch (\Exception $e) {
