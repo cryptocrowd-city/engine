@@ -34,20 +34,14 @@ class Manager
      */
     public function getLanguages(): array
     {
-        $languages = [];
-        foreach (Locales::I18N_LOCALES as $isoCode) {
-            $enDisplay = \Locale::getDisplayLanguage($isoCode, 'en');
-            $display = \Locale::getDisplayLanguage($isoCode, $isoCode);
-            $languages[$isoCode] = "$display ($enDisplay)";
-        }
-        return $languages;
+        return Locales::I18N_LOCALES;
     }
 
     /**
      * Get the current user's language, unless overriden
      * @return string
      */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         $user = Session::getLoggedInUser();
 
@@ -65,9 +59,13 @@ class Manager
      * @param string $language
      * @return bool
      */
-    public function isLanguage($language)
+    public function isLanguage(string $language): bool
     {
-        return isset($this->getLanguages()[$language]);
+        $localeCodes = array_map(function ($locale) {
+            return strtolower($locale['code']);
+        }, Locales::I18N_LOCALES);
+
+        return in_array($language, $localeCodes);
     }
 
     /**
