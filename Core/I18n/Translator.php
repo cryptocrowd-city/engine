@@ -78,7 +78,7 @@ class Translator
         $this->translator->addLoader('xlf', new XliffFileLoader());
         $languages = array_keys($this->config->get('i18n')['languages']);
         foreach ($languages as $language) {
-            $file = getcwd() . "/translations/messages.{$language}.xliff";
+            $file = dirname(dirname(dirname(__FILE__))) . "/translations/messages.{$language}.xliff";
 
             if (!file_exists($file)) {
                 $this->logger->warn("Localization resource not found ({$file})");
