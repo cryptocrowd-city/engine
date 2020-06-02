@@ -7,14 +7,22 @@ use Minds\Core\Config;
 use Minds\Core\Di\Di;
 use Minds\Core\Session;
 
-class I18n
+/**
+ * i18n Manager
+ * @package Minds\Core\I18n
+ */
+class Manager
 {
+    /** @var string */
     const DEFAULT_LANGUAGE = 'en';
-    const DEFAULT_LANGUAGE_NAME = 'English';
 
     /** @var Config */
     protected $config;
 
+    /**
+     * Manager constructor.
+     * @param null $config
+     */
     public function __construct($config = null)
     {
         $this->config = $config ?: Di::_()->get('Config');

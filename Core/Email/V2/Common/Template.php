@@ -40,7 +40,7 @@ class Template
         $this->data['cdn_assets_url'] = $this->config->get('cdn_assets_url') ?: 'https://cdn-assets.minds.com/front/dist/';
         $this->data['cdn_url'] = $this->config->get('cdn_url') ?: 'https://cdn.minds.com/';
 
-        $this->translator = $translator ?: Di::_()->get('Translator');
+        $this->translator = $translator ?: Di::_()->get('I18n\Translator');
 
         $this->set('translator', $this->translator);
     }
