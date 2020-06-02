@@ -20,8 +20,7 @@ class UserLanguageDelegate
      */
     public function __construct(
         $i18n = null
-    )
-    {
+    ) {
         $this->i18n = $i18n ?: Di::_()->get('I18n\Manager');
     }
 
