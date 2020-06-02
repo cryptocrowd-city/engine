@@ -32,7 +32,7 @@ class Events
                 // $export['custom_data'] = null;
                 // $export['thumbnail_src'] = null;
                 // $export['perma_url'] = null;
-                // $export['blurb'] = null;
+                $export['blurb'] = null;
                 // $export['title'] = null;
 
                 $dirty = true;
@@ -49,7 +49,7 @@ class Events
                 // $export['remind_object']['custom_data'] = null;
                 // $export['remind_object']['thumbnail_src'] = null;
                 // $export['remind_object']['perma_url'] = null;
-                // $export['remind_object']['blurb'] = null;
+                $export['remind_object']['blurb'] = null;
                 // $export['remind_object']['title'] = null;
 
                 $dirty = true;

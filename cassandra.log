@@ -1,8 +1,0 @@
-01-06-2020 19:04:56 UTC [ERROR] Unable to establish a control connection to host 172.18.0.5 because of the following error: Underlying connection error: Connect error 'connection refused' (src/cluster_connector.cpp:238)
-01-06-2020 19:04:56 UTC [ERROR] Unable to establish a control connection to host 172.18.0.5 because of the following error: Underlying connection error: Connect error 'connection refused' (src/cluster_connector.cpp:238)
-01-06-2020 19:05:28 UTC [ERROR] Unable to establish a control connection to host 172.18.0.5 because of the following error: Underlying connection error: Connect error 'connection refused' (src/cluster_connector.cpp:238)
-01-06-2020 19:05:28 UTC [ERROR] Unable to establish a control connection to host 172.18.0.5 because of the following error: Underlying connection error: Connect error 'connection refused' (src/cluster_connector.cpp:238)
-01-06-2020 19:05:29 UTC [ERROR] Unable to establish a control connection to host 172.18.0.5 because of the following error: Underlying connection error: Connect error 'connection refused' (src/cluster_connector.cpp:238)
-01-06-2020 19:05:29 UTC [ERROR] Unable to establish a control connection to host 172.18.0.5 because of the following error: Underlying connection error: Connect error 'connection refused' (src/cluster_connector.cpp:238)
-01-06-2020 19:05:55 UTC [ERROR] Unable to establish a control connection to host 172.18.0.5 because of the following error: Underlying connection error: Connect error 'connection refused' (src/cluster_connector.cpp:238)
-01-06-2020 19:05:55 UTC [ERROR] Unable to establish a control connection to host 172.18.0.5 because of the following error: Underlying connection error: Connect error 'connection refused' (src/cluster_connector.cpp:238)
