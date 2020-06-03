@@ -200,7 +200,7 @@ class Push implements Interfaces\NotificationExtensionInterface
     public static function buildNotificationMessage(array $notification = [], $from_user, $entity)
     {
         /** @var Core\I18n\Translator $translator */
-        $translator = Di::_()->get('Translator');
+        $translator = Di::_()->get('I18n\Translator');
         $translator->setLocale($notification['toObj']->getLanguage());
 
         $message = '';
