@@ -28,6 +28,7 @@ class Push implements Interfaces\NotificationExtensionInterface
             'queue' => 'Push',
             'uri' => null,
             'to' => null,
+            'toObj' => null,
             'from' => null,
             'params' => [],
         ], $notification);
