@@ -34,7 +34,13 @@ class Manager
      */
     public function getLanguages(): array
     {
-        return Locales::I18N_LOCALES;
+        $languages = [];
+        foreach (Locales::I18N_LOCALES as $isoCode) {
+            $enDisplay = Locale::getDisplayLanguage($isoCode, 'en');
+            $display = Locale::getDisplayLanguage($isoCode, $isoCode);
+            $languages[$isoCode] = "$display ($enDisplay)";
+        }
+        return $languages;
     }
 
     /**
@@ -66,19 +72,6 @@ class Manager
         }, Locales::I18N_LOCALES);
 
         return in_array($language, $localeCodes, true);
-    }
-
-    /**
-     * Gets the language from the query string, if valid
-     * @return null|string
-     */
-    public function getLanguageFromQueryString()
-    {
-        if (!isset($_GET['hl']) || !$this->isLanguage($_GET['hl'])) {
-            return null;
-        }
-
-        return strtolower($_GET['hl']);
     }
 
     /**
