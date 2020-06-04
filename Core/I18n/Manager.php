@@ -47,17 +47,21 @@ class Manager
      * Get the current user's language, unless overriden
      * @return string
      */
-    public function getLanguage(): string
+    public function getLanguage(): ?string
     {
         $user = Session::getLoggedInUser();
 
-        if (!$user) {
-            return $this->getPrimaryLanguageFromHeader() ?: static::DEFAULT_LANGUAGE;
-        }
+        $languages = array_values(array_filter([
+            $_COOKIE['hl'] ?? null, // Cookie override has highest priority
+            $user ? $user->getLanguage() : null, // User, if logged in, comes next
+            $this->getPrimaryLanguageFromHeader(), // Then we detect from Accept-Language header
+            static::DEFAULT_LANGUAGE // Then we default to English
+        ], function ($language) {
+            // Filter out falsy values and language codes that are not present on Locales list
+            return $language && $this->isLanguage($language);
+        }));
 
-        return $user->getLanguage()
-            ?? $this->getPrimaryLanguageFromHeader()
-            ?? static::DEFAULT_LANGUAGE;
+        return $languages[0] ?? null;
     }
 
     /**
@@ -71,22 +75,15 @@ class Manager
     }
 
     /**
-     * Gets the language from the header, if valid
-     * @return null|string
-     */
-    public function getLanguageFromHeader(): string
-    {
-        return Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-    }
-
-    /**
-     * Gets primary language, e.g. en_GB becomes just en.
+     * Gets primary language from header, e.g. en_GB becomes just en.
      * @param {string} $language - en_GB etc.
      * @return string - returns primary language.
      */
-    public function getPrimaryLanguageFromHeader(): string
+    public function getPrimaryLanguageFromHeader(): ?string
     {
-        return Locale::getPrimaryLanguage($this->getLanguageFromHeader());
+        return Locale::getPrimaryLanguage(
+            Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? static::DEFAULT_LANGUAGE)
+        );
     }
 
     /**
