@@ -22,7 +22,7 @@ class category implements Api
         /** @var Manager $manager */
         $manager = Di::_()->get('Helpdesk\Category\Manager');
 
-        if($translate) {
+        if ($translate) {
             $manager->setUser(Session::getLoggedinUser());
         }
 

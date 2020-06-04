@@ -106,8 +106,10 @@ class Translations
 
                 case 'title':
                     if (MagicAttributes::getterExists($entity, 'getTitle')) {
-                        $content = $entity->getTitle();break;
+                        $content = $entity->getTitle();
+                        break;
                     }
+                    // no break
                 case 'blurb':
                     if (!$entity->custom_type) {
                         continue 2; // exit switch AND continue foreach
