@@ -62,13 +62,13 @@ class Translations
             }
 
             $content = '';
-            
+
             switch ($field) {
                 case 'message':
                     if (method_exists($entity, 'getMessage')) {
-                        $content = $this->ignoreUrls($entity->getMessage());
+                        $content = nl2br($this->parseMessage($entity->getMessage()));
                     } elseif (property_exists($entity, 'message') || isset($entity->message)) {
-                        $content = $this->ignoreUrls($entity->message);
+                        $content = nl2br($this->parseMessage($entity->message));
                     }
                     break;
 
@@ -79,7 +79,7 @@ class Translations
                         $content = $entity->body;
                     }
                     break;
-                
+
                 case 'description':
                     if (method_exists($entity, 'getDescription')) {
                         $content = $entity->getDescription();
@@ -107,7 +107,6 @@ class Translations
             if (strlen($content) > static::MAX_CONTENT_LENGTH) {
                 $content = substr($content, 0, static::MAX_CONTENT_LENGTH);
             }
-            
             $translation[$field] = $this->translateText($content, $target);
 
             $translation[$field]['content'] = strip_tags(static::brToNewLine($translation[$field]['content']));
@@ -140,15 +139,18 @@ class Translations
     }
 
     /**
-     * Puts URLs inside a <span translate="no">
+     * Puts URLs and tags inside a <span translate="no">
      * @param string $message
      * @return string
      */
-    private function ignoreUrls(string $message): string
+    private function parseMessage(string $message): string
     {
+        $replacement = '<span translate="no">$0</span>';
         // replace URLs
-        $message = preg_replace('/(\b(https?|ftp|file):\/\/[^\s\]]+)/im', '<span translate="no">$0</span>', $message);
+        $message = preg_replace('/(\b(https?|ftp|file):\/\/[^\s\]]+)/im', $replacement, $message);
+        // replace mentions
+        $message = preg_replace('/(^|\W|\s)@([a-z0-9_\-\.]+[a-z0-9_])/im', $replacement, $message);
 
-        return nl2br($message);
+        return $message;
     }
 }
