@@ -67,11 +67,7 @@ class Manager
      */
     public function isLanguage(string $language): bool
     {
-        $localeCodes = array_map(function ($locale) {
-            return strtolower($locale['code']);
-        }, Locales::I18N_LOCALES);
-
-        return in_array($language, $localeCodes, true);
+        return in_array(strtolower($language), Locales::I18N_LOCALES, true);
     }
 
     /**
