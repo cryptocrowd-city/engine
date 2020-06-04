@@ -4,6 +4,7 @@
  * @version 1
  * @author Emiliano Balbuena
  */
+
 namespace Minds\Core\Translation;
 
 use Minds\Core;
@@ -41,16 +42,19 @@ class Translations
         }
 
         $entity = null; // Lazily-loaded if needed
+        if (is_object($guid)) {
+            $entity = $guid;
+        }
         $translation = [];
 
-        foreach ([ 'message', 'body', 'title', 'blurb', 'description' ] as $field) {
+        foreach (['message', 'body', 'title', 'blurb', 'description', 'question', 'answer'] as $field) {
             $stored = $storage->get($guid, $field, $target);
 
             if ($stored !== false) {
                 // Saved in cache store
                 $translation[$field] = [
                     'content' => $stored['content'],
-                    'source' => $stored['source_language']
+                    'source' => $stored['source_language'],
                 ];
                 continue;
             }
@@ -66,6 +70,16 @@ class Translations
             $content = '';
 
             switch ($field) {
+                case 'question':
+                    if (MagicAttributes::getterExists($entity, 'getQuestion')) {
+                        $content = $entity->getQuestion();
+                    }
+                    break;
+                case 'answer':
+                    if (MagicAttributes::getterExists($entity, 'getAnswer')) {
+                        $content = $entity->getAnswer();
+                    }
+                    break;
                 case 'message':
                     if (method_exists($entity, 'getMessage')) {
                         $content = $entity->getMessage();
@@ -91,6 +105,9 @@ class Translations
                     break;
 
                 case 'title':
+                    if (MagicAttributes::getterExists($entity, 'getTitle')) {
+                        $content = $entity->getTitle();break;
+                    }
                 case 'blurb':
                     if (!$entity->custom_type) {
                         continue 2; // exit switch AND continue foreach

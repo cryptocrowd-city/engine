@@ -94,6 +94,8 @@ class Confirmation extends EmailCampaign
             ->setSubject($subject)
             ->setHtml($this->template);
 
+        var_dump($message->buildHtml()); die();
+
         return $message;
     }
 
