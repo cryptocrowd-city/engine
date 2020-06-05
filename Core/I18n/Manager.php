@@ -34,24 +34,34 @@ class Manager
      */
     public function getLanguages(): array
     {
-        return Locales::I18N_LOCALES;
+        $languages = [];
+        foreach (Locales::I18N_LOCALES as $isoCode) {
+            $enDisplay = Locale::getDisplayLanguage($isoCode, 'en');
+            $display = Locale::getDisplayLanguage($isoCode, $isoCode);
+            $languages[$isoCode] = "$display ($enDisplay)";
+        }
+        return $languages;
     }
 
     /**
      * Get the current user's language, unless overriden
      * @return string
      */
-    public function getLanguage(): string
+    public function getLanguage(): ?string
     {
         $user = Session::getLoggedInUser();
 
-        if (!$user) {
-            return $this->getPrimaryLanguageFromHeader() ?: static::DEFAULT_LANGUAGE;
-        }
+        $languages = array_values(array_filter([
+            $_COOKIE['hl'] ?? null, // Cookie override has highest priority
+            $user ? $user->getLanguage() : null, // User, if logged in, comes next
+            $this->getPrimaryLanguageFromHeader(), // Then we detect from Accept-Language header
+            static::DEFAULT_LANGUAGE // Then we default to English
+        ], function ($language) {
+            // Filter out falsy values and language codes that are not present on Locales list
+            return $language && $this->isLanguage($language);
+        }));
 
-        return $user->getLanguage()
-            ?? $this->getPrimaryLanguageFromHeader()
-            ?? static::DEFAULT_LANGUAGE;
+        return $languages[0] ?? null;
     }
 
     /**
@@ -61,43 +71,19 @@ class Manager
      */
     public function isLanguage(string $language): bool
     {
-        $localeCodes = array_map(function ($locale) {
-            return strtolower($locale['code']);
-        }, Locales::I18N_LOCALES);
-
-        return in_array($language, $localeCodes, true);
+        return in_array(strtolower($language), Locales::I18N_LOCALES, true);
     }
 
     /**
-     * Gets the language from the query string, if valid
-     * @return null|string
-     */
-    public function getLanguageFromQueryString()
-    {
-        if (!isset($_GET['hl']) || !$this->isLanguage($_GET['hl'])) {
-            return null;
-        }
-
-        return strtolower($_GET['hl']);
-    }
-
-    /**
-     * Gets the language from the header, if valid
-     * @return null|string
-     */
-    public function getLanguageFromHeader(): string
-    {
-        return Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-    }
-
-    /**
-     * Gets primary language, e.g. en_GB becomes just en.
+     * Gets primary language from header, e.g. en_GB becomes just en.
      * @param {string} $language - en_GB etc.
      * @return string - returns primary language.
      */
-    public function getPrimaryLanguageFromHeader(): string
+    public function getPrimaryLanguageFromHeader(): ?string
     {
-        return Locale::getPrimaryLanguage($this->getLanguageFromHeader());
+        return Locale::getPrimaryLanguage(
+            Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? static::DEFAULT_LANGUAGE)
+        );
     }
 
     /**

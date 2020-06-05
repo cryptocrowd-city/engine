@@ -41,7 +41,6 @@ class Template
         $this->data['cdn_url'] = $this->config->get('cdn_url') ?: 'https://cdn.minds.com/';
 
         $this->translator = $translator ?: Di::_()->get('I18n\Translator');
-
         $this->set('translator', $this->translator);
     }
 
@@ -212,5 +211,21 @@ class Template
         ob_end_clean();
 
         return $contents;
+    }
+
+    /**
+     * Prevent sending translator to queue
+     * @return void
+     */
+    public function __sleep()
+    {
+        $this->set('translator', null);
+        return [ 'template', 'template_path', 'emailStyles', 'data', 'body', 'loadFromFile', 'useMarkdown' ];
+    }
+
+    public function __wakeup()
+    {
+        $this->translator = Di::_()->get('I18n\Translator');
+        $this->set('translator', $this->translator);
     }
 }
