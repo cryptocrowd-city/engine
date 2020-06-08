@@ -42,9 +42,6 @@ class Translations
         }
 
         $entity = null; // Lazily-loaded if needed
-        if (is_object($guid)) {
-            $entity = $guid;
-        }
         $translation = [];
 
         foreach (['message', 'body', 'title', 'blurb', 'description', 'question', 'answer'] as $field) {
@@ -72,19 +69,19 @@ class Translations
             switch ($field) {
                 case 'question':
                     if (MagicAttributes::getterExists($entity, 'getQuestion')) {
-                        $content = $entity->getQuestion();
+                        $content = nl2br($this->parseMessage($entity->getQuestion()));
                     }
                     break;
                 case 'answer':
                     if (MagicAttributes::getterExists($entity, 'getAnswer')) {
-                        $content = $entity->getAnswer();
+                        $content = nl2br($this->parseMessage($entity->getAnswer()));
                     }
                     break;
                 case 'message':
                     if (method_exists($entity, 'getMessage')) {
-                        $content = $entity->getMessage();
+                        $content = nl2br($this->parseMessage($entity->getMessage()));
                     } elseif (property_exists($entity, 'message') || isset($entity->message)) {
-                        $content = $entity->message;
+                        $content = nl2br($this->parseMessage($entity->message));
                     }
                     break;
 
@@ -131,6 +128,8 @@ class Translations
 
             $translation[$field] = $this->translateText($content, $target);
 
+            $translation[$field]['content'] = strip_tags(static::brToNewLine($translation[$field]['content']));
+
             if ($translation[$field]) {
                 $storage->set($guid, $field, $target, $translation[$field]['source'], $translation[$field]['content']);
             }
@@ -146,5 +145,31 @@ class Translations
         }
 
         return $this->service->translate($content, $target, $source);
+    }
+
+    /**
+     * Converts <br > to a new line
+     * @param string $value
+     * @return string
+     */
+    private function brToNewLine(string $value): string
+    {
+        return preg_replace('/<br\s\/>/im', "\r\n", $value);
+    }
+
+    /**
+     * Puts URLs and tags inside a <span translate="no">
+     * @param string $message
+     * @return string
+     */
+    private function parseMessage(string $message): string
+    {
+        $replacement = '<span translate="no">$0</span>';
+        // replace URLs
+        $message = preg_replace('/(\b(https?|ftp|file):\/\/[^\s\]]+)/im', $replacement, $message);
+        // replace mentions
+        $message = preg_replace('/(^|\W|\s)@([a-z0-9_\-\.]+[a-z0-9_])/im', $replacement, $message);
+
+        return $message;
     }
 }

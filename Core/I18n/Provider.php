@@ -1,18 +1,18 @@
 <?php
-/**
- * Minds i18n Provider
- */
-
 namespace Minds\Core\I18n;
 
-use Minds\Core\Di\Provider;
+use Minds\Core\Di\Provider as DiProvider;
 
-class I18nProvider extends Provider
+/**
+ * i18n Provider
+ * @package Minds\Core\I18n
+ */
+class Provider extends DiProvider
 {
     public function register()
     {
-        $this->di->bind('I18n', function ($di) {
-            return new I18n();
+        $this->di->bind('I18n\Manager', function ($di) {
+            return new Manager();
         }, ['useFactory' => true]);
 
         $this->di->bind('I18n\Translator', function ($di) {

@@ -77,10 +77,10 @@ class Confirmation extends EmailCampaign
         $this->template->set('preheader', $subject);
 
         $actionButton = (new ActionButton())
-            ->setLabel($translator->trans('Verify Address'))
-            ->setPath($this->confirmationUrl
-                ->setUser($this->user)
-                ->generate($tracking));
+        ->setLabel($translator->trans('Verify Address'))
+        ->setPath($this->confirmationUrl
+            ->setUser($this->user)
+            ->generate($tracking));
 
         $this->template->set('actionButton', $actionButton->build());
 
