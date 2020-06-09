@@ -325,6 +325,10 @@
                 <source>%user% commented on %user%'s post</source>
                 <target>%user% comentó en la publicación de %user%</target>
             </trans-unit>
+            <trans-unit id="bZ0gzc7" resname="comment.user.a.post">
+                <source>%user% commented on a post</source>
+                <target>%user% comentó en una publicación</target>
+            </trans-unit>
             <trans-unit id="bZ0gzc8" resname="comment.user.image">
                 <source>%user% commented on %user%'s image</source>
                 <target>%user% comentó en la imágen de %user%</target>
@@ -360,6 +364,10 @@
             <trans-unit id="bZ0gzc16" resname="like.blog">
                 <source>%user% voted up your blog</source>
                 <target>A %user% le gustó tu blog</target>
+            </trans-unit>
+            <trans-unit id="bZ0gzc16" resname="like.message">
+                <source>%user% voted up your message</source>
+                <target>A %user% le gustó tu mensaje</target>
             </trans-unit>
             <trans-unit id="bZ0gzc17" resname="tag.comment">
                 <source>%user% mentioned you in a comment</source>

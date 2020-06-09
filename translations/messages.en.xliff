@@ -285,6 +285,10 @@
         <source>%user% commented on %user%'s post</source>
         <target>%user% commented on %user%'s post</target>
       </trans-unit>
+      <trans-unit id="bZ0gzc7" resname="comment.user.a.post">
+        <source>%user% commented on a post</source>
+        <target>%user% commented on a post</target>
+      </trans-unit>
       <trans-unit id="bZ0gzc8" resname="comment.user.image">
         <source>%user% commented on %user%'s image</source>
         <target>%user% commented on %user%'s image</target>
@@ -320,6 +324,10 @@
       <trans-unit id="bZ0gzc16" resname="like.blog">
         <source>%user% voted up your blog</source>
         <target>%user% voted up your blog</target>
+      </trans-unit>
+      <trans-unit id="bZ0gzc16" resname="like.message">
+        <source>%user% voted up your message</source>
+        <target>%user% voted up your message</target>
       </trans-unit>
       <trans-unit id="bZ0gzc17" resname="tag.comment">
         <source>%user% mentioned you in a comment</source>

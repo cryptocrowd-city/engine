@@ -260,7 +260,7 @@ class Push implements Interfaces\NotificationExtensionInterface
                 return $translator->trans('user.subscribed', ['%user%' => $name]);
 
             case 'remind':
-                return $translator->trans('remind' . $desc, ['%user%' => $name]);
+                return $translator->trans('remind.' . $desc, ['%user%' => $name]);
 
             case 'boost_gift':
                 return $translator->trans('boost.gift', ['%user%' => $name]);
