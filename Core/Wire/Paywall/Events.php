@@ -145,8 +145,9 @@ class Events
         });
     }
 
-    private function extractTeaser($fullText){
-        if(!isset($fullText)){
+    private function extractTeaser($fullText)
+    {
+        if (!isset($fullText)) {
             return null;
         }
         $teaserText = substr($fullText, 0, 350);
