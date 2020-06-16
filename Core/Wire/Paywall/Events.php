@@ -40,8 +40,8 @@ class Events
             $dirty = false;
 
             if ($activity->isPaywall() && $activity->owner_guid != $currentUser) {
-                $export['blurb'] = extractTeaser($activity->blurb);
-                $export['message'] = extractTeaser($activity->message);
+                $export['blurb'] = $this->extractTeaser($activity->blurb);
+                $export['message'] = $this->extractTeaser($activity->message);
 
                 if (!$this->featuresManager->has('paywall-2020')) {
                     $export['custom_type'] = null;
@@ -60,8 +60,8 @@ class Events
                 $activity->remind_object['owner_guid'] != $currentUser
             ) {
                 $export['remind_object'] = $activity->remind_object;
-                $export['remind_object']['blurb'] = extractTeaser($activity->remind_object['blurb']);
-                $export['remind_object']['message'] = extractTeaser($activity->remind_object['message']);
+                $export['remind_object']['blurb'] = $this->extractTeaser($activity->remind_object['blurb']);
+                $export['remind_object']['message'] = $this->extractTeaser($activity->remind_object['message']);
 
 
                 if (!$this->featuresManager->has('paywall-2020')) {
