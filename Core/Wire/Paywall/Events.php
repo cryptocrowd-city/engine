@@ -144,7 +144,7 @@ class Events
             }
         });
     }
-    private function extractTeaser($fullText){
+    private function extractTeaser($fullText) {
         if(!isset($fullText)){
             return null;
         }
