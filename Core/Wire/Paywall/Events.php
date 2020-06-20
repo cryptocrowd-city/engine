@@ -148,7 +148,7 @@ class Events
         if (!isset($fullText)) {
             return null;
         }
-        $teaserText = substr($fullText, 0, 250);
+        $teaserText = substr($fullText, 0, 200);
 
         return $teaserText;
     }
