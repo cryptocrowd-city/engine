@@ -504,7 +504,7 @@ class Manager
         $elasticEntities = new Core\Feeds\Elastic\Entities();
         
         $opts = array_merge([
-            'cache_key' => $this->user->getGuid(),
+            'cache_key' => $this->user->getGuid() ?? null,
             'access_id' => 2,
             'limit' => 300,
             //'offset' => $offset,
