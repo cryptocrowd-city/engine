@@ -469,6 +469,12 @@ class Manager
      */
     public function getSearch(string $query, string $filter, string $type = 'activity', array $opts = []): Response
     {
+        if (!$this->user) {
+            $response = new Response();
+            $response->setException(new \Exception('User not found'));
+            return $response;
+        }
+
         $algorithm = 'latest';
         $opts = array_merge([
             'plus' => false,
@@ -502,11 +508,9 @@ class Manager
         }
 
         $elasticEntities = new Core\Feeds\Elastic\Entities();
-
-        $cacheKey = $this->user && $this->user->getGuid() ? $this->user->getGuid() : null;
-
+        
         $opts = array_merge([
-            'cache_key' => $cacheKey,
+            'cache_key' => $this->user->getGuid(),
             'access_id' => 2,
             'limit' => 300,
             //'offset' => $offset,
