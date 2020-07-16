@@ -1,5 +1,5 @@
 <?php
-namespace Minds\Core\Blockchain\Wallets\OnChain;
+namespace Minds\Core\Blockchain\Wallets\Ether;
 
 use Minds\Core\Blockchain\Token;
 use Minds\Core\Data\cache\abstractCacher;
@@ -52,14 +52,14 @@ class Balance
             return 0;
         }
 
-        $cacheKey = "blockchain:balance:{$address}";
+        $cacheKey = "blockchain:balance:eth:{$address}";
         $balance = $this->cache->get($cacheKey);
 
         if ($balance) {
             return unserialize($balance);
         }
 
-        $balance = $this->token->balanceOf($address);
+        $balance = $this->token->etherBalanceOf($address);
 
         if ($balance === null) {
             return null;
