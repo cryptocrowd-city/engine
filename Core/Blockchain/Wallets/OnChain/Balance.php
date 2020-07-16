@@ -53,11 +53,11 @@ class Balance
         }
 
         $cacheKey = "blockchain:balance:{$address}";
-        $balance = $this->cache->get($cacheKey);
+        // $balance = $this->cache->get($cacheKey);
 
-        if ($balance) {
-            return unserialize($balance);
-        }
+        // if ($balance) {
+        //     return unserialize($balance);
+        // }
 
         $balance = $this->token->balanceOf($address);
 
