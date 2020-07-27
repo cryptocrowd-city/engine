@@ -546,6 +546,7 @@ class newsfeed implements Interfaces\Api
                     ]);
                 }
 
+                // New activity
                 $activity = new Activity();
 
                 $activity->setMature(isset($_POST['mature']) && !!$_POST['mature']);
@@ -641,7 +642,21 @@ class newsfeed implements Interfaces\Api
                         // TODO: Handle immutable embeds (like blogs, which have an entity_guid and a URL)
                         // These should not appear naturally when creating, but might be implemented in the future.
                     }
+                    // TODO: verify user not plus, enforce only certain post types, change to checkbox on front, move to queue job AFTER user save.
+                    try {
+                        if ($_POST['post_to_permaweb']) {
+                            $permawebManager = Di::_()->get('Permaweb\Manager');
+                            $permawebResponse = $permawebManager->save($activity->getMessage(), Core\Session::getLoggedinUserGuid());
 
+                            if ($permawebResponse['status'] === 200) {
+                                $activity->setPermawebId($permawebResponse['id']);
+                            } else {
+                                throw new \Exception($permawebResponse['message']);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Di::_()->get('Logger')->error($e);
+                    }
                     // TODO: Move this to Core/Feeds/Activity/Manager
 
                     if ($_POST['video_poster'] ?? null) {
