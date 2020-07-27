@@ -646,13 +646,18 @@ class newsfeed implements Interfaces\Api
                     try {
                         if ($_POST['post_to_permaweb']) {
                             $permawebManager = Di::_()->get('Permaweb\Manager');
-                            $permawebResponse = $permawebManager->save($activity->getMessage(), Core\Session::getLoggedinUserGuid());
+                            $id = $permawebManager->generateId($activity->getMessage(), Core\Session::getLoggedinUserGuid());
 
-                            if ($permawebResponse['status'] === 200) {
-                                $activity->setPermawebId($permawebResponse['id']);
+                            if ($id) {
+                                $activity->setPermawebId($id);
                             } else {
-                                throw new \Exception($permawebResponse['message']);
+                                throw new \Exception('An unknown error occured getting seeded permaweb id');
                             }
+
+                            (new Core\Permaweb\Delegates\SaveDelegate())
+                                ->setData($activity->getMessage())
+                                ->setUserGuid(Core\Session::getLoggedinUserGuid())
+                                ->dispatch();
                         }
                     } catch (\Exception $e) {
                         Di::_()->get('Logger')->error($e);

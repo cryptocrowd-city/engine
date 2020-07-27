@@ -59,6 +59,37 @@ class Manager
         }
     }
 
+    /**
+     * Gets ID by signing tx inside service container and passing the id back.
+     *
+     * @param string $data
+     * @param string $guid
+     * @return string id
+     */
+    public function generateId(string $data, string $guid): string {
+        $data = [
+            'data' => $data,
+            'guid' => $guid,
+        ];
+        try {
+            $baseUrl = $this->buildUrl($this->config->get('arweave'));
+            $response = json_decode($this->http->post($baseUrl.'permaweb/getId/', $data, [
+                'headers' => [
+                    'Content-Type: application/x-www-form-urlencoded',
+                ]
+            ]));
+
+            if ($response->status !== 200) {
+                throw new \Exception('An unknown error occurred getting seeded permaweb id');
+            }
+
+            return $response->id;
+        } catch (\Exception $e) {
+            $this->logger->error($e);
+            return '';
+        }
+    }
+
     private function buildUrl($arweaveConfig): string
     {
         return 'http://'.$arweaveConfig['host'].':'.$arweaveConfig['port'].'/';
