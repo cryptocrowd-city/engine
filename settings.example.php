@@ -491,8 +491,7 @@ $CONFIG->set('features', [
     'top-feeds-by-age' => true,
     'ux-2020' => true,
     'modal-pager' => true,
-    'wallet-upgrade' => true,
-    'subscriber-conversations' => true
+    'wallet-upgrade' => true
 ]);
 
 $CONFIG->set('email', [

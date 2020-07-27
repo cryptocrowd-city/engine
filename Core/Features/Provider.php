@@ -67,7 +67,6 @@ class Provider extends DiProvider
                 'support-tiers',
                 'language-prompts',
                 'discovery-carousel',
-                'subscriber-conversations',
             ];
         });
 
