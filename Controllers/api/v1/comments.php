@@ -18,6 +18,7 @@ use Minds\Api\Factory;
 use Minds\Helpers;
 use Minds\Core\Sockets;
 use Minds\Core\Security;
+use Minds\Helpers\MagicAttributes;
 
 class comments implements Interfaces\Api
 {
@@ -170,6 +171,24 @@ class comments implements Interfaces\Api
                   'status' => 'error',
                   'message' => 'You must enter a message'
                 ]);
+            }
+
+            // get wire threshold and check paywall status.
+            $threshold = $entity->wire_threshold;
+            $isPaywall = (MagicAttributes::getterExists($entity, 'isPayWall') || method_exists($entity, 'isPayWall')) && $entity->isPayWall();
+
+            if ($isPaywall && $threshold && $threshold['support_tier']) {
+                $user = Core\Session::getLoggedInUser();
+                
+                // if content is plus and user is not plus or not logged in.
+                if ($threshold['support_tier']['urn'] === Core\Di\Di::_()->get('Config')->get('plus')['support_tier_urn']
+                    && ($user === null || !$user->plus)
+                ) {
+                    return Factory::response([
+                        'status' => 'error',
+                        'message' => 'You must be subscribed to plus to comment on this entity.'
+                    ]);
+                }
             }
 
             /*if (!Security\ACL::_()->write($entity)) {
