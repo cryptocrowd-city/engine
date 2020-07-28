@@ -11,6 +11,7 @@ use Minds\Api\Exportable;
 use Minds\Core;
 use Minds\Core\Data;
 use Minds\Core\Router\Exceptions\UnverifiedEmailException;
+use Minds\Exceptions\SupportTierNotMetException;
 use Minds\Entities;
 use Minds\Exceptions\BlockedUserException;
 use Minds\Interfaces;
@@ -173,24 +174,6 @@ class comments implements Interfaces\Api
                 ]);
             }
 
-            // get wire threshold and check paywall status.
-            $threshold = $entity->wire_threshold;
-            $isPaywall = (MagicAttributes::getterExists($entity, 'isPayWall') || method_exists($entity, 'isPayWall')) && $entity->isPayWall();
-
-            if ($isPaywall && $threshold && $threshold['support_tier']) {
-                $user = Core\Session::getLoggedInUser();
-                
-                // if content is plus and user is not plus or not logged in.
-                if ($threshold['support_tier']['urn'] === Core\Di\Di::_()->get('Config')->get('plus')['support_tier_urn']
-                    && ($user === null || !$user->plus)
-                ) {
-                    return Factory::response([
-                        'status' => 'error',
-                        'message' => 'You must be subscribed to plus to comment on this entity.'
-                    ]);
-                }
-            }
-
             /*if (!Security\ACL::_()->write($entity)) {
                 return Factory::response([
                     'status' => 'error',
@@ -256,6 +239,12 @@ class comments implements Interfaces\Api
                 $response = [
                     'status' => 'error',
                     'message' => "The comment couldn't be saved because {$parentOwnerUsername} has blocked you."
+                ];
+            } catch (SupportTierNotMetException $e) {
+                $error = true;
+                $response = [
+                    'status' => 'error',
+                    'message' => $e->getMessage()
                 ];
             } catch (\Exception $e) {
                 error_log($e);
