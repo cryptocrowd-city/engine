@@ -66,7 +66,8 @@ class Manager
      * @param string $guid
      * @return string id
      */
-    public function generateId(string $data, string $guid): string {
+    public function generateId(string $data, string $guid): string
+    {
         $data = [
             'data' => $data,
             'guid' => $guid,

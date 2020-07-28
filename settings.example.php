@@ -477,6 +477,7 @@ $CONFIG->set('max_video_length', 900);
 
 $CONFIG->set('max_video_length_plus', 1860);
 
+// You can find a list of all in use feature flags at Core/Features/Provider.php
 $CONFIG->set('features', [
     'psr7-router' => true,
     'es-feeds' => false,
