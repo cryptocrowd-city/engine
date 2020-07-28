@@ -644,9 +644,15 @@ class newsfeed implements Interfaces\Api
                     }
 
                     try {
-                        if ($_POST['post_to_permaweb'] && Di::_()->get('Features\Manager')->has('permaweb')) {
+                        $user = Core\Session::getLoggedinUser();
+
+                        if (
+                            Di::_()->get('Features\Manager')->has('permaweb')
+                            && $_POST['post_to_permaweb']
+                            && $user->isPlus()
+                        ) {
                             $permawebManager = Di::_()->get('Permaweb\Manager');
-                            $id = $permawebManager->generateId($activity->getMessage(), Core\Session::getLoggedinUserGuid());
+                            $id = $permawebManager->generateId($activity->getMessage(), $user->guid);
 
                             if ($id) {
                                 $activity->setPermawebId($id);
@@ -656,7 +662,7 @@ class newsfeed implements Interfaces\Api
 
                             (new Core\Permaweb\Delegates\SaveDelegate())
                                 ->setData($activity->getMessage())
-                                ->setUserGuid(Core\Session::getLoggedinUserGuid())
+                                ->setUserGuid($user->guid)
                                 ->dispatch();
                         }
                     } catch (\Exception $e) {
