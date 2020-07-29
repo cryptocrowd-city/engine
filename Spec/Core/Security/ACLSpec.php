@@ -223,16 +223,6 @@ class ACLSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(false);
 
-        $entity->isPaywall()
-            ->shouldBeCalled()
-            ->willReturn(false);
-
-        $entity->get('container_guid')->willReturn(null);
-        $entity->get('owner_guid')->willReturn(null);
-        $entity->get('guid')->willReturn(null);
-        $entity->get('wire_threshold')->willReturn(null);
-        $entity->get('type')->willReturn(null);
-
         Core\Events\Dispatcher::register('acl:interact', 'all', function ($event) {
             $event->setResponse(false);
         });
