@@ -11,7 +11,6 @@ use Minds\Api\Exportable;
 use Minds\Core;
 use Minds\Core\Data;
 use Minds\Core\Router\Exceptions\UnverifiedEmailException;
-use Minds\Exceptions\SupportTierNotMetException;
 use Minds\Entities;
 use Minds\Exceptions\BlockedUserException;
 use Minds\Interfaces;
@@ -19,7 +18,6 @@ use Minds\Api\Factory;
 use Minds\Helpers;
 use Minds\Core\Sockets;
 use Minds\Core\Security;
-use Minds\Helpers\MagicAttributes;
 
 class comments implements Interfaces\Api
 {
@@ -239,12 +237,6 @@ class comments implements Interfaces\Api
                 $response = [
                     'status' => 'error',
                     'message' => "The comment couldn't be saved because {$parentOwnerUsername} has blocked you."
-                ];
-            } catch (SupportTierNotMetException $e) {
-                $error = true;
-                $response = [
-                    'status' => 'error',
-                    'message' => $e->getMessage()
                 ];
             } catch (\Exception $e) {
                 error_log($e);

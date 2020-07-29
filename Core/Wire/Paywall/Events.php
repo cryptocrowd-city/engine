@@ -16,10 +16,14 @@ class Events
     /** @var SupportTier\Manager */
     private $supportTiersManager;
 
-    public function __construct($featuresManager = null, $supportTiersManager = null)
+    /** @var Paywall\Manager */
+    private $paywallManager;
+
+    public function __construct($featuresManager = null, $supportTiersManager = null, $paywallManager = null)
     {
         $this->featuresManager = $featuresManager;
         $this->supportTiersManager = $supportTiersManager;
+        $this->paywallManager = $paywallManager;
     }
 
     public function register()
@@ -198,6 +202,36 @@ class Events
             }
 
             return $event->setResponse($export);
+        });
+
+        /**
+         * Verify user meets threshold for interaction with paywalled entity.
+         */
+        Dispatcher::register('acl:interact', 'all', function ($event) {
+            if (!$this->paywallManager) { // Can not use DI in constructor due to init races
+                $this->paywallManager = Di::_()->get('Wire\Paywall\Manager');
+            }
+
+            $params = $event->getParameters();
+            $entity = $params['entity'];
+            $user = $params['user'];
+
+            echo "\ninterface match: ".var_export($entity instanceof PaywallEntityInterface, true)."\n";
+
+            if (!$entity instanceof PaywallEntityInterface) {
+                return; // Not paywallable
+            }
+
+            if ($this->paywallManager->isAllowed()) {
+                return; // Not paywallable
+            }
+            // $event->setResponse(false);
+            // // $this->paywallManager
+            // //     ->setUser($user)
+            // //     ->isAllowed($entity)
+            // return $event->setResponse(
+            //     $this->paywallManager->isAllowed()    
+            // );
         });
     }
 

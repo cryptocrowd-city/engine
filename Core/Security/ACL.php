@@ -10,7 +10,6 @@ use Minds\Core\Log\Logger;
 use Minds\Core\Security\RateLimits\Manager as RateLimitsManager;
 use Minds\Core\EntitiesBuilder;
 use Minds\Core\Router\Exceptions\UnverifiedEmailException;
-use Minds\Exceptions\SupportTierNotMetException;
 use Minds\Entities;
 use Minds\Entities\Entity;
 use Minds\Entities\RepositoryEntity;
@@ -350,10 +349,6 @@ class ACL
             return false;
         }
 
-        if (!$this->meetsSubscriptionThreshold($entity, $user)) {
-            throw new SupportTierNotMetException();
-        }
-
         /**
          * Allow plugins to extend the ACL check
          */
@@ -384,33 +379,6 @@ class ACL
             return true;
         }
         return false;
-    }
-
-    /**
-     * Returns false if interaction should fail because user does
-     * not meet subscription tier requirements.
-     *
-     * @param Entity $entity
-     * @param User $user
-     * @return boolean false if user does not meet minimum subscription threshold
-     */
-    protected function meetsSubscriptionThreshold($entity, $user): bool
-    {
-        $threshold = $entity->wire_threshold;
-        $isPaywall = (MagicAttributes::getterExists($entity, 'isPayWall') || method_exists($entity, 'isPayWall')) && $entity->isPayWall();
-
-        if ($isPaywall && $threshold && $threshold['support_tier']) {
-            if ($threshold['support_tier']['urn'] === $this->config->get('plus')['support_tier_urn'] &&
-                (
-                    $user === null
-                    || !$user->isPlus()
-                    || $entity->getOwnerGuid() !== $user->getGuid()
-                )
-            ) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public static function _()
