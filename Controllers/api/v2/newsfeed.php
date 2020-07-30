@@ -652,17 +652,26 @@ class newsfeed implements Interfaces\Api
                             && $user->isPlus()
                         ) {
                             $permawebManager = Di::_()->get('Permaweb\Manager');
-                            $id = $permawebManager->generateId($activity->getMessage(), $user->guid);
+                            $mindsLink = $permawebManager->getMindsUrl($activity->guid);
+
+                            $id = $permawebManager->generateId([
+                                'text' => $activity->getMessage(),
+                                'guid' => $user->guid,
+                                'thumbnail_src' => $_POST['thumbnail_src'],
+                                'minds_link' => $mindsLink
+                            ]);
 
                             if ($id) {
                                 $activity->setPermawebId($id);
                             } else {
-                                throw new \Exception('An unknown error occured getting seeded permaweb id');
+                                throw new \Exception('An unknown error occurred getting seeded permaweb id');
                             }
 
                             (new Core\Permaweb\Delegates\SaveDelegate())
-                                ->setData($activity->getMessage())
+                                ->setThumbnailSrc($_POST['thumbnail_src'] ?? null)
+                                ->setText($activity->getMessage())
                                 ->setUserGuid($user->guid)
+                                ->setMindsLink($mindsLink)
                                 ->dispatch();
                         }
                     } catch (\Exception $e) {

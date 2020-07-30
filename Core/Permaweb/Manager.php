@@ -34,21 +34,29 @@ class Manager
     }
 
     /**
-     * Save to permaweb
-     *
-     * @param string  $data data to save
-     * @param string  $guid user guid
-     * @return array - response from gateway.
+     * Gets newsfeed url for a post.
+     * @param { string } guid of post.
+     * @return string - url.
      */
-    public function save(string $data, string $guid): array
+    private function getMindsUrl(string $guid): string
     {
-        $data = [
-            'data' => $data,
-            'guid' => $guid,
-        ];
+        return $this->config->get('site_url').'newsfeed/'.$guid;
+    }
+
+    /**
+     * Save to permaweb
+     * @param $opts - guid, minds link required, thumbnail_src optional
+     * @return array response from microservice
+     */
+    public function save(array $opts): array
+    {
         try {
+            if (!$opts['guid'] || !$opts['minds_link']) {
+                throw new \Exception('You must pass all required parameters to save to the permaweb');
+            }
+            $opts['url'] = $this->getMindsUrl($opts['guid']);
             $baseUrl = $this->buildUrl($this->config->get('arweave'));
-            $response = $this->http->post($baseUrl.'permaweb/', $data, [
+            $response = $this->http->post($baseUrl.'permaweb/', $opts, [
                 'headers' => [
                     'Content-Type: application/x-www-form-urlencoded',
                 ]
@@ -62,24 +70,23 @@ class Manager
     /**
      * Gets ID by signing tx inside service container and passing the id back.
      *
-     * @param string $data
-     * @param string $guid
-     * @return string id
+     * @param $opts - guid, minds link required, thumbnail_src optional
+     * @return string id of the tx.
      */
-    public function generateId(string $data, string $guid): string
+    public function generateId($opts): string
     {
-        $data = [
-            'data' => $data,
-            'guid' => $guid,
-        ];
         try {
+            if (!$opts['guid'] || !$opts['minds_link']) {
+                throw new \Exception('You must pass all required parameters to save to the permaweb');
+            }
+            $opts['url'] = $this->getMindsUrl($opts['guid']);
             $baseUrl = $this->buildUrl($this->config->get('arweave'));
-            $response = json_decode($this->http->post($baseUrl.'permaweb/getId/', $data, [
+            $response = json_decode($this->http->post($baseUrl.'permaweb/getId/', $opts, [
                 'headers' => [
                     'Content-Type: application/x-www-form-urlencoded',
                 ]
             ]));
-
+            
             if ($response->status !== 200) {
                 throw new \Exception('An unknown error occurred getting seeded permaweb id');
             }
