@@ -38,7 +38,7 @@ class Manager
      * @param { string } guid of post.
      * @return string - url.
      */
-    private function getMindsUrl(string $guid): string
+    public function getMindsUrl(string $guid): string
     {
         return $this->config->get('site_url').'newsfeed/'.$guid;
     }
@@ -86,7 +86,7 @@ class Manager
                     'Content-Type: application/x-www-form-urlencoded',
                 ]
             ]));
-            
+
             if ($response->status !== 200) {
                 throw new \Exception('An unknown error occurred getting seeded permaweb id');
             }

@@ -652,12 +652,13 @@ class newsfeed implements Interfaces\Api
                             && $user->isPlus()
                         ) {
                             $permawebManager = Di::_()->get('Permaweb\Manager');
-                            $mindsLink = $permawebManager->getMindsUrl($activity->guid);
-
+                            $mindsLink = $permawebManager->getMindsUrl($activity->entity_guid);
+                            $thumbnailSrc = $activity->custom_data[0]['href'];
+                            
                             $id = $permawebManager->generateId([
                                 'text' => $activity->getMessage(),
                                 'guid' => $user->guid,
-                                'thumbnail_src' => $_POST['thumbnail_src'],
+                                'thumbnail_src' => $thumbnailSrc,
                                 'minds_link' => $mindsLink
                             ]);
 
@@ -668,7 +669,7 @@ class newsfeed implements Interfaces\Api
                             }
 
                             (new Core\Permaweb\Delegates\SaveDelegate())
-                                ->setThumbnailSrc($_POST['thumbnail_src'] ?? null)
+                                ->setThumbnailSrc($thumbnailSrc)
                                 ->setText($activity->getMessage())
                                 ->setUserGuid($user->guid)
                                 ->setMindsLink($mindsLink)
