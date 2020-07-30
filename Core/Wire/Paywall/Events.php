@@ -216,22 +216,15 @@ class Events
             $entity = $params['entity'];
             $user = $params['user'];
 
-            echo "\ninterface match: ".var_export($entity instanceof PaywallEntityInterface, true)."\n";
-
             if (!$entity instanceof PaywallEntityInterface) {
                 return; // Not paywallable
             }
 
-            if ($this->paywallManager->isAllowed()) {
-                return; // Not paywallable
+            if (!$this->paywallManager->setUser($user)->isAllowed($entity)) {
+                throw new PaywallUserNotPaid();
             }
-            // $event->setResponse(false);
-            // // $this->paywallManager
-            // //     ->setUser($user)
-            // //     ->isAllowed($entity)
-            // return $event->setResponse(
-            //     $this->paywallManager->isAllowed()    
-            // );
+
+            $event->setResponse(false);
         });
     }
 
