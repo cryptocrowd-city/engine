@@ -654,7 +654,7 @@ class newsfeed implements Interfaces\Api
                             $permawebManager = Di::_()->get('Permaweb\Manager');
                             $mindsLink = $permawebManager->getMindsUrl($activity->entity_guid);
                             $thumbnailSrc = $activity->custom_data[0]['src'];
-                            error_log(var_export($activity, true)); //TODO: Remove
+
                             $id = $permawebManager->generateId([
                                 'text' => $activity->getMessage(),
                                 'guid' => $user->guid,
@@ -665,7 +665,7 @@ class newsfeed implements Interfaces\Api
                             if ($id) {
                                 $activity->setPermawebId($id);
                             } else {
-                                throw new \Exception('An unknown error occurred getting seeded permaweb id');
+                                throw new \Exception('Could not generate a permaweb id. Ensure your file is not too large.');
                             }
 
                             (new Core\Permaweb\Delegates\SaveDelegate())
