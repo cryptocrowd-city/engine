@@ -105,7 +105,7 @@ class Manager
             return $response->id;
         } catch (\Exception $e) {
             error_log("generateId | error occured...");
-            error_log(var_export($e));
+            error_log(var_export($e, true));
             $this->logger->error($e);
             return '';
         }
