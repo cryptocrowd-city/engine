@@ -654,7 +654,7 @@ class newsfeed implements Interfaces\Api
                             $permawebManager = Di::_()->get('Permaweb\Manager');
                             $mindsLink = $permawebManager->getMindsUrl($activity->entity_guid);
                             $thumbnailSrc = $activity->custom_data[0]['src'];
-                            error_log(var_export($activity, true));
+                            error_log(var_export($activity, true)); //TODO: Remove
                             $id = $permawebManager->generateId([
                                 'text' => $activity->getMessage(),
                                 'guid' => $user->guid,

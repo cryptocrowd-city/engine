@@ -61,8 +61,15 @@ class Manager
                     'Content-Type: application/x-www-form-urlencoded',
                 ]
             ]);
+
+            //TODO: Remove diagnostics.
+            error_log("save | Response from server...");
+            error_log(var_export($response, true));
+
             return (array) json_decode($response);
         } catch (\Exception $e) {
+            error_log("save | error occured");
+            error_log(var_export($e));
             $this->logger->error($e);
         }
     }
@@ -87,12 +94,18 @@ class Manager
                 ]
             ]));
 
+            //TODO: Remove diagnostics.
+            error_log("generateId | Response from server");
+            error_log(var_export($response, true));
+
             if ($response->status !== 200) {
                 throw new \Exception('An unknown error occurred getting seeded permaweb id');
             }
 
             return $response->id;
         } catch (\Exception $e) {
+            error_log("generateId | error occured...");
+            error_log(var_export($e));
             $this->logger->error($e);
             return '';
         }
