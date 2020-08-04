@@ -223,8 +223,6 @@ class Events
             if (!$this->paywallManager->setUser($user)->isAllowed($entity)) {
                 throw new PaywallUserNotPaid();
             }
-
-            $event->setResponse(false);
         });
     }
 
