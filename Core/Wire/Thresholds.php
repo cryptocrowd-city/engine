@@ -97,7 +97,7 @@ class Thresholds
             $tokensUsdAmount = BigNumber::fromPlain($tokensAmount, 18)->toDouble() * $exRate;
             $usdAmount = $sums->setMethod('usd')->getSent();
 
-            if (isset($threshold['type'])) {
+            if (isset($threshold['type']) && $tokensAmount) {
                 $allowed = BigNumber::_($tokensAmount)->sub($minThreshold)->gte(0);
             } else {
                 // new support tiers
