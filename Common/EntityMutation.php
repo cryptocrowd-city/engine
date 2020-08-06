@@ -69,13 +69,22 @@ class EntityMutation
     }
 
     /**
-     * Returns if a value has been mutstef
+     * Returns if a value has been mutated.
      * @param string $var
      * @return bool
      */
     public function hasMutated(string $var): bool
     {
         $diffItem = $this->getDiffItem($var);
+
+        // if type mismatch between int and string, cast as string for comparison.
+        if ($var === 'entityGuid' &&
+            gettype($diffItem['original'] === 'integer' &&
+            gettype($diffItem['mutated'] === 'string'))
+        ) {
+            $diffItem['original'] = (string) $diffItem['original'];
+        }
+
         return $diffItem['original'] !== $diffItem['mutated'];
     }
 
