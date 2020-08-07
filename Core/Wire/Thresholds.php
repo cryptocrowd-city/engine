@@ -92,12 +92,12 @@ class Thresholds
                 ->setSender($user->guid)
                 ->setFrom((new \DateTime('midnight'))->modify("-30 days")->getTimestamp());
 
-            $tokensAmount = $sums->setMethod('tokens')->getSent();
+            $tokensAmount = $sums->setMethod('tokens')->getSent() ?: 0;
             $exRate = $this->config->get('token_exchange_rate') ?: 1.25; // TODO make this is a constant
             $tokensUsdAmount = BigNumber::fromPlain($tokensAmount, 18)->toDouble() * $exRate;
             $usdAmount = $sums->setMethod('usd')->getSent();
 
-            if (isset($threshold['type']) && $tokensAmount) {
+            if (isset($threshold['type'])) {
                 $allowed = BigNumber::_($tokensAmount)->sub($minThreshold)->gte(0);
             } else {
                 // new support tiers
