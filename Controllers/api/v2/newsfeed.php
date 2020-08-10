@@ -643,6 +643,15 @@ class newsfeed implements Interfaces\Api
                         // These should not appear naturally when creating, but might be implemented in the future.
                     }
 
+                    // TODO: Move this to Core/Feeds/Activity/Manager
+                    if ($_POST['video_poster'] ?? null) {
+                        $activity->setVideoPosterBase64Blob($_POST['video_poster']);
+                        $videoPosterDelegate = new Core\Feeds\Activity\Delegates\VideoPosterDelegate();
+                        $videoPosterDelegate->onAdd($activity);
+                    }
+
+                    $guid = $save->setEntity($activity)->save();
+
                     try {
                         $user = Core\Session::getLoggedinUser();
 
@@ -652,8 +661,16 @@ class newsfeed implements Interfaces\Api
                             && $user->isPlus()
                         ) {
                             $permawebManager = Di::_()->get('Permaweb\Manager');
-                            $mindsLink = $permawebManager->getMindsUrl($activity->entity_guid);
-                            $thumbnailSrc = $activity->custom_data[0]['src'];
+    
+                            $thumbnailSrc = $activity->custom_type !== 'video' 
+                                ? $activity->custom_data[0]['src']
+                                : '';
+
+                            $newsfeedGuid = $activity->custom_type === 'video' || $activity->custom_type === 'batch'
+                                ? $activity->entity_guid
+                                : $guid;
+
+                            $mindsLink = $permawebManager->getMindsUrl($newsfeedGuid);
 
                             $id = $permawebManager->generateId([
                                 'text' => $activity->getMessage(),
@@ -665,7 +682,7 @@ class newsfeed implements Interfaces\Api
                             if ($id) {
                                 $activity->setPermawebId($id);
                             } else {
-                                throw new \Exception('Could not generate a permaweb id. Ensure your file is not too large.');
+                                throw new \Exception('Could not generate a permaweb id. Ensure you can connect to the permaweb node and file size is not too large.');
                             }
 
                             (new Core\Permaweb\Delegates\SaveDelegate())
@@ -678,15 +695,6 @@ class newsfeed implements Interfaces\Api
                     } catch (\Exception $e) {
                         Di::_()->get('Logger')->error($e);
                     }
-                    // TODO: Move this to Core/Feeds/Activity/Manager
-
-                    if ($_POST['video_poster'] ?? null) {
-                        $activity->setVideoPosterBase64Blob($_POST['video_poster']);
-                        $videoPosterDelegate = new Core\Feeds\Activity\Delegates\VideoPosterDelegate();
-                        $videoPosterDelegate->onAdd($activity);
-                    }
-
-                    $guid = $save->setEntity($activity)->save();
                 } catch (\Exception $e) {
                     return Factory::response([
                         'status' => 'error',

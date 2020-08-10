@@ -54,7 +54,7 @@ class Manager
             if (!$opts['guid'] || !$opts['minds_link']) {
                 throw new \Exception('You must pass all required parameters to save to the permaweb');
             }
-            $opts['minds_link'] = $this->getMindsUrl($opts['guid']);
+
             $baseUrl = $this->buildUrl($this->config->get('arweave'));
             $response = $this->http->post($baseUrl.'permaweb/', $opts, [
                 'headers' => [
@@ -64,7 +64,6 @@ class Manager
 
             return (array) json_decode($response);
         } catch (\Exception $e) {
-            error_log("save | error occured");
             $this->logger->error($e);
         }
     }
@@ -81,7 +80,7 @@ class Manager
             if (!$opts['guid'] || !$opts['minds_link']) {
                 throw new \Exception('You must pass all required parameters to save to the permaweb');
             }
-            $opts['minds_link'] = $this->getMindsUrl($opts['guid']);
+
             $baseUrl = $this->buildUrl($this->config->get('arweave'));
             $response = json_decode($this->http->post($baseUrl.'permaweb/getId/', $opts, [
                 'headers' => [
@@ -90,7 +89,7 @@ class Manager
             ]));
 
             if ($response->status !== 200) {
-                throw new \Exception('An unknown error occurred getting seeded permaweb id.');
+                throw new \Exception('An unknown error has occurred generating permaweb id. Check permaweb containers output.');
             }
 
             return $response->id;
