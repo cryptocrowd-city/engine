@@ -662,7 +662,7 @@ class newsfeed implements Interfaces\Api
                         ) {
                             $permawebManager = Di::_()->get('Permaweb\Manager');
     
-                            $thumbnailSrc = $activity->custom_type !== 'video' 
+                            $thumbnailSrc = $activity->custom_type !== 'video'
                                 ? $activity->custom_data[0]['src']
                                 : '';
 
