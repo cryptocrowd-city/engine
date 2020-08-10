@@ -79,8 +79,8 @@ class EntityMutation
 
         // if type mismatch between int and string, cast as string for comparison.
         if ($var === 'entityGuid' &&
-            gettype($diffItem['original'] === 'integer' &&
-            gettype($diffItem['mutated'] === 'string'))
+            gettype($diffItem['original']) === 'integer' &&
+            gettype($diffItem['mutated']) === 'string'
         ) {
             $diffItem['original'] = (string) $diffItem['original'];
         }
