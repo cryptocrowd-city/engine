@@ -36,7 +36,7 @@ class SaveDelegate
      * @param string $url - thumbnail_src url
      * @return SaveDelegate - chainable.
      */
-    public function setThumbnailSrc($url): SaveDelegate
+    public function setThumbnailSrc(string $url): SaveDelegate
     {
         $this->thumbnailSrc = $url;
         return $this;

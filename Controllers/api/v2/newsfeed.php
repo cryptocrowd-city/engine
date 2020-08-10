@@ -667,11 +667,11 @@ class newsfeed implements Interfaces\Api
                                 ? $activity->entity_guid
                                 : $guid;
                             
-                            // get thumbnail src
-                            $thumbnailSrc = $this->activity->custom_type !== 'video' && $this->activity->custom_data[0]['src']
-                                ? $this->activity->custom_data[0]['src']
+                            // get thumbnail src for images
+                            $thumbnailSrc = $activity->custom_type === 'batch'
+                                ? $activity->custom_data[0]['src']
                                 : '';
-                            
+
                             $mindsLink = $permawebManager->getMindsUrl($newsfeedGuid);
                             
                             // dry run to generate id and save it, dispatch save call further down.
@@ -693,7 +693,7 @@ class newsfeed implements Interfaces\Api
                             (new Core\Permaweb\Delegates\SaveDelegate())
                                 ->setText($activity->getMessage())
                                 ->setUserGuid($user->guid)
-                                ->setThumbnailSrc($thumbnailSrc)
+                                ->setThumbnailSrc($thumbnailSrc ?? '')
                                 ->setMindsLink($mindsLink)
                                 ->dispatch();
                         }
