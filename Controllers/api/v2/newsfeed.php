@@ -650,45 +650,50 @@ class newsfeed implements Interfaces\Api
                         $videoPosterDelegate->onAdd($activity);
                     }
 
+                    // save entity
                     $guid = $save->setEntity($activity)->save();
 
+                    // if posting to permaweb
                     try {
-                        $user = Core\Session::getLoggedinUser();
-
                         if (
                             Di::_()->get('Features\Manager')->has('permaweb')
                             && $_POST['post_to_permaweb']
                             && $user->isPlus()
                         ) {
                             $permawebManager = Di::_()->get('Permaweb\Manager');
-    
-                            $thumbnailSrc = $activity->custom_type !== 'video'
-                                ? $activity->custom_data[0]['src']
-                                : '';
 
+                            // get guid for linkback
                             $newsfeedGuid = $activity->custom_type === 'video' || $activity->custom_type === 'batch'
                                 ? $activity->entity_guid
                                 : $guid;
-
+                            
+                            // get thumbnail src
+                            $thumbnailSrc = $this->activity->custom_type !== 'video' && $this->activity->custom_data[0]['src']
+                                ? $this->activity->custom_data[0]['src']
+                                : '';
+                            
                             $mindsLink = $permawebManager->getMindsUrl($newsfeedGuid);
-
-                            $id = $permawebManager->generateId([
+                            
+                            // dry run to generate id and save it, dispatch save call further down.
+                            $permawebId = $permawebManager->generateId([
                                 'text' => $activity->getMessage(),
                                 'guid' => $user->guid,
                                 'thumbnail_src' => $thumbnailSrc,
                                 'minds_link' => $mindsLink
                             ]);
 
-                            if ($id) {
-                                $activity->setPermawebId($id);
+                            if ($permawebId) {
+                                $activity->setPermawebId($permawebId);
+                                $activity->save();
                             } else {
                                 throw new \Exception('Could not generate a permaweb id. Ensure you can connect to the permaweb node and file size is not too large.');
                             }
-
+                            
+                            // dispatch call to actually write to permaweb
                             (new Core\Permaweb\Delegates\SaveDelegate())
-                                ->setThumbnailSrc($thumbnailSrc)
                                 ->setText($activity->getMessage())
                                 ->setUserGuid($user->guid)
+                                ->setThumbnailSrc($thumbnailSrc)
                                 ->setMindsLink($mindsLink)
                                 ->dispatch();
                         }

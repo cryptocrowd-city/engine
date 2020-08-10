@@ -903,7 +903,7 @@ class Activity extends Entity implements MutatableEntityInterface, PaywallEntity
      * @param string $permaweb_id
      * @return Activity
      */
-    public function setPermawebId($permaweb_id): Activity
+    public function setPermawebId(string $permaweb_id): Activity
     {
         $this->permaweb_id = $permaweb_id;
         return $this;
