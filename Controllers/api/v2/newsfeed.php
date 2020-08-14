@@ -660,41 +660,21 @@ class newsfeed implements Interfaces\Api
                             && $_POST['post_to_permaweb']
                             && $user->isPlus()
                         ) {
-                            $permawebManager = Di::_()->get('Permaweb\Manager');
-
                             // get guid for linkback
                             $newsfeedGuid = $activity->custom_type === 'video' || $activity->custom_type === 'batch'
                                 ? $activity->entity_guid
                                 : $guid;
-                            
-                            // get thumbnail src for images
-                            $thumbnailSrc = $activity->custom_type === 'batch'
-                                ? $activity->custom_data[0]['src']
-                                : '';
 
-                            $mindsLink = $permawebManager->getMindsUrl($newsfeedGuid);
+                            // dry run to generate id and save it to this activity, but not commit it to the arweave network.
+                            Di::_()->get('Permaweb\Delegates\GenerateIdDelegate')
+                                ->setActivity($activity)
+                                ->setNewsfeedGuid($newsfeedGuid)
+                                ->dispatch();
                             
-                            // dry run to generate id and save it, dispatch save call further down.
-                            $permawebId = $permawebManager->generateId([
-                                'text' => $activity->getMessage(),
-                                'guid' => $user->guid,
-                                'thumbnail_src' => $thumbnailSrc,
-                                'minds_link' => $mindsLink
-                            ]);
-
-                            if ($permawebId) {
-                                $activity->setPermawebId($permawebId);
-                                $activity->save();
-                            } else {
-                                throw new \Exception('Could not generate a permaweb id. Ensure you can connect to the permaweb node and file size is not too large.');
-                            }
-                            
-                            // dispatch call to actually write to permaweb
-                            (new Core\Permaweb\Delegates\SaveDelegate())
-                                ->setText($activity->getMessage())
-                                ->setUserGuid($user->guid)
-                                ->setThumbnailSrc($thumbnailSrc ?? '')
-                                ->setMindsLink($mindsLink)
+                            // Save to permaweb.
+                            Di::_()->get('Permaweb\Delegates\DispatchDelegate')
+                                ->setActivity($activity)
+                                ->setNewsfeedGuid($newsfeedGuid)
                                 ->dispatch();
                         }
                     } catch (\Exception $e) {
