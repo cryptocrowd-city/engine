@@ -79,7 +79,8 @@ abstract class AbstractPermawebDelegate
         return [
             'text' => $this->activity->getMessage(),
             'guid' => $this->activity->getOwnerGuid(),
-            'thumbnail_src' => $this->getThumbnailSrc(),
+            'title' => $this->activity->getTitle() ?: '',
+            'thumbnail_src' => $this->getThumbnailSrc() ?: '',
             'minds_link' => $this->manager->getMindsUrl($this->newsfeedGuid),
         ];
     }
