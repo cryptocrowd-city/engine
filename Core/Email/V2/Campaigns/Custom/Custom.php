@@ -14,7 +14,6 @@ use Minds\Core\Email\Mailer;
 use Minds\Core\Email\V2\Common\Message;
 use Minds\Core\Email\V2\Common\Template;
 
-
 class Custom
 {
     // TODO code docs
