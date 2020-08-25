@@ -1,7 +1,9 @@
 <?php
+
 /**
  * Custom Campaign Emails
  */
+
 namespace Minds\Core\Email\V2\Campaigns\Custom;
 
 use Minds\Core\Config;
@@ -12,7 +14,6 @@ use Minds\Core\Email\Mailer;
 use Minds\Core\Email\V2\Common\Message;
 use Minds\Core\Email\V2\Common\Template;
 
-use Minds\Core\Analytics\Iterators;
 
 class Custom
 {
@@ -29,6 +30,10 @@ class Custom
     protected $title = "";
     protected $signoff = "";
     protected $preheader = "";
+    protected $hideDownloadLinks = false;
+
+    /** @var Message */
+    public $message;
 
 
     public function __construct(Call $db = null, Template $template = null, Mailer $mailer = null)
@@ -86,6 +91,12 @@ class Custom
         return $this;
     }
 
+    public function setHideDownloadLinks($hideDownloadLinks)
+    {
+        $this->hideDownloadLinks = $hideDownloadLinks;
+        return $this;
+    }
+
 
     public function setVars($vars)
     {
@@ -107,6 +118,8 @@ class Custom
         $this->template->toggleMarkdown(true);
         $this->template->setLocale($this->user->getLanguage());
 
+        $translator = $this->template->getTranslator();
+
         $validatorHash = sha1($this->campaign . $this->user->guid . Config::_()->get('emails_secret'));
 
         $this->template->set('username', $this->user->username);
@@ -114,6 +127,12 @@ class Custom
         $this->template->set('guid', $this->user->guid);
         $this->template->set('user', $this->user);
         $this->template->set('topic', $this->topic);
+
+        $this->template->set('preheader', $translator->trans($this->preheader));
+        $this->template->set('title', $translator->trans($this->title));
+        $this->template->set('signoff',  $translator->trans($this->signoff));
+        $this->template->set('hideDownloadLinks', $this->hideDownloadLinks);
+
         $this->template->set('campaign', $this->campaign);
         $this->template->set('validator', $validatorHash);
         $this->template->set('tracking', $trackingQuery);
@@ -122,13 +141,21 @@ class Custom
             $this->template->set($key, $var);
         }
 
-        $message = new Message();
-        $message->setTo($this->user)
-            ->setMessageId(implode('-', [ $this->user->guid, sha1($this->user->getEmail()), $validatorHash ]))
-            ->setSubject($this->subject)
+        $this->message = new Message();
+        $this->message->setTo($this->user)
+            ->setMessageId(implode('-', [$this->user->guid, sha1($this->user->getEmail()), $validatorHash]))
+            ->setSubject($translator->trans($this->subject))
             ->setHtml($this->template);
 
         //send email
-        $this->mailer->send($message);
+        $this->mailer->send($this->message);
+    }
+
+    /**
+     * @return Message
+     */
+    public function getMessage()
+    {
+        return $this->message;
     }
 }
