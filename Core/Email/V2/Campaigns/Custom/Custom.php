@@ -118,8 +118,6 @@ class Custom
         $this->template->toggleMarkdown(true);
         $this->template->setLocale($this->user->getLanguage());
 
-        $translator = $this->template->getTranslator();
-
         $validatorHash = sha1($this->campaign . $this->user->guid . Config::_()->get('emails_secret'));
 
         $this->template->set('username', $this->user->username);
@@ -128,9 +126,9 @@ class Custom
         $this->template->set('user', $this->user);
         $this->template->set('topic', $this->topic);
 
-        $this->template->set('preheader', $translator->trans($this->preheader));
-        $this->template->set('title', $translator->trans($this->title));
-        $this->template->set('signoff',  $translator->trans($this->signoff));
+        $this->template->set('preheader', $this->preheader);
+        $this->template->set('title', $this->title);
+        $this->template->set('signoff',  $this->signoff);
         $this->template->set('hideDownloadLinks', $this->hideDownloadLinks);
 
         $this->template->set('campaign', $this->campaign);
@@ -144,7 +142,7 @@ class Custom
         $this->message = new Message();
         $this->message->setTo($this->user)
             ->setMessageId(implode('-', [$this->user->guid, sha1($this->user->getEmail()), $validatorHash]))
-            ->setSubject($translator->trans($this->subject))
+            ->setSubject($this->subject)
             ->setHtml($this->template);
 
         //send email

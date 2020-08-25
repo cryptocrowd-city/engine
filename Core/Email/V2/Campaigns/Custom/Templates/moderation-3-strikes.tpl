@@ -1,7 +1,7 @@
 <tr>
     <td>
         <p>
-             <?= $vars['translator']->trans('Unfortunately, your channel has been banned for violating our ') ?><a href="https://minds.com/content-policy"<?php echo $emailStyles->getStyles('m-link'); ?>><?= $vars['translator']->trans('Content Policy') ?></a>.
+            Unfortunately, your channel has been banned for receiving three strikes against our Content Policy.
         </p>
     </td>
 </tr>
