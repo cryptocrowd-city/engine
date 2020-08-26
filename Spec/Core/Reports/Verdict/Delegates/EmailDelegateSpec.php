@@ -7,6 +7,8 @@ use Minds\Core\Di\Di;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Minds\Core\Config;
+use Minds\Core\Reports\Report;
+use Minds\Common\Urn;
 use Minds\Core\Email\V2\Campaigns\Custom\Custom;
 
 class EmailDelegateSpec extends ObjectBehavior
@@ -109,17 +111,23 @@ class EmailDelegateSpec extends ObjectBehavior
 
     public function it_should_discern_ban_reason_text()
     {
-        // Di::_()->get('Config')->set('report_reasons', $this->banReasons);
+        Di::_()->get('Config')->set('report_reasons', $this->banReasons);
+
         $this->getBanReasons(1)
             ->shouldReturn("Illegal");
+
         $this->getBanReasons("1.3")
             ->shouldReturn("Illegal / Extortion");
+
         $this->getBanReasons("2.3")
             ->shouldReturn("NSFW (not safe for work) / Profanity");
+
         $this->getBanReasons("3")
             ->shouldReturn("Encourages or incites violence");
+
         $this->getBanReasons("8")
             ->shouldReturn("Spam");
+
         $this->getBanReasons("because reasons")
             ->shouldReturn("because reasons");
     }

@@ -10,6 +10,8 @@ use Minds\Core\Di\Di;
 use Minds\Core\Reports\Report;
 use Minds\Common\Urn;
 use Minds\Core\Email\V2\Campaigns\Custom\Custom;
+use Minds\Core\Config;
+
 
 class EmailDelegate
 {
@@ -21,11 +23,15 @@ class EmailDelegate
 
     /** @var Urn $urn */
 
-    public function __construct($campaign = null, $entitiesBuilder = null, $urn = null)
+    /** @var Config */
+    protected $config;
+
+    public function __construct($campaign = null, $entitiesBuilder = null, $urn = null, $config = null)
     {
         $this->campaign = $campaign ?: new Custom;
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
         $this->urn = $urn ?: new Urn;
+        $this->config = $config ?: Di::_()->get('Config');
     }
 
     /**
