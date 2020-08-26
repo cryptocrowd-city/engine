@@ -11,30 +11,28 @@ use Minds\Core\Config;
 
 class EventsSpec extends ObjectBehavior
 {
-  /** @var EventsDispatcher */
-  protected $dispatcher;
-  protected $config;
+    /** @var EventsDispatcher */
+    protected $dispatcher;
 
-  public function let(EventsDispatcher $dispatcher, Config $config)
-  {
-    Di::_()->bind('EventsDispatcher', function ($di) use ($dispatcher) {
-      return $dispatcher->getWrappedObject();
-    });
-    $this->dispatcher = $dispatcher;
-    $this->config = $config;
-  }
+    public function let(EventsDispatcher $dispatcher)
+    {
+        Di::_()->bind('EventsDispatcher', function ($di) use ($dispatcher) {
+            return $dispatcher->getWrappedObject();
+        });
+        $this->dispatcher = $dispatcher;
+    }
 
 
-  public function it_is_initializable()
-  {
-    $this->shouldHaveType(Events::class);
-  }
+    public function it_is_initializable()
+    {
+        $this->shouldHaveType(Events::class);
+    }
 
-  public function it_should_register_the_user_ban_event()
-  {
-    $this->dispatcher->register('ban', 'user', Argument::any())
+    public function it_should_register_the_user_ban_event()
+    {
+        $this->dispatcher->register('ban', 'user', Argument::any())
       ->shouldBeCalled();
 
-    $this->register();
-  }
+        $this->register();
+    }
 }

@@ -12,7 +12,6 @@ use Minds\Common\Urn;
 use Minds\Core\Email\V2\Campaigns\Custom\Custom;
 use Minds\Core\Config;
 
-
 class EmailDelegate
 {
     /** @var Custom $campaign */

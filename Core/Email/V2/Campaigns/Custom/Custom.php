@@ -127,7 +127,7 @@ class Custom
 
         $this->template->set('preheader', $this->preheader);
         $this->template->set('title', $this->title);
-        $this->template->set('signoff',  $this->signoff);
+        $this->template->set('signoff', $this->signoff);
         $this->template->set('hideDownloadLinks', $this->hideDownloadLinks);
 
         $this->template->set('campaign', $this->campaign);

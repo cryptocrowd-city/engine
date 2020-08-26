@@ -13,12 +13,12 @@ use Minds\Core\Email\V2\Campaigns\Custom\Custom;
 
 class EmailDelegateSpec extends ObjectBehavior
 {
-
     protected $config;
     protected $banReasons;
 
-    public function let(Config $config)
+    public function let(Config $config, Custom $customCampaign)
     {
+        $this->beConstructedWith($customCampaign);
         $this->config = $config;
         $this->banReasons = [
             [
@@ -117,10 +117,10 @@ class EmailDelegateSpec extends ObjectBehavior
             ->shouldReturn("Illegal");
 
         $this->getBanReasons("1.3")
-            ->shouldReturn("Illegal / Extortion");
+            ->shouldReturn("Illegal - Extortion");
 
         $this->getBanReasons("2.3")
-            ->shouldReturn("NSFW (not safe for work) / Profanity");
+            ->shouldReturn("NSFW (not safe for work) - Profanity");
 
         $this->getBanReasons("3")
             ->shouldReturn("Encourages or incites violence");
