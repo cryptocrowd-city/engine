@@ -75,9 +75,8 @@ class keys implements Interfaces\Api
         if (!$_POST['password']) {
             return Factory::response([
                 'status' => 'error',
-                'message' => 'You must provide a password.'  
+                'message' => 'You must provide a password.'
             ]);
- 
         }
 
         $openssl = new Messenger\Encryption\OpenSSL();
