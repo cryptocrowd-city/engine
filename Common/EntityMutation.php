@@ -76,7 +76,11 @@ class EntityMutation
     public function hasMutated(string $var): bool
     {
         $diffItem = $this->getDiffItem($var);
-        return (string) $diffItem['original'] !== (string) $diffItem['mutated'];
+        try {
+            return (string) $diffItem['original'] !== (string) $diffItem['mutated'];
+        } catch (\Exception $e) {
+            return $diffItem['original'] !== $diffItem['mutated']; // cannot be cast to string
+        }
     }
 
     /**
