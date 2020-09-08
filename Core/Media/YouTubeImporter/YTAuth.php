@@ -6,11 +6,15 @@ use Minds\Core\Entities\Actions\Save;
 use Minds\Core\Data\Call;
 use Minds\Entities\User;
 use Minds\Core\Config;
+use Google_Service_Exception;
 
 class YTAuth
 {
     /** @var YTClient */
     protected $ytClient;
+
+    /** @var YTSubscription */
+    protected $ytSubscription;
 
     /** @var Save */
     protected $save;
@@ -21,9 +25,15 @@ class YTAuth
     /** @var Config */
     protected $config;
 
-    public function __construct($ytClient = null, $save = null, $db = null, $config = null)
-    {
+    public function __construct(
+        $ytClient = null,
+        $ytSubscription = null,
+        $save = null,
+        $db = null,
+        $config = null
+    ) {
         $this->ytClient = $ytClient ?? Di::_()->get('Media\YouTubeImporter\YTClient');
+        $this->ytSubscription = $ytSubscription ?? new YTSubscription();
         $this->save = $save ?? new Save();
         $this->db = $db ?: Di::_()->get('Database\Cassandra\Indexes');
         $this->config = $config ?? Di::_()->get('Config');
@@ -37,11 +47,15 @@ class YTAuth
      */
     public function connectWithBacklink(User $user, string $channelId): bool
     {
-        $youtube = $this->ytClient->getService(true);
+        try {
+            $youtube = $this->ytClient->getService(true);
 
-        $channelsResponse = $youtube->channels->listChannels('id, snippet', [
-            'id' => $channelId
-        ]);
+            $channelsResponse = $youtube->channels->listChannels('id, snippet', [
+                'id' => $channelId
+            ]);
+        } catch (Google_Service_Exception $e) {
+            throw new QuotaExceededException();
+        }
 
         $description = strtolower($channelsResponse->items[0]->snippet->description);
 
@@ -53,12 +67,13 @@ class YTAuth
 
         // save channel id into indexes
         $this->db->insert("yt_channel:user:{$channelId}", [$user->getGUID()]);
+        $this->db->insert("yt_channel:connected-users", [$user->getGUID() => $channelId]);
 
         $ytChannel = [
             'id' => $channelId,
             'title' => $channelsResponse->items[0]->snippet->title,
             'connected' => time(),
-            'auto_import' => false,
+            'auto_import' => false, // This is handled by YTSubscription
         ];
 
         $user->setYouTubeChannels([ $ytChannel ]);
@@ -66,6 +81,9 @@ class YTAuth
         $this->save
             ->setEntity($user)
             ->save();
+
+        // TODO: consider moving to a delegate
+        $this->ytSubscription->update($user, $channelId, true);
 
         return true;
     }

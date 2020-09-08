@@ -140,22 +140,24 @@
                 <tr>
                 <td align="center" valign="top" width="600">
                 <![endif]-->
-            <table
-              border="0"
-              cellpadding="0"
-              cellspacing="0"
-              width="100%"
-              class="m-wrapper"
-              <?php echo $emailStyles->getStyles('m-maxWidth'); ?> >
-              <tr>
-                <td align="center" valign="top" style="padding: 65px 0 38px 0;">
-                    <a href="<?php echo $vars['site_url']; ?>?__e_ct_guid=<?= $vars['guid']?>"  target="_blank">
-                    <img src="<?php echo $vars['cdn_assets_url']; ?>assets/logos/logo-email.png" alt="Logo" style="display: block; width: 168px;max-height:80px;" border="0"
-                    />
-                  </a>
-                </td>
-              </tr>
-            </table>
+            <?php if (isset($vars['custom_header'])) { echo $vars['custom_header']; } else { ?>
+              <table
+                border="0"
+                cellpadding="0"
+                cellspacing="0"
+                width="100%"
+                class="m-wrapper"
+                <?php echo $emailStyles->getStyles('m-maxWidth'); ?> >
+                <tr>
+                  <td align="center" valign="top" style="padding: 65px 0 38px 0;">
+                      <a href="<?php echo $vars['site_url']; ?>?__e_ct_guid=<?= $vars['guid']?>"  target="_blank">
+                      <img src="<?php echo $vars['cdn_assets_url']; ?>assets/logos/logo-email.png" alt="Logo" style="display: block; width: 168px;max-height:80px;" border="0"
+                      />
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            <?php } ?>
 
             <!--[if (gte mso 9)|(IE)]>
                 </td>
@@ -269,15 +271,15 @@
                 <!------------------------------>
                 <!-- GREETING: Start -->
                 <!------------------------------>
-                  <tr>
-                    <td>
-                      <p
-                        <?php echo $emailStyles->getStyles('m-copy'); ?>
-                      >
-                        <?= $vars['translator']->trans('Hi') ?> @<?php echo $vars['username'] ?>,
-                      </p>
-                    </td>
-                  </tr>
+                  <?php if (!($vars['hideGreeting'] ?? false)) { ?>
+                    <tr>
+                      <td>
+                        <p <?php echo $emailStyles->getStyles('m-copy'); ?> >
+                          <?= $vars['translator']->trans('Hi') ?> @<?php echo $vars['username'] ?>,
+                        </p>
+                      </td>
+                    </tr>
+                  <?php } ?>
                 <!------------------------------>
                 <!-- GREETING: End -->
                 <!------------------------------>
@@ -296,7 +298,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <?php if ($vars['signoff']): ?>
+                      <?php if ($vars['signoff'] ?? null): ?>
                         <p <?php echo $emailStyles->getStyles('m-copy', 'm-signature'); ?>>
                           <?php echo $vars['signoff'] ?>
                         </p>
@@ -328,337 +330,341 @@
       <!------------------------------>
       <!-- FOOTER: Start -->
       <!------------------------------>
-      <tfoot>
-        <tr>
-          <td bgcolor="#ffffff" align="center">
-            <!--[if (gte mso 9)|(IE)]>
-                <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
-                <tr>
-                <td align="center" valign="top" width="600">
-                <![endif]-->
-            <table
-              border="0"
-              cellpadding="0"
-              cellspacing="0"
-              width="100%"
-              <?php echo $emailStyles->getStyles('m-maxWidth'); ?> class="m-responsiveTable" >
-              <!------------------------------>
-              <!-- BORDER/SPACER: Start -->
-              <!------------------------------>
-              <tr>
-                <td <?php echo $emailStyles->getStyles('m-spacer--large', 'm-borderTop'); ?> >
-                </td>
-              </tr>
-              <!------------------------------>
-              <!-- BORDER/SPACER: End -->
-              <!------------------------------>
-              <!------------------------------>
-              <!-- DOWNLOAD APP: Start -->
-              <!------------------------------>
-              <tr>
-                <td>
-                  <table
-                    width="100%"
-                    border="0"
-                    cellspacing="0"
-                    cellpadding="0"
-                  >
-                    <tr>
-                      <td
-                        align="center"
-                        style="
-                          font-weight: bold;
-                          text-align: center;
-                          font-family: Roboto, Helvetica, sans-serif;
-                          color: #4f4f50;
-                          font-size: 22px;
-                        "
-                      >
-                        <?= $vars['translator']->trans('Download the Minds app today!') ?>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <!------------------------------>
-                        <!-- TWO COLUMNS : DOWNLOAD BUTTONS -->
-                        <!------------------------------>
-                        <tr>
-                          <td>
-                            <table
-                              cellspacing="0"
-                              cellpadding="0"
-                              border="0"
-                              width="100%"
-                            >
-                              <tr>
-                                <td <?php echo $emailStyles->getStyles('m-spacer--small'); ?>>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td valign="top">
-                                  <!------------------------------>
-                                  <!-- LEFT COLUMN -->
-                                  <!------------------------------>
-                                  <table
-                                    cellpadding="0"
-                                    cellspacing="0"
-                                    border="0"
-                                    width="47%"
-                                    style="width: 47%;"
-                                    align="left"
-                                  >
-                                    <tr>
-                                      <td>
-                                        <table
-                                          cellpadding="0"
-                                          cellspacing="0"
-                                          border="0"
-                                          width="100%"
-                                        >
-                                          <tr>
-                                            <td align="right">
-                                              <a href="<?php echo $vars['site_url']; ?>/mobile"
-                                                target="_blank"
-                                                style="text-decoration: none;"
-                                              >
-                                                <img
-                                                src="<?php echo $vars['cdn_assets_url']; ?>assets/homepage/android.png" style="width: 142px;max-height:44px;" alt="Google Play"
-                                                />
-                                              </a>
-                                            </td>
-                                          </tr>
-                                        </table>
-                                      </td>
-                                    </tr>
-                                  </table>
-
-                                  <!------------------------------>
-                                  <!-- RIGHT COLUMN -->
-                                  <!------------------------------>
-                                  <table
-                                    cellpadding="0"
-                                    cellspacing="0"
-                                    border="0"
-                                    width="47%"
-                                    style="width: 47%;"
-                                    align="right"
-                                  >
-                                    <tr>
-                                      <td>
-                                        <table
-                                          cellpadding="0"
-                                          cellspacing="0"
-                                          border="0"
-                                          width="100%"
-                                        >
-                                          <tr>
-                                            <td align="left">
-                                              <a
-                                                href="https://itunes.apple.com/us/app/minds-com/id961771928?ls=1&mt=8"
-                                                target="_blank"
-                                                style="text-decoration: none;"
-                                              >
-                                                <img
-                                                  src="<?php echo $vars['cdn_assets_url']; ?>assets/homepage/app-store.png" style="width: 142px;max-height:44px;"
-                                                  alt="Apple App Store"
-                                                />
-                                              </a>
-                                            </td>
-                                          </tr>
-                                        </table>
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                            </table>
-                          </td>
-                        </tr>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <!------------------------------>
-              <!-- DOWNLOAD APP: End -->
-              <!------------------------------>
-              <!------------------------------>
-              <!-- BORDER/SPACER: Start -->
-              <!------------------------------>
-              <tr>
-                <td <?php echo $emailStyles->getStyles('m-spacer--large'); ?>>
-                </td>
-              </tr>
-              <tr>
-                <td <?php echo $emailStyles->getStyles('m-spacer--small', 'm-borderTop'); ?> >
-                </td>
-              </tr>
-              <!------------------------------>
-              <!-- BORDER/SPACER: End -->
-              <!------------------------------>
-              <!------------------------------>
-              <!-- FOOTER LINKS: Start -->
-              <!------------------------------>
-              <tr>
-                <td bgcolor="#ffffff" align="center">
-                  <!--[if (gte mso 9)|(IE)]>
+        <tfoot>
+          <tr>
+            <td bgcolor="#ffffff" align="center">
+              <!--[if (gte mso 9)|(IE)]>
                   <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
                   <tr>
                   <td align="center" valign="top" width="600">
                   <![endif]-->
-                  <table
-                    border="0"
-                    cellpadding="0"
-                    cellspacing="0"
-                    width="95%"
-                    class="m-responsiveTable" >
-                    <!------------------------------>
-                    <!-- TWO COLUMNS : FOOTER LINKS -->
-                    <!------------------------------>
-
-                    <tr>
-                      <td>
-                        <table
-                          cellspacing="0"
-                          cellpadding="0"
-                          border="0"
-                          width="100%"
-                        >
-                          <tr>
-                            <td valign="top">
-                              <!------------------------------>
-                              <!-- LEFT COLUMN -->
-                              <!------------------------------>
-                              <table
-                                cellpadding="0"
-                                cellspacing="0"
-                                border="0"
-                                width="47%"
-                                style="width: 47%;"
-                                align="left"
-                              >
-                                <tr>
-                                  <td>
-                                    <table
-                                      cellpadding="0"
-                                      cellspacing="0"
-                                      border="0"
-                                      width="100%"
-                                    >
-                                      <tr>
-                                        <td
-                                          align="left"
-                                          style="
-                                            font-size: 14px;
-                                            font-family: Roboto, Helvetica, sans-serif;
-                                            color: #7d7d82;
-                                          "
-                                        >
-                                          <div>
-                                            <div style="display: inline-block;">
-                                              <?= $vars['translator']->trans('Sent to you from') ?>
-                                            </div>
-                                            <div style="display: inline-block;">
-                                              Minds Inc
-                                              <span style="white-space: nowrap;"
-                                                >© 2020</span
-                                              >
-                                            </div>
-                                          </div>
-                                          <div>
-                                            <div style="display: inline-block;">PO Box 7681, </div>
-                                            <div style="display: inline-block;">Wilton, CT 06897</div>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    </table>
-                                  </td>
-                                </tr>
-                              </table>
-
-                              <!------------------------------>
-                              <!-- RIGHT COLUMN -->
-                              <!------------------------------>
-                              <table
-                                cellpadding="0"
-                                cellspacing="0"
-                                border="0"
-                                width="47%"
-                                style="width: 47%;"
-                                align="right"
-                              >
-                                <tr>
-                                  <td>
-                                    <table
-                                      cellpadding="0"
-                                      cellspacing="0"
-                                      border="0"
-                                      width="100%"
-                                    >
-                                      <tr>
-                                        <td align="right">
-                                          <a
-                                            style="
-                                              font-size: 14px;
-                                              color: #1b85d6;
-                                              text-decoration: underline;
-                                              font-family: Roboto, Helvetica,
-                                                sans-serif;
-                                            "
-                                            href="https://www.minds.com/settings/canary/account/email-notifications"
-                                            target="_blank"
-                                            >
-                                            <?= $vars['translator']->trans('Manage email settings') ?>
-                                          </a>
-                                          </br>
-                                          <a
-                                            style="
-                                              font-size: 14px;
-                                              color: #1b85d6;
-                                              text-decoration: underline;
-                                              font-family: Roboto, Helvetica,
-                                                sans-serif;
-                                            "
-                                            href="https://www.minds.com/emails/unsubscribe/<?= $vars['guid']?>/<?= urlencode($vars['email'])?>/<?= $vars['campaign']?><?= '/' . $vars['topic']?>?__e_ct_guid=<?= $vars['guid']?>&campaign=<?= $vars['campaign'] ?>&topic=<?= $vars['topic'] ?>&state=<?= $vars['state']?>"
-                                            target="_blank"
-                                          >
-                                            <?= $vars['translator']->trans('Unsubscribe') ?>
-                                          </a>
-                                        </td>
-                                      </tr>
-                                    </table>
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 40px 0;"></td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
-
-                  <!--[if (gte mso 9)|(IE)]>
-                  </td>
+              <table
+                border="0"
+                cellpadding="0"
+                cellspacing="0"
+                width="100%"
+                <?php echo $emailStyles->getStyles('m-maxWidth'); ?> class="m-responsiveTable" >
+                <!------------------------------>
+                <!-- BORDER/SPACER: Start -->
+                <!------------------------------>
+                <?php if (!isset($vars['hideDownloadLinks']) || (!$vars['hideDownloadLinks'])): ?>
+                  <tr>
+                    <td <?php echo $emailStyles->getStyles('m-spacer--large', 'm-borderTop'); ?> >
+                    </td>
                   </tr>
-                  </table>
-                  <![endif]-->
-                </td>
+                  <!------------------------------>
+                  <!-- BORDER/SPACER: End -->
+                  <!------------------------------>
+                  <!------------------------------>
+                  <!-- DOWNLOAD APP: Start -->
+                  <!------------------------------>
+                  <tr>
+                    <td>
+                      <table
+                        width="100%"
+                        border="0"
+                        cellspacing="0"
+                        cellpadding="0"
+                      >
+                        <tr>
+                          <td
+                            align="center"
+                            style="
+                              font-weight: bold;
+                              text-align: center;
+                              font-family: Roboto, Helvetica, sans-serif;
+                              color: #4f4f50;
+                              font-size: 22px;
+                            "
+                          >
+                            <?= $vars['translator']->trans('Download the Minds app today!') ?>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <!------------------------------>
+                            <!-- TWO COLUMNS : DOWNLOAD BUTTONS -->
+                            <!------------------------------>
+                            <tr>
+                              <td>
+                                <table
+                                  cellspacing="0"
+                                  cellpadding="0"
+                                  border="0"
+                                  width="100%"
+                                >
+                                  <tr>
+                                    <td <?php echo $emailStyles->getStyles('m-spacer--small'); ?>>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td valign="top">
+                                      <!------------------------------>
+                                      <!-- LEFT COLUMN -->
+                                      <!------------------------------>
+                                      <table
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        border="0"
+                                        width="47%"
+                                        style="width: 47%;"
+                                        align="left"
+                                      >
+                                        <tr>
+                                          <td>
+                                            <table
+                                              cellpadding="0"
+                                              cellspacing="0"
+                                              border="0"
+                                              width="100%"
+                                            >
+                                              <tr>
+                                                <td align="right">
+                                                  <a href="<?php echo $vars['site_url']; ?>/mobile"
+                                                    target="_blank"
+                                                    style="text-decoration: none;"
+                                                  >
+                                                    <img
+                                                    src="<?php echo $vars['cdn_assets_url']; ?>assets/homepage/android.png" style="width: 142px;max-height:44px;" alt="Google Play"
+                                                    />
+                                                  </a>
+                                                </td>
+                                              </tr>
+                                            </table>
+                                          </td>
+                                        </tr>
+                                      </table>
+
+                                      <!------------------------------>
+                                      <!-- RIGHT COLUMN -->
+                                      <!------------------------------>
+                                      <table
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        border="0"
+                                        width="47%"
+                                        style="width: 47%;"
+                                        align="right"
+                                      >
+                                        <tr>
+                                          <td>
+                                            <table
+                                              cellpadding="0"
+                                              cellspacing="0"
+                                              border="0"
+                                              width="100%"
+                                            >
+                                              <tr>
+                                                <td align="left">
+                                                  <a
+                                                    href="https://itunes.apple.com/us/app/minds-com/id961771928?ls=1&mt=8"
+                                                    target="_blank"
+                                                    style="text-decoration: none;"
+                                                  >
+                                                    <img
+                                                      src="<?php echo $vars['cdn_assets_url']; ?>assets/homepage/app-store.png" style="width: 142px;max-height:44px;"
+                                                      alt="Apple App Store"
+                                                    />
+                                                  </a>
+                                                </td>
+                                              </tr>
+                                            </table>
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <!------------------------------>
+                  <!-- DOWNLOAD APP: End -->
+                  <!------------------------------>
+                  <!------------------------------>
+                  <!-- BORDER/SPACER: Start -->
+                  <!------------------------------>
+                  <tr>
+                    <td <?php echo $emailStyles->getStyles('m-spacer--large'); ?>>
+                    </td>
+                  </tr>
+                <?php endif; ?>
+                <tr>
+                  <td <?php echo $emailStyles->getStyles('m-spacer--small', 'm-borderTop'); ?> >
+                  </td>
+                </tr>
+                <!------------------------------>
+                <!-- BORDER/SPACER: End -->
+                <!------------------------------>
+                <!------------------------------>
+                <!-- FOOTER LINKS: Start -->
+                <!------------------------------>
+                <tr>
+                  <td bgcolor="#ffffff" align="center">
+                    <!--[if (gte mso 9)|(IE)]>
+                    <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+                    <tr>
+                    <td align="center" valign="top" width="600">
+                    <![endif]-->
+                    <table
+                      border="0"
+                      cellpadding="0"
+                      cellspacing="0"
+                      width="95%"
+                      class="m-responsiveTable" >
+                      <!------------------------------>
+                      <!-- TWO COLUMNS : FOOTER LINKS -->
+                      <!------------------------------>
+
+                      <tr>
+                        <td>
+                          <table
+                            cellspacing="0"
+                            cellpadding="0"
+                            border="0"
+                            width="100%"
+                          >
+                            <tr>
+                              <td valign="top">
+                                <!------------------------------>
+                                <!-- LEFT COLUMN -->
+                                <!------------------------------>
+                                <table
+                                  cellpadding="0"
+                                  cellspacing="0"
+                                  border="0"
+                                  width="47%"
+                                  style="width: 47%;"
+                                  align="left"
+                                >
+                                  <tr>
+                                    <td>
+                                      <table
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        border="0"
+                                        width="100%"
+                                      >
+                                        <tr>
+                                          <td
+                                            align="left"
+                                            style="
+                                              font-size: 14px;
+                                              font-family: Roboto, Helvetica, sans-serif;
+                                              color: #7d7d82;
+                                            "
+                                          >
+                                            <div>
+                                              <div style="display: inline-block;">
+                                                <?= $vars['translator']->trans('Sent to you from') ?>
+                                              </div>
+                                              <div style="display: inline-block;">
+                                                Minds Inc
+                                                <span style="white-space: nowrap;"
+                                                  >© 2020</span
+                                                >
+                                              </div>
+                                            </div>
+                                            <div>
+                                              <div style="display: inline-block;">PO Box 7681, </div>
+                                              <div style="display: inline-block;">Wilton, CT 06897</div>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </table>
+
+                                <!------------------------------>
+                                <!-- RIGHT COLUMN -->
+                                <!------------------------------>
+                                <table
+                                  cellpadding="0"
+                                  cellspacing="0"
+                                  border="0"
+                                  width="47%"
+                                  style="width: 47%;"
+                                  align="right"
+                                >
+                                  <tr>
+                                    <td>
+                                      <table
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        border="0"
+                                        width="100%"
+                                      >
+                                        <tr>
+                                          <td align="right">
+                                            <a
+                                              style="
+                                                font-size: 14px;
+                                                color: #1b85d6;
+                                                text-decoration: underline;
+                                                font-family: Roboto, Helvetica,
+                                                  sans-serif;
+                                              "
+                                              href="https://www.minds.com/settings/canary/account/email-notifications"
+                                              target="_blank"
+                                              >
+                                              <?= $vars['translator']->trans('Manage email settings') ?>
+                                            </a>
+                                            </br>
+                                            <?php if (isset($vars['campaign'])): ?>
+                                              <a
+                                                style="
+                                                  font-size: 14px;
+                                                  color: #1b85d6;
+                                                  text-decoration: underline;
+                                                  font-family: Roboto, Helvetica,
+                                                    sans-serif;
+                                                "
+                                                href="https://www.minds.com/emails/unsubscribe/<?= $vars['guid']?>/<?= urlencode($vars['email'])?>/<?= $vars['campaign']?><?= '/' . $vars['topic']?>?__e_ct_guid=<?= $vars['guid']?>&campaign=<?= $vars['campaign'] ?>&topic=<?= $vars['topic'] ?>&state=<?= $vars['state']?>"
+                                                target="_blank"
+                                              >
+                                                <?= $vars['translator']->trans('Unsubscribe') ?>
+                                              </a>
+                                            <?php endif; ?>
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td style="padding: 40px 0;"></td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!--[if (gte mso 9)|(IE)]>
+                    </td>
+                    </tr>
+                    </table>
+                    <![endif]-->
+                  </td>
+                </tr>
+                <!------------------------------>
+                <!-- FOOTER LINKS: End -->
+                <!------------------------------>
+              </table>
+              <!--[if (gte mso 9)|(IE)]>
+              </td>
               </tr>
-              <!------------------------------>
-              <!-- FOOTER LINKS: End -->
-              <!------------------------------>
-            </table>
-            <!--[if (gte mso 9)|(IE)]>
+              </table>
+              <![endif]-->
             </td>
-            </tr>
-            </table>
-            <![endif]-->
-          </td>
-        </tr>
-      </tfoot>
+          </tr>
+        </tfoot>
       <!------------------------------>
       <!-- FOOTER: End -->
       <!------------------------------>

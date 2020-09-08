@@ -10,9 +10,11 @@ use Minds\Core\Email\EmailSubscribersIterator;
 use Minds\Core\Email\V2\Campaigns;
 use Minds\Core\Email\V2\Campaigns\Recurring\BoostComplete\BoostComplete;
 use Minds\Core\Email\V2\Campaigns\Recurring\WireReceived\WireReceived;
+use Minds\Core\Email\V2\Campaigns\Recurring\WireSent\WireSent;
 use Minds\Core\Email\V2\Campaigns\Recurring\WelcomeComplete\WelcomeComplete;
 use Minds\Core\Email\V2\Campaigns\Recurring\WelcomeIncomplete\WelcomeIncomplete;
 use Minds\Core\Email\V2\Campaigns\Recurring\WeMissYou\WeMissYou;
+use Minds\Core\Email\V2\Campaigns\Recurring\Digest\Digest;
 use Minds\Core\Email\Campaigns\Recurring\WirePromotions;
 use Minds\Core\Email\V2\Delegates\ConfirmationSender;
 use Minds\Core\Reports;
@@ -34,25 +36,25 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
     {
         switch ($command) {
             case 'exec':
-                $this->out(file_get_contents(dirname(__FILE__).'/Help/Email/exec.txt'));
+                $this->out(file_get_contents(dirname(__FILE__) . '/Help/Email/exec.txt'));
                 break;
             case 'testBoostComplete':
-                $this->out(file_get_contents(dirname(__FILE__).'/Help/Email/testBoostComplete.txt'));
+                $this->out(file_get_contents(dirname(__FILE__) . '/Help/Email/testBoostComplete.txt'));
                 break;
             case 'testWeMissYou':
-                $this->out(file_get_contents(dirname(__FILE__).'/Help/Email/testWeMissYou.txt'));
+                $this->out(file_get_contents(dirname(__FILE__) . '/Help/Email/testWeMissYou.txt'));
                 break;
             case 'testWelcomeComplete':
-                $this->out(file_get_contents(dirname(__FILE__).'/Help/Email/testWelcomeComplete.txt'));
+                $this->out(file_get_contents(dirname(__FILE__) . '/Help/Email/testWelcomeComplete.txt'));
                 break;
             case 'testWelcomeIncomplete':
-                $this->out(file_get_contents(dirname(__FILE__).'/Help/Email/testWelcomeIncomplete.txt'));
+                $this->out(file_get_contents(dirname(__FILE__) . '/Help/Email/testWelcomeIncomplete.txt'));
                 break;
-            case 'testWireReceived':
-                $this->out(file_get_contents(dirname(__FILE__).'/Help/Email/testWireReceived.txt'));
+            case 'testWire':
+                $this->out(file_get_contents(dirname(__FILE__) . '/Help/Email/testWire.txt'));
                 break;
             case 'testWirePromotion':
-                $this->out(file_get_contents(dirname(__FILE__).'/Help/Email/testWirePromotion.txt'));
+                $this->out(file_get_contents(dirname(__FILE__) . '/Help/Email/testWirePromotion.txt'));
                 break;
             default:
                 $this->out('Utilities for testing emails and sending them manually');
@@ -184,7 +186,7 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
         $message = $campaign->build();
 
         if ($send) {
-            Core\Events\Dispatcher::trigger('user_state_change', 'cold', [ 'user_guid' => $userguid ]);
+            Core\Events\Dispatcher::trigger('user_state_change', 'cold', ['user_guid' => $userguid]);
         }
 
         if ($output) {
@@ -205,9 +207,9 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
             $this->out('User not found');
             exit;
         }
-    
+
         if ($send) {
-            Core\Events\Dispatcher::trigger('welcome_email', 'all', [ 'user_guid' => $userguid ]);
+            Core\Events\Dispatcher::trigger('welcome_email', 'all', ['user_guid' => $userguid]);
         }
     }
 
@@ -296,12 +298,13 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
         }
     }
 
-    public function testWireReceived()
+    public function testWire()
     {
         $output = $this->getOpt('output');
         $entityGuid = $this->getOpt('guid');
         $senderGuid = $this->getOpt('sender');
         $timestamp = $this->getOpt('timestamp');
+        $variant = $this->getOpt('variant');
 
         $send = $this->getOpt('send');
 
@@ -336,7 +339,16 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
             exit;
         }
         $wire = $wireResults['wires'][0];
-        $campaign = (new WireReceived())
+
+        if ($variant === 'sent') {
+            $campaign = (new WireSent());
+        } elseif ($variant === 'received') {
+            $campaign = (new WireReceived());
+        } else {
+            $this->out('--variant must be sent or received');
+        }
+
+        $campaign
             ->setUser($wire->getReceiver())
             ->setWire($wire);
 
@@ -344,6 +356,7 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
 
         if ($send) {
             $campaign->send();
+            $this->out('sent');
         }
 
         if ($output) {
@@ -372,7 +385,7 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
             exit;
         }
 
-        $boost = $manager->get("urn:boost:{$boostType}:{$entityGuid}", [ 'hydrate' => true ]);
+        $boost = $manager->get("urn:boost:{$boostType}:{$entityGuid}", ['hydrate' => true]);
 
         if (!$boost) {
             $this->out('Boost not found');
@@ -409,30 +422,45 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
         $this->out('sent');
     }
 
+    /**
+     * Example usage:
+     *  php cli.php Email testModerationBanned
+     * --entityUrn=urn:user:12345
+     * --reasonCode=1
+     * --subReasonCode=4
+     * --output=/var/www/Minds/engine/mod_banned.html
+     *
+     * reasonCode opt(s) will be used only if
+     * your user doesn't have a ban_reason already
+     */
     public function testModerationBanned()
     {
         $entityUrn = $this->getOpt('entityUrn');
+        $output = $this->getOpt('output');
+        $reasonCode = $this->getOpt('reasonCode');
+        $subReasonCode = $this->getOpt('subReasonCode');
 
         if (!$entityUrn) {
             return $this->out('entityUrn must be supplied');
         }
 
-        $userGuid = $this->getOpt('guid');
-        $user = new User($userGuid);
-
-        if (!$userGuid) {
-            return $this->out('userGuid must be supplied');
-        }
-
-        // Use 8 for strike
-        $reasonCode = $this->getOpt('reasonCode');
-
         $banDelegate = new Reports\Verdict\Delegates\EmailDelegate();
         $report = new Reports\Report();
         $report->setEntityUrn($entityUrn);
-        $report->setReasonCode($reasonCode);
+
+        if ($reasonCode) {
+            $report->setReasonCode($reasonCode);
+        }
+        if ($subReasonCode) {
+            $report->setSubReasonCode($subReasonCode);
+        }
 
         $banDelegate->onBan($report);
+
+        if ($output) {
+            $message = $banDelegate->getCampaign()->getMessage();
+            file_put_contents($output, $message->buildHtml());
+        }
     }
 
     public function testModerationStrike()
@@ -454,7 +482,7 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
         $reasonCode = $this->getOpt('reasonCode');
 
         $strikeDelegate = new Reports\Strikes\Delegates\EmailDelegate();
-        
+
         $report = new Reports\Report();
         $report->setEntityUrn($entityUrn);
         $report->setReasonCode($reasonCode);
@@ -468,7 +496,7 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
     {
         $issued = $this->getOpt('issued');
         $amount = $this->getOpt('amount') ?: 10 ** 18;
-       
+
 
         $userGuid = $this->getOpt('userGuid');
         $user = new User($userGuid);
@@ -484,6 +512,18 @@ class Email extends Cli\Controller implements Interfaces\CliControllerInterface
         }
 
         $delegate->send($purchase);
+    }
+
+    public function testDigest()
+    {
+        $userGuid = $this->getOpt('userGuid');
+        $user = new User($userGuid);
+
+        $digest = new Digest();
+        $digest->setUser($user);
+        $digest->send();
+
+        $this->out('Sent');
     }
 
     public function sync_sendgrid_lists(): void
