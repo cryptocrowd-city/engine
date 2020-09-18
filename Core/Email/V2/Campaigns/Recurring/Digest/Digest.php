@@ -91,7 +91,7 @@ class Digest extends EmailCampaign
             });
 
         // Get the timestamp of the last sent campaign
-        $refUnixTimestamp = max(isset($campaigns[0]) ? $campaigns[0]->getTimeSent() : 0, strtotime('7 days ago'));
+        $refUnixTimestamp = max(isset($campaigns[0]) ? $campaigns[0]->getTimeSent() : 0, strtotime('30 days ago'));
 
         // Get trends (highlights) from discovery
         try {
@@ -133,6 +133,12 @@ class Digest extends EmailCampaign
             return false;
         } finally {
             $this->template->set('activities', $activities);
+        }
+
+        //
+
+        if (!count($activities)) {
+            return null; // Require activies to be set in order for this email to send
         }
 
         //
