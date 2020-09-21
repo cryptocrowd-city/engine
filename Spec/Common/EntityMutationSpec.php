@@ -105,4 +105,16 @@ class EntityMutationSpec extends ObjectBehavior
         $values['title']->shouldBe('testing has changed');
         $values['message']->shouldBe('my message has changed...');
     }
+
+    public function it_should_return_mutated_array_values()
+    {
+        $this->activity->setNsfw([1,2,3]);
+
+        // Mutate
+        $this->setNsfw([1]);
+
+        $values = $this->getMutatedValues();
+        $values->shouldHaveCount(1);
+        $values['nsfw']->shouldBe([1]);
+    }
 }
