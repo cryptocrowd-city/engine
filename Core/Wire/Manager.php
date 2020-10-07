@@ -85,6 +85,9 @@ class Manager
     /** @var Core\Security\ACL */
     protected $acl;
 
+    /** @var int */
+    const WIRE_SERVICE_FEE_PCT = 5;
+
     public function __construct(
         $repository = null,
         $txManager = null,
@@ -293,6 +296,10 @@ class Manager
                 if (!$this->receiver->getMerchant() || !$this->receiver->getMerchant()['id']) {
                     throw new \Exception("This channel is not able to receive USD at the moment");
                 }
+                if (!empty($this->receiver->getNsfw())) {
+                    throw new \Exception("This channel cannot receive USD due to being flagged as NSFW");
+                }
+
                 $intent = new PaymentIntent();
                 $intent
                     ->setUserGuid($this->sender->getGuid())
@@ -300,7 +307,8 @@ class Manager
                     ->setPaymentMethod($this->payload['paymentMethodId'])
                     ->setOffSession(true)
                     ->setConfirm(true)
-                    ->setStripeAccountId($this->receiver->getMerchant()['id']);
+                    ->setStripeAccountId($this->receiver->getMerchant()['id'])
+                    ->setServiceFeePct(static::WIRE_SERVICE_FEE_PCT);
 
                 // Charge stripe
                 $this->stripeIntentsManager->add($intent);

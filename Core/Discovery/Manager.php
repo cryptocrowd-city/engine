@@ -60,6 +60,17 @@ class Manager
     }
 
     /**
+     * Set the user
+     * @param User $user
+     * @return self
+     */
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
      * Return the overview for discovery
      * @param array $opts (optional)
      * @return Trend[]
@@ -243,7 +254,7 @@ class Manager
         ], $opts);
 
         if ($opts['plus'] === true) {
-            $opts['hoursAgo'] = 168; // 1 Week
+            $opts['hoursAgo'] = 1680; // 10 Weeks
         }
 
         $algorithm = new SortingAlgorithms\TopV2();
@@ -553,9 +564,17 @@ class Manager
             return $tag['type'] === 'trending' || $tag['type'] === 'default';
         });
 
+        $default = $this->hashtagManager
+            ->setUser($this->user)
+            ->get([
+                'defaults' => true,
+                'limit' => 20,
+            ]);
+
         return [
             'tags' => array_values($tags),
             'trending' => array_values($trending),
+            'default' => array_values($default),
         ];
     }
 
