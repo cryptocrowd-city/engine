@@ -664,3 +664,8 @@ $CONFIG->set('snowplow', [
     'collector_uri' => 'host.docker.internal:8090',
     'proto' => 'http',
 ]);
+
+$CONFIG->set('arweave', [
+    'host' => 'host.docker.internal',
+    'port' => 5000,
+]);
