@@ -233,7 +233,7 @@ class Manager
                 ->setHashtag($tag)
                 ->setVolume($bucket['doc_count'])
                 ->setPeriod($hoursAgo)
-                ->setSelected(in_array(strtolower($tag), array_map('strtolower',$this->tagCloud)));
+                ->setSelected(in_array(strtolower($tag), array_map('strtolower', $this->tagCloud), true));
 
             $trends[] = $trend;
         }
