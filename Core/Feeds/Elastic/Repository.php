@@ -84,6 +84,7 @@ class Repository
             'plus' => false,
             'portrait' => false,
             'hide_reminds' => false,
+            'memberships_only' => false,
         ], $opts);
 
         if (!$opts['type']) {
@@ -296,6 +297,12 @@ class Repository
                 'term' => [
                     'is_remind' => true,
                 ],
+            ];
+        }
+
+        if ($opts['memberships_only']) {
+            $body['query']['function_score']['query']['bool']['must'][] = [
+                'exists' => ['field' => 'support_tier_urn']
             ];
         }
 

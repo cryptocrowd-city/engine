@@ -116,6 +116,7 @@ class Manager
             'pending' => false,
             'plus' => false,
             'hide_reminds' => $hide_reminds,
+            'memberships_only' => false,
         ], $opts);
 
         if (isset($opts['query']) && $opts['query']) {

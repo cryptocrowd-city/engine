@@ -91,7 +91,9 @@ class feeds implements Interfaces\Api
             $exportCounts = true;
         }
 
-        //
+        if (isset($_GET['memberships_feed'])) {
+            $membershipsOnly = true;
+        }
 
         $hardLimit = 600;
 
@@ -180,6 +182,7 @@ class feeds implements Interfaces\Api
             'query' => $query ?? null,
             'single_owner_threshold' => 36,
             'as_activities' => $asActivities,
+            'memberships_only' => $membershipsOnly,
             'plus' => filter_var($_GET['plus'] ?? false, FILTER_VALIDATE_BOOLEAN),
         ];
 
