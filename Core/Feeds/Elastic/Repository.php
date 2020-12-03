@@ -11,6 +11,9 @@ use Minds\Helpers\Text;
 
 class Repository
 {
+    /* Change to true to output ES query in logs */
+    const DEBUG = true;
+
     const PERIODS = [
         '12h' => 43200,
         '24h' => 86400,
@@ -301,8 +304,9 @@ class Repository
         }
 
         if ($opts['memberships_only']) {
+            error_log("memberships only");
             $body['query']['function_score']['query']['bool']['must'][] = [
-                'exists' => ['field' => 'support_tier_urn']
+                'exists' => ['field' => 'wire_support_tier']
             ];
         }
 
@@ -527,6 +531,10 @@ class Repository
 
         $prepared = new Prepared\Search();
         $prepared->query($query);
+
+        if (static::DEBUG) {
+            error_log("Querying ES with: \n".json_encode($query));
+        }
 
         $response = $this->client->request($prepared);
 
