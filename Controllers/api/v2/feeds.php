@@ -178,7 +178,7 @@ class feeds implements Interfaces\Api
             'query' => $query ?? null,
             'single_owner_threshold' => 36,
             'as_activities' => $asActivities,
-            'memberships_only' => filter_var($_GET['memberships_only'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            'wire_support_tier_only' => filter_var($_GET['wire_support_tier_only'] ?? false, FILTER_VALIDATE_BOOLEAN),
             'plus' => filter_var($_GET['plus'] ?? false, FILTER_VALIDATE_BOOLEAN),
         ];
 

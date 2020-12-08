@@ -87,7 +87,7 @@ class Repository
             'plus' => false,
             'portrait' => false,
             'hide_reminds' => false,
-            'memberships_only' => false,
+            'wire_support_tier_only' => false,
         ], $opts);
 
         if (!$opts['type']) {
@@ -303,7 +303,7 @@ class Repository
             ];
         }
 
-        if ($opts['memberships_only']) {
+        if ($opts['wire_support_tier_only']) {
             error_log("memberships only");
             $body['query']['function_score']['query']['bool']['must'][] = [
                 'exists' => ['field' => 'wire_support_tier']
