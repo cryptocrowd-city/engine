@@ -297,15 +297,12 @@ class peer implements Interfaces\Api
         $activity->ownerObj = Core\Session::getLoggedInUser()->export();
         $activity->p2p_boosted = true;
 
-        if ($embedded->remind_object) {
-            $activity->setRemind($embedded->remind_object)->save();
-        } else {
-            $remindIntent = new Activity\RemindIntent();
-            $remindIntent->setGuid($boost->getEntity()->guid)
-                ->setOwnerGuid($boost->getOwner()->guid)
-                ->setQuotedPost(false);
-            $activity->setRemind($remindIntent)->save();
-        }
+
+        $remindIntent = new Activity\RemindIntent();
+        $remindIntent->setGuid($boost->getEntity()->guid)
+            ->setOwnerGuid($boost->getOwner()->guid)
+            ->setQuotedPost(false);
+        $activity->setRemind($remindIntent)->save();
 
         // Notify
 
