@@ -303,7 +303,7 @@ class peer implements Interfaces\Api
             $remindIntent = new Activity\RemindIntent();
             $remindIntent->setGuid($boost->getEntity()->guid)
                 ->setOwnerGuid($boost->getOwner()->guid)
-                ->setQuotedPost(false));
+                ->setQuotedPost(false);
             $activity->setRemind($remindIntent)->save();
         }
 
