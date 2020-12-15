@@ -12,7 +12,7 @@ use Minds\Helpers\Text;
 class Repository
 {
     /* Change to true to output ES query in logs */
-    const DEBUG = true;
+    const DEBUG = false;
 
     const PERIODS = [
         '12h' => 43200,
