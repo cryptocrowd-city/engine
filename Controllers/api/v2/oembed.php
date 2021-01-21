@@ -8,14 +8,14 @@ use Minds\Core\Di\Di;
 
 /**
  * oEmbed endpoint for returning summary objects of video and images.
- * 
+ *
  * Specifications: https://oembed.com/
- * 
+ *
  * [x] image
  * [x] video
  * [ ] link
  * [ ] rich
- * 
+ *
  */
 class oembed implements Interfaces\Api
 {
@@ -34,7 +34,7 @@ class oembed implements Interfaces\Api
             'maxheight' => (int) filter_var($_GET['maxheight'] ?? '', FILTER_SANITIZE_STRING),
         ];
 
-        if($params['format'] !== 'json') {
+        if ($params['format'] !== 'json') {
             return Factory::response([
                 'status' => 501,
                 'message' => 'Unsupported format, only the default format, "json" is currently supported.',
@@ -96,7 +96,7 @@ class oembed implements Interfaces\Api
             $width = $params['maxwidth'];
         }
 
-        switch($entity->subtype) {
+        switch ($entity->subtype) {
             case 'video':
                 $type = 'video';
 
@@ -104,7 +104,7 @@ class oembed implements Interfaces\Api
                     'status' => 200,
                     'html' => "<iframe src=\"https://www.minds.com/embed/$entity->guid\"></iframe>",
                     'height' => $height,
-                    'width' => $width,  
+                    'width' => $width,
                 ]);
                 break;
             case 'image':
