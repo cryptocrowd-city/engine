@@ -84,7 +84,7 @@ class Network extends Entities\DenormalizedEntity implements BoostEntityInterfac
         $this->categories = $array['categories'];
         $this->rejection_reason = $array['rejection_reason'];
         $this->checksum = $array['checksum'];
-        $this->revoked_timestamp = $array['@revoked'];
+        $this->revoked_timestamp = $array['@revoked'] ?? null;
         return $this;
     }
 
