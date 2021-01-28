@@ -1,27 +1,40 @@
 <?php
+
 /**
- * Minds OEmbed Controller
- *
+ * oEmbed endpoint for returning summary objects of video and images.
+ * Specifications: https://oembed.com/
  * @version 1
  */
-
 namespace Minds\Core\OEmbed;
 
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
 use Minds\Core\Di\Di;
 
-const OEMBED_VERSION = 1;
-
 class Controller
 {
-    /** @var EntitiesBuilder */
+    /** @var acl */
     protected $entitiesBuilder;
 
+    /** @var Security\ACL */
+    protected $acl;
+
+    /** @var Config */
+    protected $config;
+
+    /**
+     * Current oEmbed version.
+     */
+    const OEMBED_VERSION = 1;
+
     public function __construct(
-        $entitiesBuilder = null
+        $entitiesBuilder = null,
+        $acl = null,
+        $config = null
     ) {
         $this->entitiesBuilder = $entitiesBuilder ?: Di::_()->get('EntitiesBuilder');
+        $this->acl = $acl ?: Di::_()->get('Security\ACL');
+        $this->config = $config ?: Di::_()->get('Config');
     }
 
     /**
@@ -58,13 +71,19 @@ class Controller
         if (!filter_var($guid ?? false, FILTER_VALIDATE_INT)) {
             return new JsonResponse([
                 'status' => 400,
-                'message' => 'Invalid GUID format.',
+                'message' => 'Invalid GUID.',
             ]);
         }
 
         $entity = $this->entitiesBuilder->single($guid);
 
-        // TODO: Paywall check
+        if (!$this->acl->read($entity) || $entity->wire_threshold) {
+            return new JsonResponse([
+                'status' => 401,
+                'messaged' => 'Unauthorized access to resource'
+            ]);
+        }
+
         if (!$entity) {
             return new JsonResponse([
                 'status' => 404,
@@ -72,7 +91,7 @@ class Controller
             ]);
         }
 
-        // image or video
+        // not image or video
         if ($entity->type !== 'object') {
             return new JsonResponse([
                 'status' => 501,
@@ -80,7 +99,7 @@ class Controller
             ]);
         }
 
-        $version = $this->OEMBED_VERSION;
+        $version = self::OEMBED_VERSION;
 
         $dimensions = $this->getRestrictedDimensions($entity, $params['maxheight'], $params['maxwidth']);
 
@@ -98,6 +117,11 @@ class Controller
                     'width' => $width,
                     'type' => $type,
                     'version' => $version,
+                    'title' => $entity->getTitle() ?: null,
+                    'author_name' => $this->getAuthorName($entity) ?: null,
+                    'author_url' => $this->getAuthorUrl($entity) ?: null,
+                    'provider_name' => $this->getProviderName() ?: null,
+                    'provider_url' => $this->getProviderUrl()  ?: null,
                 ]);
                 break;
             case 'image':
@@ -120,6 +144,11 @@ class Controller
                     'url' => $url,
                     'width' => $width,
                     'height' => $height,
+                    'title' => $entity->getTitle() ?: null,
+                    'author_name' => $this->getAuthorName($entity) ?: null,
+                    'author_url' => $this->getAuthorUrl($entity) ?: null,
+                    'provider_name' => $this->getProviderName() ?: null,
+                    'provider_url' => $this->getProviderUrl()  ?: null,
                 ]);
                 break;
             default:
@@ -160,10 +189,12 @@ class Controller
         }
 
         if ($maxHeight && $height > $maxHeight) {
+            $width = ($width / $height) * $maxHeight;
             $height = $maxHeight;
         }
 
         if ($maxWidth && $width > $maxWidth) {
+            $height = ($height / $width) * $maxWidth;
             $width = $maxWidth;
         }
 
@@ -171,5 +202,43 @@ class Controller
             'width' => $width,
             'height' => $height
         ];
+    }
+
+    /**
+     * Gets author name.
+     * @param $entity.
+     * @return string author name.
+     */
+    private function getAuthorName($entity): string
+    {
+        return $entity->getOwnerEntity()->username;
+    }
+
+    /**
+     * Gets author url.
+     * @param $entity.
+     * @return string author url.
+     */
+    private function getAuthorUrl($entity): string
+    {
+        return $this->getProviderUrl().$this->getAuthorName($entity);
+    }
+
+    /**
+     * Gets provider name.
+     * @return string provider name.
+     */
+    private function getProviderName(): string
+    {
+        return $this->config->get('site_name');
+    }
+
+    /**
+     * Gets Provider URL
+     * @return string - provider url
+     */
+    private function getProviderUrl(): string
+    {
+        return $this->config->get('site_url');
     }
 }

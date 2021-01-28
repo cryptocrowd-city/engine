@@ -10,6 +10,12 @@ use Minds\Core\Di\Di;
  * oEmbed endpoint for returning summary objects of video and images.
  *
  * Specifications: https://oembed.com/
+ * 
+ * "title": "ZB8T0193",
+   "author_name": "Bees",
+   "author_url": "http://www.flickr.com/photos/bees/",
+   "provider_name": "Flickr",
+   "provider_url": "http://www.flickr.com/"
  */
 class oembed implements Interfaces\Api
 {
@@ -99,6 +105,11 @@ class oembed implements Interfaces\Api
                     'html' => "<iframe src=\"https://www.minds.com/embed/$entity->guid\"></iframe>",
                     'height' => $height,
                     'width' => $width,
+                    'title' => $entity->getTitle() ?: null,
+                    'author_name' => $entity->getUsername() ?: null,
+                    'author_url' => 
+                    provider_name
+                    provider_url
                 ]);
                 break;
             case 'image':
