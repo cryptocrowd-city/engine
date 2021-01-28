@@ -50,6 +50,7 @@ class Minds extends base
         Media\Proxy\Module::class,
         Blockchain\Module::class,
         Boost\Module::class,
+        OEmbed\Module::class,
     ];
 
     /**

@@ -10,12 +10,6 @@ use Minds\Core\Di\Di;
  * oEmbed endpoint for returning summary objects of video and images.
  *
  * Specifications: https://oembed.com/
- *
- * [x] image
- * [x] video
- * [ ] link
- * [ ] rich
- *
  */
 class oembed implements Interfaces\Api
 {
@@ -53,7 +47,7 @@ class oembed implements Interfaces\Api
         $guid = explode('?', $queryString)[0];
 
         if (!filter_var($guid ?? false, FILTER_VALIDATE_INT)) {
-            return Factory::response([
+            return FactoryA::response([
                 'status' => 400,
                 'message' => 'Invalid GUID format.',
             ]);
