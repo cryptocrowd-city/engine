@@ -208,11 +208,19 @@ class Manager
             ]);
         }
 
+        // Check if we had a score yesterday so we can increment the multiplier respectfully
+
+        $yesterdayOpts = new RewardsQueryOpts();
+        $yesterdayOpts->setUserGuid($contributionSummary->getUserGuid())
+            ->setDateTs(($opts->getDateTs()) - 86400);
+
+
+        $yesterdayRewardEntries = $this->repository->getList($yesterdayOpts);
 
         // Liquidity rewards
 
         foreach ($this->liquidityPositionsManager->setDateTs($opts->getDateTs())->getAllProvidersSummaries() as $i => $liquiditySummary) {
-            $multiplier = 1; // TODO: check if we had a score yesterday and then increment the multiplier respectfully
+            $multiplier = $this->calculateMultiplier($yesterdayRewardEntries, 'liquidity');
 
             $score = $liquiditySummary->getUserLiquidityTokens()->multipliedBy($multiplier);
 
@@ -245,7 +253,8 @@ class Manager
                 $this->token->balanceOf($uniqueOnChain->getAddress(), $blockNumber)
             );
 
-            $multiplier = 1;
+            $multiplier = $this->calculateMultiplier($yesterdayRewardEntries, 'holding');
+
             $score = BigDecimal::of($tokenBalance)->multipliedBy($multiplier);
 
             $rewardEntry = new RewardEntry();
@@ -284,13 +293,43 @@ class Manager
 
             $rewardEntry->setTokenAmount($tokenAmount);
             $this->add($rewardEntry);
-        
+
             $sharePct = $rewardEntry->getSharePct() * 100;
 
             $this->logger->info("[$i]: Issued $tokenAmount tokens ($sharePct%)", [
                 'userGuid' => $rewardEntry->getUserGuid(),
                 'reward_type' => $rewardEntry->getRewardType(),
             ]);
+        }
+    }
+
+    /**
+     * Calculate today's reward multiplier by adding daily increment to yesterday's multiplier
+     * @return float
+     * @param array $yesterdayRewardEntries
+     * @param string $rewardType
+     */
+    private function calculateMultiplier($yesterdayRewardEntries, $rewardType): float
+    {
+        foreach ($yesterdayRewardEntries as $rewardEntry) {
+            $yesterdayRewardEntry = null;
+            if ($rewardEntry->getRewardType() === $rewardType) {
+                $yesterdayRewardEntry = $rewardEntry;
+                break;
+            }
+            if ($yesterdayRewardEntry) {
+                $manifest = $this->getTokenomicsManifest($yesterdayRewardEntry->getTokenomicsManifest());
+
+                $maxMultiplierDays = $manifest->getMaxMultiplierDays(); //365
+                $multiplierRange = $manifest->getMaxMultiplier() - 1;
+
+                $dailyIncrement = $multiplierRange / $maxMultiplierDays(); // 0.005479452055
+
+                $todayMultiplier = $yesterdayRewardEntry->getMultiplier() + $dailyIncrement;
+                return $todayMultiplier;
+            } else {
+                return 1;
+            }
         }
     }
 
@@ -360,7 +399,7 @@ class Manager
             ],
             'contract' => 'offchain:reward',
         ]);
-        
+
         if ($transactions['transactions']) {
             throw new \Exception("Already issued rewards to this user");
         }
@@ -375,7 +414,7 @@ class Manager
         }
 
         $amount = $this->contributions->getRewardsAmount();
- 
+
         $transaction = new Transaction();
         $transaction
             ->setUserGuid($this->user->guid)
@@ -429,7 +468,7 @@ class Manager
                 BigNumber::_($amount)->mul(0.25)->toHex(true),
             ])
         ]);
-        
+
         $transaction = new Transaction();
         $transaction
             ->setUserGuid($this->user->guid)
@@ -439,7 +478,7 @@ class Manager
             ->setAmount((string) BigNumber::_($amount)->mul(0.25))
             ->setContract('bonus')
             ->setCompleted(true);
-    
+
         $this->txRepository->add($transaction);
         return $transaction;
     }
