@@ -232,12 +232,12 @@ class Manager
             ->setDateTs(($opts->getDateTs()) - 86400);
 
 
-        $yesterdayRewardEntries = $this->repository->getList($yesterdayOpts);
+        $yesterdayRewardEntries = $this->getList($yesterdayOpts);
 
         // Liquidity rewards
 
         foreach ($this->liquidityPositionsManager->setDateTs($opts->getDateTs())->getAllProvidersSummaries() as $i => $liquiditySummary) {
-            $multiplier = $this->calculateMultiplier($yesterdayRewardEntries, 'liquidity');
+            $multiplier = $this->calculateMultiplier($yesterdayRewardEntries, static::REWARD_TYPE_LIQUIDITY);
 
             $score = $liquiditySummary->getUserLiquidityTokens()->multipliedBy($multiplier);
 
@@ -270,7 +270,7 @@ class Manager
                 $this->token->balanceOf($uniqueOnChain->getAddress(), $blockNumber)
             );
 
-            $multiplier = $this->calculateMultiplier($yesterdayRewardEntries, 'holding');
+            $multiplier = $this->calculateMultiplier($yesterdayRewardEntries, static::REWARD_TYPE_HOLDING);
 
             $score = BigDecimal::of($tokenBalance)->multipliedBy($multiplier);
 
@@ -323,30 +323,30 @@ class Manager
     /**
      * Calculate today's reward multiplier by adding daily increment to yesterday's multiplier
      * @return float
-     * @param array $yesterdayRewardEntries
+     * @param Response $yesterdayRewardEntries
      * @param string $rewardType
      */
-    private function calculateMultiplier($yesterdayRewardEntries, $rewardType): float
+    private function calculateMultiplier(Response $yesterdayRewardEntries, string $rewardType): float
     {
+        $yesterdayRewardEntry = null;
         foreach ($yesterdayRewardEntries as $rewardEntry) {
-            $yesterdayRewardEntry = null;
             if ($rewardEntry->getRewardType() === $rewardType) {
                 $yesterdayRewardEntry = $rewardEntry;
                 break;
             }
-            if ($yesterdayRewardEntry) {
-                $manifest = $this->getTokenomicsManifest($yesterdayRewardEntry->getTokenomicsManifest());
+        }
+        if ($yesterdayRewardEntry) {
+            $manifest = $this->getTokenomicsManifest($yesterdayRewardEntry->getTokenomicsManifest());
 
-                $maxMultiplierDays = $manifest->getMaxMultiplierDays(); //365
-                $multiplierRange = $manifest->getMaxMultiplier() - 1;
+            $maxMultiplierDays = $manifest->getMaxMultiplierDays(); // 365
+            $multiplierRange = $manifest->getMaxMultiplier() - 1; // 1 is the min multiplier
 
-                $dailyIncrement = $multiplierRange / $maxMultiplierDays(); // 0.005479452055
+            $dailyIncrement = $multiplierRange / $maxMultiplierDays; // 0.005479452055
 
-                $todayMultiplier = $yesterdayRewardEntry->getMultiplier() + $dailyIncrement;
-                return $todayMultiplier;
-            } else {
-                return 1;
-            }
+            $todayMultiplier = $yesterdayRewardEntry->getMultiplier() + $dailyIncrement;
+            return $todayMultiplier;
+        } else {
+            return 1;
         }
     }
 
