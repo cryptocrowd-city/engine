@@ -213,7 +213,7 @@ class Manager
                 ->setDateTs($contributionSummary->getDateTs())
                 ->setRewardType(static::REWARD_TYPE_ENGAGEMENT)
                 ->setScore($score)
-                ->setMultiplier($multiplier);
+                ->setMultiplier(BigDecimal::of($multiplier));
 
             //
 
@@ -225,26 +225,22 @@ class Manager
             ]);
         }
 
-        // Check if we had a score yesterday so we can increment the multiplier respectfully
-
-        $yesterdayOpts = new RewardsQueryOpts();
-        $yesterdayOpts->setUserGuid($contributionSummary->getUserGuid())
-            ->setDateTs(($opts->getDateTs()) - 86400);
-
-
-        $yesterdayRewardEntries = $this->getList($yesterdayOpts);
-
         // Liquidity rewards
 
         foreach ($this->liquidityPositionsManager->setDateTs($opts->getDateTs())->getAllProvidersSummaries() as $i => $liquiditySummary) {
-            $multiplier = $this->calculateMultiplier($yesterdayRewardEntries, static::REWARD_TYPE_LIQUIDITY);
-
-            $score = $liquiditySummary->getUserLiquidityTokens()->multipliedBy($multiplier);
-
             $rewardEntry = new RewardEntry();
             $rewardEntry->setUserGuid($liquiditySummary->getUserGuid())
                 ->setDateTs($opts->getDateTs())
-                ->setRewardType(static::REWARD_TYPE_LIQUIDITY)
+                ->setRewardType(static::REWARD_TYPE_LIQUIDITY);
+
+            // Get yesterday RewardEntry
+            $yesterdayRewardEntry = $this->getPreviousRewardEntry($rewardEntry, 1);
+            $multiplier = $yesterdayRewardEntry ? $this->calculateMultiplier($yesterdayRewardEntry, static::REWARD_TYPE_LIQUIDITY) : BigDecimal::of(1);
+            
+            $score = $liquiditySummary->getUserLiquidityTokens()->multipliedBy($multiplier);
+            
+            // Update our new RewardEntry
+            $rewardEntry
                 ->setScore($score)
                 ->setMultiplier($multiplier);
 
@@ -253,6 +249,7 @@ class Manager
             $this->logger->info("[$i]: Liquidity score calculated as $score", [
                 'userGuid' => $rewardEntry->getUserGuid(),
                 'reward_type' => $rewardEntry->getRewardType(),
+                'multiplier' => (string) $multiplier,
             ]);
         }
 
@@ -270,14 +267,19 @@ class Manager
                 $this->token->balanceOf($uniqueOnChain->getAddress(), $blockNumber)
             );
 
-            $multiplier = $this->calculateMultiplier($yesterdayRewardEntries, static::REWARD_TYPE_HOLDING);
-
-            $score = BigDecimal::of($tokenBalance)->multipliedBy($multiplier);
-
             $rewardEntry = new RewardEntry();
             $rewardEntry->setUserGuid($user->getGuid())
                 ->setDateTs($opts->getDateTs())
-                ->setRewardType(static::REWARD_TYPE_HOLDING)
+                ->setRewardType(static::REWARD_TYPE_HOLDING);
+
+            // Get yesterday RewardEntry
+            $yesterdayRewardEntry = $this->getPreviousRewardEntry($rewardEntry, 1);
+            $multiplier = $yesterdayRewardEntry ? $this->calculateMultiplier($yesterdayRewardEntry, static::REWARD_TYPE_HOLDING) : BigDecimal::of(1);
+
+            $score = BigDecimal::of($tokenBalance)->multipliedBy($multiplier);
+
+            // Update our new RewardEntry
+            $rewardEntry
                 ->setScore($score)
                 ->setMultiplier($multiplier);
 
@@ -288,6 +290,7 @@ class Manager
                 'reward_type' => $rewardEntry->getRewardType(),
                 'blockNumber' => $blockNumber,
                 'tokenBalance' => $tokenBalance,
+                'multiplier' => (string) $multiplier,
             ]);
         }
 
@@ -323,31 +326,20 @@ class Manager
     /**
      * Calculate today's reward multiplier by adding daily increment to yesterday's multiplier
      * @return float
-     * @param Response $yesterdayRewardEntries
-     * @param string $rewardType
+     * @param RewardEntry $rewardEntry
      */
-    private function calculateMultiplier(Response $yesterdayRewardEntries, string $rewardType): float
+    public function calculateMultiplier(RewardEntry $rewardEntry): BigDecimal
     {
-        $yesterdayRewardEntry = null;
-        foreach ($yesterdayRewardEntries as $rewardEntry) {
-            if ($rewardEntry->getRewardType() === $rewardType) {
-                $yesterdayRewardEntry = $rewardEntry;
-                break;
-            }
-        }
-        if ($yesterdayRewardEntry) {
-            $manifest = $this->getTokenomicsManifest($yesterdayRewardEntry->getTokenomicsManifest());
+        $manifest = $this->getTokenomicsManifest($rewardEntry->getTokenomicsVersion());
 
-            $maxMultiplierDays = $manifest->getMaxMultiplierDays(); // 365
-            $multiplierRange = $manifest->getMaxMultiplier() - 1; // 1 is the min multiplier
+        $maxMultiplierDays = $manifest->getMaxMultiplierDays(); // 365
+        $multiplierRange = $manifest->getMaxMultiplier() - $manifest->getMinMultiplier();
 
-            $dailyIncrement = $multiplierRange / $maxMultiplierDays; // 0.005479452055
+        $dailyIncrement = BigDecimal::of($multiplierRange)->dividedBy($maxMultiplierDays, 12, RoundingMode::CEILING); // 0.0054794520
 
-            $todayMultiplier = $yesterdayRewardEntry->getMultiplier() + $dailyIncrement;
-            return $todayMultiplier;
-        } else {
-            return 1;
-        }
+        $multiplier = $rewardEntry->getMultiplier()->plus($dailyIncrement);
+
+        return BigDecimal::min($multiplier, $manifest->getMaxMultiplier());
     }
 
     /**
@@ -372,6 +364,27 @@ class Manager
             default:
                 throw new \Exception("Invalid tokenomics version");
         }
+    }
+
+    /**
+     * Will return a previous days RewardEntry
+     * @param RewardEntry $rewardEntry
+     * @param int $daysAgo
+     * @return RewardEntry
+     */
+    private function getPreviousRewardEntry(RewardEntry $rewardEntry, int $daysAgo = 1): ?RewardEntry
+    {
+        $opts = new RewardsQueryOpts();
+        $opts->setUserGuid($rewardEntry->getUserGuid())
+            ->setDateTs($rewardEntry->getDateTs() - (86400 * $daysAgo));
+
+        foreach ($this->getList($opts) as $previousRewardEntry) {
+            if ($previousRewardEntry->getRewardType() === $rewardEntry->getRewardType()) {
+                return $previousRewardEntry;
+            }
+        }
+
+        return null;
     }
 
     ////
