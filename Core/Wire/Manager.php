@@ -223,9 +223,13 @@ class Manager
             ->setTimestamp(time())
             ->setRecurringInterval($this->recurringInterval);
 
-        // If Minds+ is the reciever, bypass the ACL
+        // If receiver is handler for Minds+/Pro, bypass the ACL
         $bypassAcl = false;
         if ((string) $this->receiver->getGuid() === (string) $this->config->get('plus')['handler']) {
+            $bypassAcl = true;
+        }
+
+        if ((string) $this->receiver->getGuid() === (string) $this->config->get('pro')['handler']) {
             $bypassAcl = true;
         }
 
@@ -262,7 +266,7 @@ class Manager
                 /* @var Core\Blockchain\Wallets\OffChain\Cap $cap */
                 $this->cap
                     ->setUser($this->sender)
-                    ->setContract('wire');
+                    ->setContract('wire'); // canexceed cap??
 
                 if (!$this->cap->isAllowed($this->amount)) {
                     throw new \Exception('You are not allowed to spend that amount of coins.');
