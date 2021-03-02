@@ -266,7 +266,7 @@ class Manager
                 /* @var Core\Blockchain\Wallets\OffChain\Cap $cap */
                 $this->cap
                     ->setUser($this->sender)
-                    ->setContract('wire'); // canexceed cap??
+                    ->setContract('wire');
 
                 if (!$this->cap->isAllowed($this->amount)) {
                     throw new \Exception('You are not allowed to spend that amount of coins.');
